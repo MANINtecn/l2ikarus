@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 
-export default function Navbar() {
+export default function Navbar({ onRegisterClick }) {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const navRef = useRef(null)
@@ -65,12 +65,12 @@ export default function Navbar() {
         </a>
 
         {/* NAV DESKTOP */}
-        <nav style={{ display: 'flex', gap: '2.5rem' }} className="nav-desktop">
+        <nav style={{ display: 'flex', gap: '2rem' }} className="nav-desktop">
           {links.map(l => (
             <a key={l.href} href={l.href} style={{
               fontFamily: "'Outfit', sans-serif",
               fontWeight: 600,
-              fontSize: '0.8rem',
+              fontSize: '0.75rem',
               letterSpacing: '2px',
               textTransform: 'uppercase',
               color: 'rgba(224,230,237,0.8)',
@@ -81,11 +81,30 @@ export default function Navbar() {
             onMouseLeave={e => e.target.style.color = 'rgba(224,230,237,0.8)'}
             >{l.label}</a>
           ))}
+          <button 
+            onClick={onRegisterClick}
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              fontFamily: "'Outfit', sans-serif",
+              fontWeight: 600,
+              fontSize: '0.75rem',
+              letterSpacing: '2px',
+              textTransform: 'uppercase',
+              color: '#c5a059',
+              transition: 'all 0.3s ease',
+            }}
+            onMouseEnter={e => e.target.style.textShadow = '0 0 10px rgba(197, 160, 89, 0.5)'}
+            onMouseLeave={e => e.target.style.textShadow = 'none'}
+          >
+            CADASTRO
+          </button>
         </nav>
 
         {/* CTA */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <a href="#download" className="btn-primary" style={{ fontSize: '0.75rem', padding: '0.65rem 1.8rem' }}>
+          <a href="#download" className="btn-primary" style={{ fontSize: '0.7rem', padding: '0.6rem 1.5rem' }}>
             ▶ PLAY NOW
           </a>
 
@@ -135,6 +154,26 @@ export default function Navbar() {
               }}
             >{l.label}</a>
           ))}
+          <button
+            onClick={() => {
+              setMenuOpen(false);
+              onRegisterClick();
+            }}
+            style={{
+              background: 'none',
+              border: 'none',
+              textAlign: 'left',
+              cursor: 'pointer',
+              fontFamily: "'Outfit', sans-serif",
+              fontWeight: 600,
+              fontSize: '0.9rem',
+              letterSpacing: '3px',
+              textTransform: 'uppercase',
+              color: '#fff',
+            }}
+          >
+            CADASTRO
+          </button>
         </nav>
       )}
 
