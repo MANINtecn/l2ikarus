@@ -53,7 +53,7 @@ export default function Navbar({ onRegisterClick }) {
               filter: 'drop-shadow(0 0 8px rgba(197, 160, 89, 0.3))'
             }}
           >
-            <source src="/src/assets/logo-animated.mp4" type="video/mp4" />
+            <source src="/assets/logo-animated.mp4" type="video/mp4" />
           </video>
           <span style={{
             fontFamily: "'Cinzel', serif",
