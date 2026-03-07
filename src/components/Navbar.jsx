@@ -41,42 +41,49 @@ export default function Navbar({ onRegisterClick }) {
         justifyContent: 'space-between',
       }}>
         {/* LOGO — texto */}
-        <a href="#hero" style={{ 
+        <div style={{ 
           display: 'flex', 
           alignItems: 'center', 
-          gap: '1rem', 
+          gap: '2.5rem', 
           lineHeight: 1,
-          textDecoration: 'none'
+          flex: 1
         }}>
-          <div style={{ position: 'relative', width: 'auto', height: '45px', display: 'flex', alignItems: 'center' }}>
-            <img 
-              src="/assets/Section 8.png" 
-              alt="Ikarus Logo" 
-              style={{
-                height: scrolled ? '110px' : '65px',
-                width: 'auto',
-                transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
-                transform: scrolled ? 'translateY(25px)' : 'translateY(0)',
-                filter: 'drop-shadow(0 0 15px rgba(197, 160, 89, 0.3))',
-                zIndex: 2000,
-              }}
-            />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
+            {/* OPCÃO 1 (Section 8) */}
+            <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <span style={{ fontSize: '10px', color: '#c5a059', marginBottom: '5px', textTransform: 'uppercase', opacity: scrolled ? 1 : 0.7 }}>Opção 1</span>
+              <img 
+                src="/assets/Section 8.png" 
+                alt="Logo Opção 1" 
+                style={{
+                  height: scrolled ? '150px' : '90px',
+                  width: 'auto',
+                  transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+                  transform: scrolled ? 'translateY(20px)' : 'translateY(0)',
+                  filter: 'drop-shadow(0 0 15px rgba(197, 160, 89, 0.3))',
+                  zIndex: 2000,
+                }}
+              />
+            </div>
+
+            {/* OPCÃO 2 (Section 9) */}
+            <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <span style={{ fontSize: '10px', color: '#fff', marginBottom: '5px', textTransform: 'uppercase', opacity: scrolled ? 1 : 0.7 }}>Opção 2</span>
+              <img 
+                src="/assets/Section 9.png" 
+                alt="Logo Opção 2" 
+                style={{
+                  height: scrolled ? '150px' : '90px',
+                  width: 'auto',
+                  transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+                  transform: scrolled ? 'translateY(20px)' : 'translateY(0)',
+                  filter: 'drop-shadow(0 0 15px rgba(255, 255, 255, 0.2))',
+                  zIndex: 2000,
+                }}
+              />
+            </div>
           </div>
-          <span style={{
-            fontFamily: "'Cinzel', serif",
-            fontWeight: 900,
-            fontSize: '1.35rem',
-            letterSpacing: '6px',
-            textTransform: 'uppercase',
-            background: 'linear-gradient(90deg, #c5a059, #f0d080, #c5a059)',
-            backgroundSize: '200% auto',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            animation: 'shimmer 3s linear infinite',
-            marginLeft: scrolled ? '10px' : '0',
-            transition: 'all 0.5s ease',
-          }}>IKARUS</span>
-        </a>
+        </div>
 
         {/* NAV DESKTOP */}
         <nav style={{ display: 'flex', gap: '2rem' }} className="nav-desktop">
