@@ -46,50 +46,25 @@ export default function Navbar({ onRegisterClick }) {
         <div style={{ 
           display: 'flex', 
           alignItems: 'center', 
-          gap: '2.5rem', 
           lineHeight: 1,
           flex: 1
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '3rem' }}>
-            {/* OPCÃO 1 (Section 8) */}
-            <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <span style={{ fontSize: '9px', color: '#c5a059', marginBottom: '2px', textTransform: 'uppercase', letterSpacing: '1px' }}>Opção 1</span>
-              <div style={{ height: '40px', display: 'flex', alignItems: 'center' }}>
-                <img 
-                  src="/assets/Section 8.png" 
-                  alt="Logo Opção 1" 
-                  style={{
-                    height: scrolled ? '160px' : '95px',
-                    width: 'auto',
-                    transition: 'all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-                    transform: scrolled ? 'translateY(35px) scale(1.1)' : 'translateY(0)',
-                    filter: 'drop-shadow(0 0 15px rgba(197, 160, 89, 0.3))',
-                    zIndex: 2000,
-                    pointerEvents: 'none'
-                  }}
-                />
-              </div>
-            </div>
-
-            {/* OPCÃO 2 (Section 9) - Favorita com detalhes brancos */}
-            <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <span style={{ fontSize: '9px', color: '#fff', marginBottom: '2px', textTransform: 'uppercase', letterSpacing: '1px' }}>Opção 2</span>
-              <div style={{ height: '40px', display: 'flex', alignItems: 'center' }}>
-                <img 
-                  src="/assets/Section 9.png" 
-                  alt="Logo Opção 2" 
-                  style={{
-                    height: scrolled ? '160px' : '95px',
-                    width: 'auto',
-                    transition: 'all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-                    transform: scrolled ? 'translateY(35px) scale(1.1)' : 'translateY(0)',
-                    filter: 'drop-shadow(0 0 20px rgba(255, 255, 255, 0.15))',
-                    zIndex: 2000,
-                    pointerEvents: 'none'
-                  }}
-                />
-              </div>
-            </div>
+          {/* LOGO FINAL (Section 9) */}
+          <div style={{ position: 'relative', height: '40px', display: 'flex', alignItems: 'center', marginLeft: '-1rem' }}>
+            <img 
+              src="/assets/Section 9.png" 
+              alt="Ikarus Logo" 
+              style={{
+                height: scrolled ? '180px' : '110px',
+                width: 'auto',
+                transition: 'all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                transform: scrolled ? 'translateY(45px) scale(1.1)' : 'translateY(0)',
+                filter: 'drop-shadow(0 0 20px rgba(255, 255, 255, 0.15))',
+                zIndex: 2000,
+                pointerEvents: 'none',
+                transformOrigin: 'top left'
+              }}
+            />
           </div>
         </div>
 

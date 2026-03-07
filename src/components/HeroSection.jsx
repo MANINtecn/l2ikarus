@@ -17,7 +17,7 @@ export default function HeroSection({ onRegisterClick }) {
           width: '100%',
           height: '100%',
           objectFit: 'cover',
-          objectPosition: 'center 40%', // Deslocando o vídeo para baixo
+          objectPosition: 'center 60%', // Baixando ainda mais para mostrar o rosto
           filter: 'brightness(0.78)',
           zIndex: 1
         }}
@@ -25,7 +25,7 @@ export default function HeroSection({ onRegisterClick }) {
         <source src="/assets/video-bg.webm" type="video/webm" />
         <source src="/assets/video-bg.mp4" type="video/mp4" />
         {/* Fallback caso não encontre o vídeo */}
-        <img src="/src/assets/section-1.jpg.jpg" alt="Background Ikarus" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 40%' }} />
+        <img src="/src/assets/section-1.jpg.jpg" alt="Background Ikarus" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 60%' }} />
       </video>
 
       {/* OVERLAYS */}
