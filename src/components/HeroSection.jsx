@@ -17,14 +17,15 @@ export default function HeroSection({ onRegisterClick }) {
           width: '100%',
           height: '100%',
           objectFit: 'cover',
+          objectPosition: 'center 40%', // Deslocando o vídeo para baixo
           filter: 'brightness(0.78)',
-          zIndex: 1 // Mantendo atrás dos overlays e conteúdo
+          zIndex: 1
         }}
       >
         <source src="/assets/video-bg.webm" type="video/webm" />
         <source src="/assets/video-bg.mp4" type="video/mp4" />
         {/* Fallback caso não encontre o vídeo */}
-        <img src="/src/assets/section-1.jpg.jpg" alt="Background Ikarus" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        <img src="/src/assets/section-1.jpg.jpg" alt="Background Ikarus" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 40%' }} />
       </video>
 
       {/* OVERLAYS */}

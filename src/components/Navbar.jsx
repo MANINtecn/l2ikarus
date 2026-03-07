@@ -26,15 +26,17 @@ export default function Navbar({ onRegisterClick }) {
       width: '100%',
       zIndex: 1000,
       transition: 'all 0.4s ease',
-      background: scrolled
-        ? 'rgba(5, 5, 10, 0.92)'
-        : 'linear-gradient(to bottom, rgba(5,5,10,0.85) 0%, transparent 100%)',
-      backdropFilter: scrolled ? 'blur(16px)' : 'none',
-      borderBottom: scrolled ? '1px solid rgba(197, 160, 89, 0.12)' : 'none',
-      padding: scrolled ? '0.7rem 2rem' : '1.2rem 2rem',
+      background: 'rgba(5, 5, 10, 0.98)', // Fundo escuro sólido para melhor visibilidade
+      backdropFilter: 'blur(16px)',
+      borderBottom: scrolled ? '1px solid rgba(197, 160, 89, 0.2)' : '1px solid rgba(255, 255, 255, 0.05)',
+      padding: scrolled ? '0.5rem 2rem' : '1rem 2rem',
+      height: '80px', // Altura fixa para o menu
+      display: 'flex',
+      alignItems: 'center',
     }}>
       <div style={{
-        maxWidth: 1200,
+        width: '100%',
+        maxWidth: 1400, // Aumentando um pouco o limite para caber os dois logos
         margin: '0 auto',
         display: 'flex',
         alignItems: 'center',
@@ -48,39 +50,45 @@ export default function Navbar({ onRegisterClick }) {
           lineHeight: 1,
           flex: 1
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '3rem' }}>
             {/* OPCÃO 1 (Section 8) */}
             <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <span style={{ fontSize: '10px', color: '#c5a059', marginBottom: '5px', textTransform: 'uppercase', opacity: scrolled ? 1 : 0.7 }}>Opção 1</span>
-              <img 
-                src="/assets/Section 8.png" 
-                alt="Logo Opção 1" 
-                style={{
-                  height: scrolled ? '150px' : '90px',
-                  width: 'auto',
-                  transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
-                  transform: scrolled ? 'translateY(20px)' : 'translateY(0)',
-                  filter: 'drop-shadow(0 0 15px rgba(197, 160, 89, 0.3))',
-                  zIndex: 2000,
-                }}
-              />
+              <span style={{ fontSize: '9px', color: '#c5a059', marginBottom: '2px', textTransform: 'uppercase', letterSpacing: '1px' }}>Opção 1</span>
+              <div style={{ height: '40px', display: 'flex', alignItems: 'center' }}>
+                <img 
+                  src="/assets/Section 8.png" 
+                  alt="Logo Opção 1" 
+                  style={{
+                    height: scrolled ? '160px' : '95px',
+                    width: 'auto',
+                    transition: 'all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                    transform: scrolled ? 'translateY(35px) scale(1.1)' : 'translateY(0)',
+                    filter: 'drop-shadow(0 0 15px rgba(197, 160, 89, 0.3))',
+                    zIndex: 2000,
+                    pointerEvents: 'none'
+                  }}
+                />
+              </div>
             </div>
 
-            {/* OPCÃO 2 (Section 9) */}
+            {/* OPCÃO 2 (Section 9) - Favorita com detalhes brancos */}
             <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <span style={{ fontSize: '10px', color: '#fff', marginBottom: '5px', textTransform: 'uppercase', opacity: scrolled ? 1 : 0.7 }}>Opção 2</span>
-              <img 
-                src="/assets/Section 9.png" 
-                alt="Logo Opção 2" 
-                style={{
-                  height: scrolled ? '150px' : '90px',
-                  width: 'auto',
-                  transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
-                  transform: scrolled ? 'translateY(20px)' : 'translateY(0)',
-                  filter: 'drop-shadow(0 0 15px rgba(255, 255, 255, 0.2))',
-                  zIndex: 2000,
-                }}
-              />
+              <span style={{ fontSize: '9px', color: '#fff', marginBottom: '2px', textTransform: 'uppercase', letterSpacing: '1px' }}>Opção 2</span>
+              <div style={{ height: '40px', display: 'flex', alignItems: 'center' }}>
+                <img 
+                  src="/assets/Section 9.png" 
+                  alt="Logo Opção 2" 
+                  style={{
+                    height: scrolled ? '160px' : '95px',
+                    width: 'auto',
+                    transition: 'all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                    transform: scrolled ? 'translateY(35px) scale(1.1)' : 'translateY(0)',
+                    filter: 'drop-shadow(0 0 20px rgba(255, 255, 255, 0.15))',
+                    zIndex: 2000,
+                    pointerEvents: 'none'
+                  }}
+                />
+              </div>
             </div>
           </div>
         </div>
