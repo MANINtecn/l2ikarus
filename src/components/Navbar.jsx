@@ -58,7 +58,7 @@ export default function Navbar({ onRegisterClick }) {
                 height: scrolled ? '180px' : '110px',
                 width: 'auto',
                 transition: 'all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-                transform: scrolled ? 'translateY(45px) scale(1.1)' : 'translateY(0)',
+                transform: scrolled ? 'translateY(70px) scale(1.15)' : 'translateY(25px)',
                 filter: 'drop-shadow(0 0 20px rgba(255, 255, 255, 0.15))',
                 zIndex: 2000,
                 pointerEvents: 'none',
