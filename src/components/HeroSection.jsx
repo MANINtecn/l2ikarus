@@ -38,33 +38,29 @@ export default function HeroSection({ onRegisterClick }) {
 
       {/* CONTEÚDO */}
       <div style={{ position:'relative',zIndex:10,textAlign:'center',padding:'2rem',maxWidth:900 }}>
+        {/*
         <p style={{ fontFamily:"'Outfit',sans-serif", fontSize:'0.75rem', fontWeight:600,
           letterSpacing:'8px', textTransform:'uppercase', color:'rgba(200,100,255,0.95)',
           marginBottom:'1.2rem', animation:'fadeUp 0.6s ease forwards' }}>
           ⚔ Lineage 2 Private Server ⚔
         </p>
+        */}
 
         <h1 style={{ fontFamily:"'Cinzel',serif", fontWeight:900,
           fontSize:'clamp(2.8rem, 8vw, 7rem)', textTransform:'uppercase',
           lineHeight:0.95, letterSpacing:'2px', marginBottom:'0.5rem',
           animation:'fadeUp 0.7s 0.1s ease both' }}>
-          <span style={{ display:'block',
-            background:'linear-gradient(135deg,#c5a059 0%,#f0d080 40%,#c5a059 70%,#e8c870 100%)',
-            backgroundSize:'200% auto', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent',
-            animation:'shimmer 4s linear infinite' }}>IKARUS</span>
-          <span style={{ display:'block', fontSize:'clamp(1.6rem,4.5vw,3.5rem)',
-            letterSpacing:'14px', color:'rgba(255,255,255,0.92)',
-            WebkitTextFillColor:'rgba(255,255,255,0.92)', marginTop:'0.3rem' }}>ARISE</span>
+          {/* LOGO NOVA AQUI — Substituindo o texto IKARUS */}
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
+            {/* 
+            <img 
+              src="/assets/new-hero-logo.png" 
+              alt="Ikarus Logo" 
+              style={{ width: 'clamp(200px, 40vw, 500px)', height: 'auto' }} 
+            /> 
+            */}
+          </div>
         </h1>
-
-        <p style={{ fontFamily:"'Outfit',sans-serif",
-          fontSize:'clamp(0.85rem,2vw,1.1rem)', color:'rgba(224,230,237,0.75)',
-          letterSpacing:'3px', textTransform:'uppercase',
-          margin:'1.8rem auto 3rem', maxWidth:560,
-          animation:'fadeUp 0.8s 0.2s ease both', lineHeight:1.8 }}>
-          Adentre os mais profundos Dungeons.<br />
-          Ascenda. Conquiste. Torne-se Lenda.
-        </p>
 
         <div className="ornament" style={{ animation:'fadeUp 0.8s 0.3s ease both', margin:'0 auto 2.5rem' }}>
           <div className="ornament-diamond" />
