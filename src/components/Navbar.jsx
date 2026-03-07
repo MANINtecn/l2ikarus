@@ -41,20 +41,27 @@ export default function Navbar({ onRegisterClick }) {
         justifyContent: 'space-between',
       }}>
         {/* LOGO — texto */}
-        <a href="#hero" style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', lineHeight: 1 }}>
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            style={{
-              height: '45px',
-              width: 'auto',
-              filter: 'drop-shadow(0 0 8px rgba(197, 160, 89, 0.3))'
-            }}
-          >
-            <source src="/assets/logo-animated.mp4" type="video/mp4" />
-          </video>
+        <a href="#hero" style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: '1rem', 
+          lineHeight: 1,
+          textDecoration: 'none'
+        }}>
+          <div style={{ position: 'relative', width: 'auto', height: '45px', display: 'flex', alignItems: 'center' }}>
+            <img 
+              src="/assets/Section 8.png" 
+              alt="Ikarus Logo" 
+              style={{
+                height: scrolled ? '110px' : '65px',
+                width: 'auto',
+                transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+                transform: scrolled ? 'translateY(25px)' : 'translateY(0)',
+                filter: 'drop-shadow(0 0 15px rgba(197, 160, 89, 0.3))',
+                zIndex: 2000,
+              }}
+            />
+          </div>
           <span style={{
             fontFamily: "'Cinzel', serif",
             fontWeight: 900,
@@ -66,6 +73,8 @@ export default function Navbar({ onRegisterClick }) {
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             animation: 'shimmer 3s linear infinite',
+            marginLeft: scrolled ? '10px' : '0',
+            transition: 'all 0.5s ease',
           }}>IKARUS</span>
         </a>
 
