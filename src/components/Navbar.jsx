@@ -41,7 +41,20 @@ export default function Navbar({ onRegisterClick }) {
         justifyContent: 'space-between',
       }}>
         {/* LOGO — texto */}
-        <a href="#hero" style={{ display: 'flex', flexDirection: 'column', lineHeight: 1 }}>
+        <a href="#hero" style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', lineHeight: 1 }}>
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            style={{
+              height: '45px',
+              width: 'auto',
+              filter: 'drop-shadow(0 0 8px rgba(197, 160, 89, 0.3))'
+            }}
+          >
+            <source src="/src/assets/logo-animated.mp4" type="video/mp4" />
+          </video>
           <span style={{
             fontFamily: "'Cinzel', serif",
             fontWeight: 900,
@@ -54,14 +67,6 @@ export default function Navbar({ onRegisterClick }) {
             WebkitTextFillColor: 'transparent',
             animation: 'shimmer 3s linear infinite',
           }}>IKARUS</span>
-          <span style={{
-            fontFamily: "'Outfit', sans-serif",
-            fontWeight: 300,
-            fontSize: '0.6rem',
-            letterSpacing: '5px',
-            color: 'rgba(0, 210, 255, 0.8)',
-            textTransform: 'uppercase',
-          }}>ARISE</span>
         </a>
 
         {/* NAV DESKTOP */}
