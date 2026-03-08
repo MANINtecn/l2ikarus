@@ -29,36 +29,35 @@ export default function Navbar({ onRegisterClick }) {
       background: 'rgba(5, 5, 10, 0.98)', // Fundo escuro sólido para melhor visibilidade
       backdropFilter: 'blur(16px)',
       borderBottom: scrolled ? '1px solid rgba(197, 160, 89, 0.2)' : '1px solid rgba(255, 255, 255, 0.05)',
-      padding: scrolled ? '0.5rem 2rem' : '1rem 2rem',
-      height: '80px', // Altura fixa para o menu
+      padding: scrolled ? '0.3rem 2rem' : '0.5rem 2rem',
+      height: '45px', // Reduzido pela metade (aprox) para um menu mais slim
       display: 'flex',
       alignItems: 'center',
     }}>
       <div style={{
         width: '100%',
-        maxWidth: 1400, // Aumentando um pouco o limite para caber os dois logos
+        maxWidth: 1400,
         margin: '0 auto',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
       }}>
-        {/* LOGO — texto */}
+        {/* LOGO FINAL (Section 9) */}
         <div style={{ 
           display: 'flex', 
           alignItems: 'center', 
           lineHeight: 1,
           flex: 1
         }}>
-          {/* LOGO FINAL (Section 9) */}
-          <div style={{ position: 'relative', height: '40px', display: 'flex', alignItems: 'center', marginLeft: '-1rem' }}>
+          <div style={{ position: 'relative', height: '30px', display: 'flex', alignItems: 'center', marginLeft: '-1rem' }}>
             <img 
               src="/assets/Section 9.png" 
               alt="Ikarus Logo" 
               style={{
-                height: scrolled ? '280px' : '110px',
+                height: scrolled ? '140px' : '95px', // Expansão reduzida pela metade
                 width: 'auto',
-                transition: 'all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-                transform: scrolled ? 'translateY(120px) scale(1.1)' : 'translateY(25px)',
+                transition: 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)', // Transição mais suave e elegante
+                transform: scrolled ? 'translateY(50px) scale(1.05)' : 'translateY(22px)',
                 filter: 'drop-shadow(0 0 20px rgba(255, 255, 255, 0.15))',
                 zIndex: 2000,
                 pointerEvents: 'none',
