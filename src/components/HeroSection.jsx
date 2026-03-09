@@ -38,13 +38,26 @@ export default function HeroSection({ onRegisterClick }) {
 
       {/* CONTEÚDO */}
       <div style={{ position:'relative',zIndex:10,textAlign:'center',padding:'2rem',maxWidth:900 }}>
-        {/*
-        <p style={{ fontFamily:"'Outfit',sans-serif", fontSize:'0.75rem', fontWeight:600,
-          letterSpacing:'8px', textTransform:'uppercase', color:'rgba(200,100,255,0.95)',
-          marginBottom:'1.2rem', animation:'fadeUp 0.6s ease forwards' }}>
-          ⚔ Lineage 2 Private Server ⚔
-        </p>
-        */}
+        
+        {/* LOGO NO CANTO SUPERIOR DIREITO (Marcação Verde) */}
+        <div style={{
+          position: 'absolute',
+          top: '20px',
+          right: '2vw',
+          zIndex: 25,
+          animation: 'fadeUp 1.2s 0.6s ease both',
+          pointerEvents: 'none'
+        }}>
+          <img 
+            src="/assets/Section 13.png" 
+            alt="Ikarus Decoration" 
+            style={{
+              width: 'max(220px, 18vw)',
+              height: 'auto',
+              filter: 'drop-shadow(0 0 20px rgba(197, 160, 89, 0.4))'
+            }} 
+          />
+        </div>
 
         <h1 style={{ 
           display: 'flex', 
@@ -52,15 +65,7 @@ export default function HeroSection({ onRegisterClick }) {
           marginBottom: '2rem',
           animation:'fadeUp 0.7s 0.1s ease both' 
         }}>
-          <img 
-            src="/assets/Section 13.png" 
-            alt="Ikarus Logo" 
-            style={{ 
-              width: 'max(300px, 25vw)', 
-              height: 'auto',
-              filter: 'drop-shadow(0 0 25px rgba(197, 160, 89, 0.4))'
-            }} 
-          />
+          {/* Espaço central limpo — Logo movido para o canto superior direito */}
         </h1>
 
         <div className="ornament" style={{ 
