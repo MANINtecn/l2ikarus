@@ -36,14 +36,11 @@ export default function HeroSection({ onRegisterClick }) {
       <div style={{ position:'absolute',inset:0,zIndex:3,pointerEvents:'none',
         background:'linear-gradient(to left, rgba(5,5,8,0.5) 0%, transparent 55%)' }} />
 
-      {/* CONTEÚDO */}
-      <div style={{ position:'relative',zIndex:10,textAlign:'center',padding:'2rem',maxWidth:900 }}>
-        
-        {/* LOGO NO CANTO SUPERIOR DIREITO (Marcação Verde) */}
-        <div style={{
+      {/* LOGO NO CANTO SUPERIOR DIREITO (Marcação Verde) - Fora da div centralizada */}
+      <div style={{
           position: 'absolute',
-          top: '20px',
-          right: '2vw',
+          top: '120px', // Abaixo do Navbar slim
+          right: '4vw',
           zIndex: 25,
           animation: 'fadeUp 1.2s 0.6s ease both',
           pointerEvents: 'none'
@@ -59,13 +56,16 @@ export default function HeroSection({ onRegisterClick }) {
           />
         </div>
 
+      {/* CONTEÚDO */}
+      <div style={{ position:'relative',zIndex:10,textAlign:'center',padding:'2rem',maxWidth:900 }}>
+        
         <h1 style={{ 
           display: 'flex', 
           justifyContent: 'center', 
           marginBottom: '2rem',
           animation:'fadeUp 0.7s 0.1s ease both' 
         }}>
-          {/* Espaço central limpo — Logo movido para o canto superior direito */}
+          {/* Espaço central limpo — Logo movido para o canto superior direito absoluto */}
         </h1>
 
         <div className="ornament" style={{ 
