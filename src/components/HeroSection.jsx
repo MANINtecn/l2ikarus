@@ -66,7 +66,14 @@ export default function HeroSection({ onRegisterClick }) {
           <div className="ornament-diamond" />
         </div>
 
-        <div style={{ display:'flex',gap:'1.2rem',justifyContent:'center',flexWrap:'wrap',animation:'fadeUp 0.9s 0.4s ease both' }}>
+        <div style={{ 
+          display:'flex',
+          gap:'1.2rem',
+          justifyContent:'center',
+          flexWrap:'wrap',
+          animation:'fadeUp 0.9s 0.4s ease both',
+          transform: 'translateY(15vh)' // Empurrando para a zona marcada em verde
+        }}>
           <a href="#download" className="btn-primary">▶ JOGAR AGORA</a>
           <button 
             onClick={onRegisterClick}

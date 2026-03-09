@@ -51,7 +51,7 @@ export default function Navbar({ onRegisterClick }) {
         }}>
           <div style={{ position: 'relative', height: '30px', display: 'flex', alignItems: 'center', marginLeft: '-1rem' }}>
             <img 
-              src="/assets/Section 9.png" 
+              src="/assets/Section 11.png" 
               alt="Ikarus Logo" 
               style={{
                 height: scrolled ? '140px' : '95px', // Expansão reduzida pela metade
