@@ -101,6 +101,22 @@ export default function HeroSection({ onRegisterClick }) {
             DISCORD
           </a>
         </div>
+        
+        <p style={{
+          fontFamily: "'Outfit', sans-serif",
+          fontSize: '0.8rem',
+          fontWeight: 400,
+          color: 'rgba(224, 230, 237, 0.65)',
+          letterSpacing: '1px',
+          marginTop: '17vh', // Posicionando abaixo da área dos botões que foi deslocada
+          animation: 'fadeUp 1s 0.6s ease both',
+          maxWidth: '600px',
+          marginInline: 'auto'
+        }}>
+          O SEU DESPERTAR É <span style={{ color: '#c5a059', fontWeight: 600 }}>INEVITÁVEL</span>. 
+          <br />
+          L2 ÍKARUS COM SISTEMA ÚNICO DE JOGABILIDADE.
+        </p>
 
         <div style={{ position:'absolute',bottom:'-120px',left:'50%',transform:'translateX(-50%)',
           display:'flex',flexDirection:'column',alignItems:'center',gap:'6px',opacity:0.5,

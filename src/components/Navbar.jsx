@@ -15,6 +15,7 @@ export default function Navbar({ onRegisterClick }) {
     { label: 'Início',    href: '#hero' },
     { label: 'Rates',     href: '#rates' },
     { label: 'Features',  href: '#features' },
+    { label: 'Roadmap',   href: '#roadmap' },
     { label: 'Download',  href: '#download' },
   ]
 
