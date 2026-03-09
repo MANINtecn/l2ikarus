@@ -46,20 +46,21 @@ export default function HeroSection({ onRegisterClick }) {
         </p>
         */}
 
-        <h1 style={{ fontFamily:"'Cinzel',serif", fontWeight:900,
-          fontSize:'clamp(2.8rem, 8vw, 7rem)', textTransform:'uppercase',
-          lineHeight:0.95, letterSpacing:'2px', marginBottom:'0.5rem',
-          animation:'fadeUp 0.7s 0.1s ease both' }}>
-          {/* LOGO NOVA AQUI — Substituindo o texto IKARUS */}
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
-            {/* 
-            <img 
-              src="/assets/new-hero-logo.png" 
-              alt="Ikarus Logo" 
-              style={{ width: 'clamp(200px, 40vw, 500px)', height: 'auto' }} 
-            /> 
-            */}
-          </div>
+        <h1 style={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          marginBottom: '2rem',
+          animation:'fadeUp 0.7s 0.1s ease both' 
+        }}>
+          <img 
+            src="/assets/Section 13.png" 
+            alt="Ikarus Logo" 
+            style={{ 
+              width: 'max(300px, 25vw)', 
+              height: 'auto',
+              filter: 'drop-shadow(0 0 25px rgba(197, 160, 89, 0.4))'
+            }} 
+          />
         </h1>
 
         <div className="ornament" style={{ 
@@ -106,53 +107,6 @@ export default function HeroSection({ onRegisterClick }) {
           </a>
         </div>
         
-        {/* CONTAINER DIREITO - LOGO E FRASE */}
-        <div style={{
-          position: 'absolute',
-          top: '80px', // Posição do retângulo verde
-          right: '40px',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'flex-end',
-          zIndex: 20,
-          animation: 'fadeUp 1.2s 0.6s ease both',
-          pointerEvents: 'none'
-        }}>
-          {/* NOVA LOGO (RETÂNGULO VERDE) */}
-          <img 
-            src="/assets/Section 13.png" 
-            alt="Ikarus Decoration" 
-            style={{
-              width: 'max(200px, 15vw)',
-              height: 'auto',
-              marginBottom: '40px', // Espaço para chegar no retângulo vermelho
-              filter: 'drop-shadow(0 0 15px rgba(197, 160, 89, 0.3))'
-            }}
-          />
-
-          {/* FRASE DE IMPACTO (RETÂNGULO VERMELHO) */}
-          <div style={{ textAlign: 'right' }}>
-            <p style={{
-              fontFamily: "'Outfit', sans-serif",
-              fontSize: 'max(0.75rem, 0.9vw)',
-              fontWeight: 400,
-              color: 'rgba(224, 230, 237, 0.75)',
-              letterSpacing: '2px',
-              lineHeight: 1.8,
-              textTransform: 'uppercase'
-            }}>
-              O seu despertar é <span style={{ color: '#c5a059', fontWeight: 700 }}>inevitável</span>
-              <br />
-              L2 Íkarus
-              <br />
-              com sistema único
-              <br />
-              de
-              <br />
-              jogabilidade
-            </p>
-          </div>
-        </div>
 
         <div style={{ position:'absolute',bottom:'-120px',left:'50%',transform:'translateX(-50%)',
           display:'flex',flexDirection:'column',alignItems:'center',gap:'6px',opacity:0.5,
