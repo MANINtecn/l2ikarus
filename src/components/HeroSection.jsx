@@ -62,7 +62,11 @@ export default function HeroSection({ onRegisterClick }) {
           </div>
         </h1>
 
-        <div className="ornament" style={{ animation:'fadeUp 0.8s 0.3s ease both', margin:'0 auto 2.5rem' }}>
+        <div className="ornament" style={{ 
+          animation:'fadeUp 0.8s 0.3s ease both', 
+          margin:'0 auto 2.5rem',
+          transform: 'translateY(25vh)' // Empurrando junto com os botões
+        }}>
           <div className="ornament-diamond" />
         </div>
 
@@ -72,7 +76,7 @@ export default function HeroSection({ onRegisterClick }) {
           justifyContent:'center',
           flexWrap:'wrap',
           animation:'fadeUp 0.9s 0.4s ease both',
-          transform: 'translateY(15vh)' // Empurrando para a zona marcada em verde
+          transform: 'translateY(25vh)' // Empurrando mais para baixo conforme solicitado
         }}>
           <a href="#download" className="btn-primary">▶ JOGAR AGORA</a>
           <button 
@@ -102,21 +106,36 @@ export default function HeroSection({ onRegisterClick }) {
           </a>
         </div>
         
-        <p style={{
-          fontFamily: "'Outfit', sans-serif",
-          fontSize: '0.8rem',
-          fontWeight: 400,
-          color: 'rgba(224, 230, 237, 0.65)',
-          letterSpacing: '1px',
-          marginTop: '17vh', // Posicionando abaixo da área dos botões que foi deslocada
-          animation: 'fadeUp 1s 0.6s ease both',
-          maxWidth: '600px',
-          marginInline: 'auto'
+        {/* FRASE DE IMPACTO - REPOSICIONADA E FORMATADA */}
+        <div style={{
+          position: 'absolute',
+          top: '120px',
+          right: '40px',
+          textAlign: 'right',
+          zIndex: 20,
+          animation: 'fadeUp 1.2s 0.6s ease both',
+          pointerEvents: 'none'
         }}>
-          O SEU DESPERTAR É <span style={{ color: '#c5a059', fontWeight: 600 }}>INEVITÁVEL</span>. 
-          <br />
-          L2 ÍKARUS COM SISTEMA ÚNICO DE JOGABILIDADE.
-        </p>
+          <p style={{
+            fontFamily: "'Outfit', sans-serif",
+            fontSize: 'max(0.7rem, 0.8vw)',
+            fontWeight: 400,
+            color: 'rgba(224, 230, 237, 0.7)',
+            letterSpacing: '2px',
+            lineHeight: 1.6,
+            textTransform: 'uppercase'
+          }}>
+            O seu despertar é <span style={{ color: '#c5a059', fontWeight: 700 }}>inevitável</span>
+            <br />
+            L2 Íkarus
+            <br />
+            com sistema único
+            <br />
+            de
+            <br />
+            jogabilidade
+          </p>
+        </div>
 
         <div style={{ position:'absolute',bottom:'-120px',left:'50%',transform:'translateX(-50%)',
           display:'flex',flexDirection:'column',alignItems:'center',gap:'6px',opacity:0.5,

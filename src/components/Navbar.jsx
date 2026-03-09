@@ -55,14 +55,15 @@ export default function Navbar({ onRegisterClick }) {
               src="/assets/Section 11.png" 
               alt="Ikarus Logo" 
               style={{
-                height: scrolled ? '140px' : '95px', // Expansão reduzida pela metade
+                height: scrolled ? '140px' : '95px',
                 width: 'auto',
-                transition: 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)', // Transição mais suave e elegante
-                transform: scrolled ? 'translateY(50px) scale(1.05)' : 'translateY(22px)',
+                transition: 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
+                transform: scrolled ? 'translateY(50px)' : 'translateY(22px)',
                 filter: 'drop-shadow(0 0 20px rgba(255, 255, 255, 0.15))',
                 zIndex: 2000,
                 pointerEvents: 'none',
-                transformOrigin: 'top left'
+                transformOrigin: 'top left',
+                objectFit: 'contain'
               }}
             />
           </div>
