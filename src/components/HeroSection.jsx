@@ -106,35 +106,52 @@ export default function HeroSection({ onRegisterClick }) {
           </a>
         </div>
         
-        {/* FRASE DE IMPACTO - REPOSICIONADA E FORMATADA */}
+        {/* CONTAINER DIREITO - LOGO E FRASE */}
         <div style={{
           position: 'absolute',
-          top: '120px',
+          top: '80px', // Posição do retângulo verde
           right: '40px',
-          textAlign: 'right',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'flex-end',
           zIndex: 20,
           animation: 'fadeUp 1.2s 0.6s ease both',
           pointerEvents: 'none'
         }}>
-          <p style={{
-            fontFamily: "'Outfit', sans-serif",
-            fontSize: 'max(0.7rem, 0.8vw)',
-            fontWeight: 400,
-            color: 'rgba(224, 230, 237, 0.7)',
-            letterSpacing: '2px',
-            lineHeight: 1.6,
-            textTransform: 'uppercase'
-          }}>
-            O seu despertar é <span style={{ color: '#c5a059', fontWeight: 700 }}>inevitável</span>
-            <br />
-            L2 Íkarus
-            <br />
-            com sistema único
-            <br />
-            de
-            <br />
-            jogabilidade
-          </p>
+          {/* NOVA LOGO (RETÂNGULO VERDE) */}
+          <img 
+            src="/assets/Section 13.png" 
+            alt="Ikarus Decoration" 
+            style={{
+              width: 'max(200px, 15vw)',
+              height: 'auto',
+              marginBottom: '40px', // Espaço para chegar no retângulo vermelho
+              filter: 'drop-shadow(0 0 15px rgba(197, 160, 89, 0.3))'
+            }}
+          />
+
+          {/* FRASE DE IMPACTO (RETÂNGULO VERMELHO) */}
+          <div style={{ textAlign: 'right' }}>
+            <p style={{
+              fontFamily: "'Outfit', sans-serif",
+              fontSize: 'max(0.75rem, 0.9vw)',
+              fontWeight: 400,
+              color: 'rgba(224, 230, 237, 0.75)',
+              letterSpacing: '2px',
+              lineHeight: 1.8,
+              textTransform: 'uppercase'
+            }}>
+              O seu despertar é <span style={{ color: '#c5a059', fontWeight: 700 }}>inevitável</span>
+              <br />
+              L2 Íkarus
+              <br />
+              com sistema único
+              <br />
+              de
+              <br />
+              jogabilidade
+            </p>
+          </div>
         </div>
 
         <div style={{ position:'absolute',bottom:'-120px',left:'50%',transform:'translateX(-50%)',
