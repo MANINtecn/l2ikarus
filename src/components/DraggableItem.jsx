@@ -34,7 +34,7 @@ export default function DraggableItem({
 
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
-  const [showToolbar, setShowToolbar] = useState(false);
+  const [isSelected, setIsSelected] = useState(false);
   
   const offset = useRef({ x: 0, y: 0 });
   const startSize = useRef({ w: 0, h: 0 });
@@ -48,9 +48,23 @@ export default function DraggableItem({
     localStorage.setItem(`text-${id}`, text);
   }, [pos, size, style, text, id]);
 
+  // Click outside to deselect
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (elementRef.current && !elementRef.current.contains(e.target)) {
+        setIsSelected(false);
+      }
+    };
+    if (isAdmin) {
+      window.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => window.removeEventListener('mousedown', handleClickOutside);
+  }, [isAdmin]);
+
   const onMouseDown = (e) => {
     if (!isAdmin || e.button !== 0 || e.target.closest('.builder-toolbar') || e.target.classList.contains('resize-handle')) return;
     setIsDragging(true);
+    setIsSelected(true);
     const rect = elementRef.current.getBoundingClientRect();
     offset.current = {
       x: e.clientX - rect.left,
@@ -62,6 +76,7 @@ export default function DraggableItem({
   const onResizeStart = (e) => {
     if (!isAdmin) return;
     setIsResizing(true);
+    setIsSelected(true);
     startSize.current = {
       w: elementRef.current.offsetWidth,
       h: elementRef.current.offsetHeight,
@@ -139,9 +154,7 @@ export default function DraggableItem({
     <div
       ref={elementRef}
       onMouseDown={onMouseDown}
-      onMouseEnter={() => isAdmin && setShowToolbar(true)}
-      onMouseLeave={() => isAdmin && setShowToolbar(false)}
-      className={`${className} ${isAdmin ? 'builder-mode' : ''}`}
+      className={`${className} ${isAdmin ? 'builder-mode' : ''} ${isSelected ? 'is-selected' : ''}`}
       style={{
         position: 'absolute',
         left: pos.x,
@@ -151,25 +164,27 @@ export default function DraggableItem({
         fontSize: style.fontSize,
         fontFamily: style.fontFamily,
         cursor: isAdmin ? (isDragging ? 'grabbing' : 'grab') : 'default',
-        zIndex: isDragging || isResizing ? 2000 : (isAdmin ? 100 : 10),
-        border: (isAdmin && (isDragging || isResizing || showToolbar)) ? '1px dashed var(--gold)' : 'none',
+        zIndex: isDragging || isResizing || isSelected ? 2000 : (isAdmin ? 100 : 10),
+        border: (isAdmin && (isDragging || isResizing || isSelected)) ? '2px solid var(--gold)' : 'none',
+        padding: isAdmin ? '4px' : '0',
       }}
     >
       {/* TOOLBAR */}
-      {isAdmin && showToolbar && (
+      {isAdmin && isSelected && (
         <div className="builder-toolbar" style={{
-          position: 'absolute', top: '-45px', left: 0, 
-          background: '#111', border: '1px solid var(--gold)',
-          borderRadius: '4px', display: 'flex', gap: '8px', padding: '6px',
-          zIndex: 3000, boxShadow: '0 4px 15px rgba(0,0,0,0.5)',
+          position: 'absolute', top: '-50px', left: 0, 
+          background: '#111', border: '2px solid var(--gold)',
+          borderRadius: '4px', display: 'flex', gap: '8px', padding: '8px',
+          zIndex: 3000, boxShadow: '0 4px 20px rgba(0,0,0,0.8)',
           whiteSpace: 'nowrap'
         }}>
-          <button onClick={toggleFont} title="Mudar Fonte" style={{ background:'none', color:'var(--gold)', border:'none', cursor:'pointer', fontSize:'10px' }}>🎨 FONTE</button>
-          <button onClick={() => changeFontSize(2)} title="Aumentar" style={{ background:'none', color:'var(--gold)', border:'none', cursor:'pointer' }}>A+</button>
-          <button onClick={() => changeFontSize(-2)} title="Diminuir" style={{ background:'none', color:'var(--gold)', border:'none', cursor:'pointer' }}>A-</button>
-          <div style={{ width:1, background:'#444', margin:'0 4px' }} />
-          {onDuplicate && <button onClick={() => onDuplicate(id)} title="Copiado" style={{ background:'none', color:'var(--gold)', border:'none', cursor:'pointer' }}>📋</button>}
-          {onDelete && <button onClick={() => onDelete(id)} title="Excluir" style={{ background:'none', color:'#ff4444', border:'none', cursor:'pointer' }}>🗑️</button>}
+          <button onClick={(e) => { e.stopPropagation(); toggleFont(); }} title="Mudar Fonte" style={{ background:'none', color:'var(--gold)', border:'none', cursor:'pointer', fontSize:'11px', fontWeight:'700' }}>🎨 FONTE</button>
+          <button onClick={(e) => { e.stopPropagation(); changeFontSize(2); }} title="Aumentar" style={{ background:'none', color:'var(--gold)', border:'none', cursor:'pointer', fontWeight:'700', padding:'0 5px' }}>A+</button>
+          <button onClick={(e) => { e.stopPropagation(); changeFontSize(-2); }} title="Diminuir" style={{ background:'none', color:'var(--gold)', border:'none', cursor:'pointer', fontWeight:'700', padding:'0 5px' }}>A-</button>
+          <div style={{ width:2, background:'rgba(197,160,89,0.3)', margin:'0 4px' }} />
+          {onDuplicate && <button onClick={(e) => { e.stopPropagation(); onDuplicate(id); }} title="Duplicar" style={{ background:'none', color:'var(--gold)', border:'none', cursor:'pointer', fontSize:'14px' }}>📋</button>}
+          {onDelete && <button onClick={(e) => { e.stopPropagation(); onDelete(id); }} title="Excluir" style={{ background:'none', color:'#ff4444', border:'none', cursor:'pointer', fontSize:'14px' }}>🗑️</button>}
+          <button onClick={(e) => { e.stopPropagation(); setIsSelected(false); }} title="Fechar" style={{ background:'none', color:'#666', border:'none', cursor:'pointer', fontSize:'12px', marginLeft:'4px' }}>✕</button>
         </div>
       )}
 
