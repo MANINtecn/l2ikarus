@@ -101,30 +101,32 @@ export default function HeroSection({ onRegisterClick, isAdmin }) {
         <div style={{ width:1, height:60, background:'linear-gradient(to bottom, var(--gold), transparent)', opacity: 0.5 }} />
       </div>
 
-      {/* RESET BUTTON */}
-      <button 
-        onClick={handleReset}
-        style={{
-          position: 'absolute',
-          bottom: '20px',
-          right: '20px',
-          zIndex: 100,
-          background: 'rgba(197, 160, 89, 0.15)',
-          border: '1px solid var(--gold)',
-          color: 'var(--gold)',
-          padding: '8px 16px',
-          borderRadius: '4px',
-          fontSize: '0.7rem',
-          cursor: 'pointer',
-          letterSpacing: '1px',
-          backdropFilter: 'blur(10px)',
-          transition: 'all 0.3s'
-        }}
-        onMouseEnter={e => e.target.style.background = 'rgba(197, 160, 89, 0.3)'}
-        onMouseLeave={e => e.target.style.background = 'rgba(197, 160, 89, 0.15)'}
-      >
-        RESTAURAR LAYOUT
-      </button>
+      {/* RESET BUTTON (ADMIN ONLY) */}
+      {isAdmin && (
+        <button 
+          onClick={handleReset}
+          style={{
+            position: 'absolute',
+            bottom: '20px',
+            right: '20px',
+            zIndex: 100,
+            background: 'rgba(197, 160, 89, 0.15)',
+            border: '1px solid var(--gold)',
+            color: 'var(--gold)',
+            padding: '8px 16px',
+            borderRadius: '4px',
+            fontSize: '0.7rem',
+            cursor: 'pointer',
+            letterSpacing: '1px',
+            backdropFilter: 'blur(10px)',
+            transition: 'all 0.3s'
+          }}
+          onMouseEnter={e => e.target.style.background = 'rgba(197, 160, 89, 0.3)'}
+          onMouseLeave={e => e.target.style.background = 'rgba(197, 160, 89, 0.15)'}
+        >
+          RESTAURAR LAYOUT (HERO)
+        </button>
+      )}
 
     </section>
   )
