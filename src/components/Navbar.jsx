@@ -38,10 +38,10 @@ export default function Navbar({ onRegisterClick }) {
 
   return (
     <header className={`nav-header ${scrolled ? 'scrolled' : ''}`} style={{
-      background: scrolled ? 'rgba(5, 5, 10, 0.92)' : 'transparent',
-      backdropFilter: scrolled ? 'blur(20px)' : 'none',
+      background: scrolled ? (window.innerWidth > 992 ? 'transparent' : 'rgba(5, 5, 10, 0.92)') : 'transparent',
+      backdropFilter: scrolled ? (window.innerWidth > 992 ? 'none' : 'blur(20px)') : 'none',
       height: scrolled ? '70px' : '90px',
-      borderBottom: scrolled ? '1px solid rgba(197, 160, 89, 0.2)' : '1px solid transparent',
+      borderBottom: scrolled ? (window.innerWidth > 992 ? 'none' : '1px solid rgba(197, 160, 89, 0.2)') : '1px solid transparent',
     }}>
       <div className="container-wide" style={{
         display: 'flex',
