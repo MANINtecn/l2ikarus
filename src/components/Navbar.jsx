@@ -31,7 +31,7 @@ export default function Navbar({ onRegisterClick }) {
       backdropFilter: scrolled ? 'blur(16px)' : 'none',
       borderBottom: scrolled ? '1px solid rgba(197, 160, 89, 0.2)' : '1px solid rgba(255, 255, 255, 0.05)',
       padding: scrolled ? '0.5rem 2rem' : '1rem 2rem',
-      height: '85px', // Aumentado para combinar com o botão e dar aspecto premium
+      height: '70px',
       display: 'flex',
       alignItems: 'center',
       transition: 'all 0.3s ease',
@@ -99,7 +99,7 @@ export default function Navbar({ onRegisterClick }) {
           gap: '1rem',
           flex: 1 
         }}>
-          <a href="#download" className="btn-primary" style={{ fontSize: '0.85rem', padding: '0.8rem 2.2rem' }}>
+          <a href="#download" className="btn-primary" style={{ fontSize: '0.8rem', padding: '0.5rem 1.8rem' }}>
             ▶ PLAY NOW
           </a>
 

@@ -41,10 +41,10 @@ export default function HeroSection({ onRegisterClick }) {
       {/* LOGO NO LADO DIREITO */}
       <div className="hero-right-logo" style={{
         position: 'absolute',
-        top: '80px',
-        right: '5%',
+        top: '65px',
+        right: '4%',
         zIndex: 20,
-        width: '300px',
+        width: '240px',
         animation: 'fadeUp 1.2s ease both',
         pointerEvents: 'none'
       }}>
@@ -62,12 +62,12 @@ export default function HeroSection({ onRegisterClick }) {
         }}>
           <span style={{
             fontFamily: "'Cinzel', serif",
-            fontSize: '1.1rem',
+            fontSize: '0.9rem',
             fontWeight: 700,
-            letterSpacing: '6px',
+            letterSpacing: '5px',
             color: 'var(--gold)',
             textTransform: 'uppercase',
-            textShadow: '0 0 20px rgba(197, 160, 89, 0.6)'
+            textShadow: '0 0 15px rgba(197, 160, 89, 0.5)'
           }}>Season 1 BETA</span>
         </div>
 
