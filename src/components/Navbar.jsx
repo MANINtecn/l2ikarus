@@ -1,15 +1,31 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 export default function Navbar({ onRegisterClick }) {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
-  const navRef = useRef(null)
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 60)
+    const handleScroll = () => setScrolled(window.scrollY > 40)
+    const handleResize = () => {
+      if (window.innerWidth > 992) setMenuOpen(false)
+    }
+    
     window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
+    window.addEventListener('resize', handleResize)
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+      window.removeEventListener('resize', handleResize)
+    }
   }, [])
+
+  // Lock scroll when menu is open
+  useEffect(() => {
+    if (menuOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = 'unset'
+    }
+  }, [menuOpen])
 
   const links = [
     { label: 'Início',    href: '#hero' },
@@ -21,163 +37,87 @@ export default function Navbar({ onRegisterClick }) {
   ]
 
   return (
-    <header ref={navRef} style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      width: '100%',
-      zIndex: 1000,
-      background: scrolled ? 'rgba(5, 5, 10, 0.8)' : 'transparent',
-      backdropFilter: scrolled ? 'blur(16px)' : 'none',
-      borderBottom: scrolled ? '1px solid rgba(197, 160, 89, 0.2)' : '1px solid rgba(255, 255, 255, 0.05)',
-      padding: scrolled ? '0.5rem 1.5rem' : '0.8rem 2rem',
-      height: scrolled ? '64px' : '84px',
-      display: 'flex',
-      alignItems: 'center',
-      transition: 'all 0.3s ease',
+    <header className={`nav-header ${scrolled ? 'scrolled' : ''}`} style={{
+      background: scrolled ? 'rgba(5, 5, 10, 0.92)' : 'transparent',
+      backdropFilter: scrolled ? 'blur(20px)' : 'none',
+      height: scrolled ? '70px' : '90px',
+      borderBottom: scrolled ? '1px solid rgba(197, 160, 89, 0.2)' : '1px solid transparent',
     }}>
-      <div style={{
-        width: '100%',
-        maxWidth: 1400,
-        margin: '0 auto',
+      <div className="container-wide" style={{
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
+        padding: '0 2rem'
       }}>
-        {/* LADO ESQUERDO (EQUILIBRAR CENTRO) */}
-        <div style={{ 
-          display: 'flex', 
-          alignItems: 'center', 
-          flex: 1
-        }}>
-          {/* Espaço vazio para manter o menu centralizado */}
+        {/* LADO ESQUERDO (EQUILIBRAR) */}
+        <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
+          {/* Logo could go here if requested, currently empty to center menu */}
         </div>
 
         {/* NAV DESKTOP */}
-        <nav style={{ display: 'flex', gap: '1.2rem' }} className="nav-desktop">
+        <nav className="nav-desktop" style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
           {links.map(l => (
-            <a key={l.href} href={l.href} style={{
-              fontFamily: "'Outfit', sans-serif",
-              fontWeight: 600,
-              fontSize: '0.72rem',
-              letterSpacing: '1.5px',
-              textTransform: 'uppercase',
-              color: 'rgba(224,230,237,0.8)',
-              transition: 'color 0.3s ease',
-              position: 'relative',
-            }}
-            onMouseEnter={e => e.target.style.color = '#c5a059'}
-            onMouseLeave={e => e.target.style.color = 'rgba(224,230,237,0.8)'}
-            >{l.label}</a>
+            <a key={l.href} href={l.href} className="nav-link">
+              {l.label}
+            </a>
           ))}
-          <button 
-            onClick={onRegisterClick}
-            style={{
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              fontFamily: "'Outfit', sans-serif",
-              fontWeight: 600,
-              fontSize: '0.72rem',
-              letterSpacing: '1.5px',
-              textTransform: 'uppercase',
-              color: '#c5a059',
-              transition: 'all 0.3s ease',
-            }}
-            onMouseEnter={e => e.target.style.textShadow = '0 0 10px rgba(197, 160, 89, 0.5)'}
-            onMouseLeave={e => e.target.style.textShadow = 'none'}
-          >
+          <button onClick={onRegisterClick} className="nav-link" style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
             CADASTRO
           </button>
         </nav>
 
-        {/* CTA (LADO DIREITO - EQUILIBRAR CENTRO) */}
-        <div style={{ 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'flex-end', 
-          gap: '1rem',
-          flex: 1 
-        }}>
-          <a href="#download" className="btn-primary" style={{ fontSize: '0.75rem', padding: '0.5rem 1.5rem' }}>
+        {/* CTA DIREITO */}
+        <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '1.5rem' }}>
+          <a href="#download" className="btn btn-primary btn-glow" style={{ fontSize: '0.75rem', padding: '0.6rem 1.5rem' }}>
             ▶ PLAY NOW
           </a>
 
           {/* HAMBURGER */}
           <button
-            onClick={() => setMenuOpen(o => !o)}
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="hamburger-btn"
             style={{
-              display: 'none',
               background: 'none',
               border: 'none',
               cursor: 'pointer',
-              padding: '4px',
+              padding: '6px',
+              zIndex: 2100,
+              display: 'none'
             }}
-            className="hamburger-btn"
           >
-            <div style={{ width: 24, height: 2, background: '#c5a059', margin: '5px 0', transition: '0.3s' }} />
-            <div style={{ width: 24, height: 2, background: '#c5a059', margin: '5px 0', transition: '0.3s' }} />
-            <div style={{ width: 24, height: 2, background: '#c5a059', margin: '5px 0', transition: '0.3s' }} />
+            <div style={{ width: 26, height: 2, background: '#c5a059', margin: '6px 0', transition: '0.3s', transform: menuOpen ? 'rotate(45deg) translate(6px, 6px)' : '' }} />
+            <div style={{ width: 26, height: 2, background: '#c5a059', margin: '6px 0', transition: '0.3s', opacity: menuOpen ? 0 : 1 }} />
+            <div style={{ width: 26, height: 2, background: '#c5a059', margin: '6px 0', transition: '0.3s', transform: menuOpen ? 'rotate(-45deg) translate(6px, -6px)' : '' }} />
           </button>
         </div>
       </div>
 
       {/* MOBILE MENU */}
       {menuOpen && (
-        <nav style={{
-          position: 'absolute',
-          top: '100%',
-          left: 0,
-          width: '100%',
-          background: 'rgba(5,5,10,0.97)',
-          borderTop: '1px solid rgba(197,160,89,0.15)',
-          padding: '1.5rem 2rem',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '1.2rem',
-        }}>
+        <div className="mobile-overlay">
           {links.map(l => (
-            <a key={l.href} href={l.href}
-              onClick={() => setMenuOpen(false)}
-              style={{
-                fontFamily: "'Outfit', sans-serif",
-                fontWeight: 600,
-                fontSize: '0.9rem',
-                letterSpacing: '3px',
-                textTransform: 'uppercase',
-                color: '#c5a059',
-              }}
-            >{l.label}</a>
+            <a key={l.href} href={l.href} className="mobile-nav-link" onClick={() => setMenuOpen(false)}>
+              {l.label}
+            </a>
           ))}
           <button
+            className="mobile-nav-link"
+            style={{ background: 'none', border: 'none', textAlign: 'left', cursor: 'pointer' }}
             onClick={() => {
               setMenuOpen(false);
               onRegisterClick();
             }}
-            style={{
-              background: 'none',
-              border: 'none',
-              textAlign: 'left',
-              cursor: 'pointer',
-              fontFamily: "'Outfit', sans-serif",
-              fontWeight: 600,
-              fontSize: '0.9rem',
-              letterSpacing: '3px',
-              textTransform: 'uppercase',
-              color: '#fff',
-            }}
           >
             CADASTRO
           </button>
-        </nav>
+          
+          <div style={{ marginTop: 'auto', padding: '2rem 1rem', textAlign: 'center' }}>
+             <a href="#download" className="btn btn-primary" style={{ width: '100%' }} onClick={() => setMenuOpen(false)}>
+                ▶ COMEÇAR AGORA
+             </a>
+          </div>
+        </div>
       )}
-
-      <style>{`
-        @media (max-width: 768px) {
-          .nav-desktop { display: none !important; }
-          .hamburger-btn { display: block !important; }
-        }
-      `}</style>
     </header>
   )
 }
