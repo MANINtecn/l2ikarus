@@ -13,7 +13,34 @@ export default function HeroSection({ onRegisterClick, isAdmin }) {
       position: 'relative', height: '100vh', minHeight: 700,
       display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
     }}>
-      {/* ... (video and overlays remain same) */}
+      {/* VÍDEO DE FUNDO */}
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          objectPosition: 'center top',
+          filter: 'brightness(0.65)',
+          zIndex: 1
+        }}
+      >
+        <source src="/assets/video-bg.webm" type="video/webm" />
+        <source src="/assets/video-bg.mp4" type="video/mp4" />
+        <img src="/src/assets/section-1.jpg.jpg" alt="Background Ikarus" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top' }} />
+      </video>
+
+      {/* OVERLAYS */}
+      <div style={{ position:'absolute',inset:0,zIndex:3,pointerEvents:'none',
+        background:'radial-gradient(ellipse at 30% 50%, transparent 20%, rgba(5,5,8,0.9) 100%)' }} />
+      <div style={{ position:'absolute',bottom:0,left:0,right:0,height:'40%',zIndex:3,pointerEvents:'none',
+        background:'linear-gradient(to top, var(--bg) 0%, transparent 100%)' }} />
 
       {/* DRAGGABLE LOGO */}
       <DraggableItem id="hero-logo" isAdmin={isAdmin} initialPos={{ x: window.innerWidth * 0.7, y: 100 }} initialSize={{ width: 300 }}>
