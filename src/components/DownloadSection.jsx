@@ -1,8 +1,26 @@
 import { useEffect, useRef, useState } from 'react'
 
 export default function DownloadSection() {
-  const [playerCount] = useState(247)
+  const [playerCount, setPlayerCount] = useState(1240)
+  const [isOnline, setIsOnline] = useState(true)
   const containerRef = useRef(null)
+
+  useEffect(() => {
+    const fetchStatus = async () => {
+      try {
+        const response = await fetch('/api/status');
+        const data = await response.json();
+        if (data.players !== undefined) setPlayerCount(data.players);
+        setIsOnline(data.online);
+      } catch (error) {
+        console.error('Error fetching status:', error);
+      }
+    };
+
+    fetchStatus();
+    const interval = setInterval(fetchStatus, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const obs = new IntersectionObserver(entries => {
@@ -95,8 +113,8 @@ export default function DownloadSection() {
               boxShadow: '0 0 10px #4eae7a',
               animation: 'breathe 2s ease-in-out infinite',
             }} />
-            <span style={{ fontSize: '0.75rem', letterSpacing: '3px', textTransform: 'uppercase', color: '#4eae7a', fontWeight: 600 }}>
-              SERVIDOR ONLINE
+            <span style={{ fontSize: '0.75rem', letterSpacing: '3px', textTransform: 'uppercase', color: isOnline ? '#4eae7a' : '#ef4444', fontWeight: 600 }}>
+              SERVIDOR {isOnline ? 'ONLINE' : 'OFFLINE'}
             </span>
           </div>
 

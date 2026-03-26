@@ -1,3 +1,5 @@
+import logoBranca from '../assets/LOGO BASICA BRANCA.png'
+
 export default function HeroSection({ onRegisterClick }) {
   return (
     <section id="hero" style={{
@@ -36,42 +38,43 @@ export default function HeroSection({ onRegisterClick }) {
       <div style={{ position:'absolute',inset:0,zIndex:3,pointerEvents:'none',
         background:'linear-gradient(to left, rgba(5,5,8,0.5) 0%, transparent 55%)' }} />
 
-      {/* LOGO NO CANTO SUPERIOR DIREITO (Marcação Verde) - Fora da div centralizada */}
-      <div style={{
-          position: 'absolute',
-          top: '120px', // Abaixo do Navbar slim
-          right: '4vw',
-          zIndex: 25,
-          animation: 'fadeUp 1.2s 0.6s ease both',
-          pointerEvents: 'none'
-        }}>
-          <img 
-            src="/assets/Section 13.png" 
-            alt="Ikarus Decoration" 
-            style={{
-              width: 'max(220px, 18vw)',
-              height: 'auto',
-              filter: 'drop-shadow(0 0 20px rgba(197, 160, 89, 0.4))'
-            }} 
-          />
-        </div>
+      {/* LOGO NO LADO DIREITO */}
+      <div className="hero-right-logo" style={{
+        position: 'absolute',
+        top: '80px',
+        right: '5%',
+        zIndex: 20,
+        width: '300px',
+        animation: 'fadeUp 1.2s ease both',
+        pointerEvents: 'none'
+      }}>
+        <img src={logoBranca} alt="L2 Ikarus Logo" style={{ width: '100%', filter: 'drop-shadow(0 0 20px rgba(197, 160, 89, 0.4))' }} />
+      </div>
 
       {/* CONTEÚDO */}
       <div style={{ position:'relative',zIndex:10,textAlign:'center',padding:'2rem',maxWidth:900 }}>
         
-        <h1 style={{ 
-          display: 'flex', 
-          justifyContent: 'center', 
-          marginBottom: '2rem',
-          animation:'fadeUp 0.7s 0.1s ease both' 
+        {/* SEASON LABEL */}
+        <div style={{
+          animation: 'fadeUp 0.8s 0.2s ease both',
+          marginBottom: '1rem',
+          transform: 'translateY(60vh)' 
         }}>
-          {/* Espaço central limpo — Logo movido para o canto superior direito absoluto */}
-        </h1>
+          <span style={{
+            fontFamily: "'Cinzel', serif",
+            fontSize: '1.1rem',
+            fontWeight: 700,
+            letterSpacing: '6px',
+            color: 'var(--gold)',
+            textTransform: 'uppercase',
+            textShadow: '0 0 20px rgba(197, 160, 89, 0.6)'
+          }}>Season 1 BETA</span>
+        </div>
 
         <div className="ornament" style={{ 
           animation:'fadeUp 0.8s 0.3s ease both', 
           margin:'0 auto 2.5rem',
-          transform: 'translateY(25vh)' // Empurrando junto com os botões
+          transform: 'translateY(60vh)' 
         }}>
           <div className="ornament-diamond" />
         </div>
@@ -82,7 +85,7 @@ export default function HeroSection({ onRegisterClick }) {
           justifyContent:'center',
           flexWrap:'wrap',
           animation:'fadeUp 0.9s 0.4s ease both',
-          transform: 'translateY(25vh)' // Empurrando mais para baixo conforme solicitado
+          transform: 'translateY(60vh)' 
         }}>
           <a href="#download" className="btn-primary">▶ JOGAR AGORA</a>
           <button 
@@ -120,6 +123,19 @@ export default function HeroSection({ onRegisterClick }) {
           <div style={{ width:1,height:40,background:'linear-gradient(to bottom, var(--gold), transparent)' }} />
         </div>
       </div>
+
+      <style>{`
+        @media (max-width: 992px) {
+          .hero-right-logo {
+            position: relative !important;
+            top: 40px !important;
+            right: auto !important;
+            margin: 0 auto !important;
+            width: 220px !important;
+            transform: none !important;
+          }
+        }
+      `}</style>
     </section>
   )
 }

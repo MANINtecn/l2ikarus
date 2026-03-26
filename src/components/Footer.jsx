@@ -35,6 +35,8 @@ export default function Footer() {
     { label: 'Início', href: '#hero' },
     { label: 'Rates', href: '#rates' },
     { label: 'Features', href: '#features' },
+    { label: 'Roadmap', href: '#roadmap' },
+    { label: 'Donate', href: '#donate' },
     { label: 'Download', href: '#download' },
   ]
 

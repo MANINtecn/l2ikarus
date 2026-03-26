@@ -1,10 +1,41 @@
+import { useState, useEffect } from 'react';
+
 const StatusSection = () => {
-  const stats = [
-    { label: 'Jogadores Online', value: '1,240', color: '#4ade80' },
-    { label: 'Status do Login', value: 'ONLINE', color: '#4ade80' },
-    { label: 'Status do Jogo', value: 'ONLINE', color: '#4ade80' },
-    { label: 'Versão', value: 'Essence 7.3', color: 'var(--primary-gold)' },
-  ];
+  const [stats, setStats] = useState([
+    { label: 'Jogadores Online', value: '...', color: '#4ade80', key: 'players' },
+    { label: 'Status do Login', value: '...', color: '#4ade80', key: 'status_login' },
+    { label: 'Status do Jogo', value: '...', color: '#4ade80', key: 'status_game' },
+    { label: 'Versão', value: 'Essence 7.3', color: 'var(--primary-gold)', key: 'version' },
+  ]);
+
+  useEffect(() => {
+    const fetchStatus = async () => {
+      try {
+        const response = await fetch('/api/status');
+        const data = await response.json();
+        
+        setStats(prev => prev.map(s => {
+          if (s.key === 'players') return { ...s, value: data.players.toLocaleString() };
+          if (s.key === 'status_login') return { ...s, value: data.status_login, color: data.online ? '#4ade80' : '#ef4444' };
+          if (s.key === 'status_game') return { ...s, value: data.status_game, color: data.online ? '#4ade80' : '#ef4444' };
+          return s;
+        }));
+      } catch (error) {
+        console.error('Error fetching status:', error);
+        // Fallback or keep loading
+        setStats(prev => prev.map(s => {
+          if (s.key === 'players') return { ...s, value: '1,240' };
+          if (s.key === 'status_login') return { ...s, value: 'ONLINE' };
+          if (s.key === 'status_game') return { ...s, value: 'ONLINE' };
+          return s;
+        }));
+      }
+    };
+
+    fetchStatus();
+    const interval = setInterval(fetchStatus, 30000); // Update every 30 seconds
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <section className="status-section" style={{ padding: '4rem 2rem', background: 'var(--bg-darker)' }}>

@@ -16,6 +16,7 @@ export default function Navbar({ onRegisterClick }) {
     { label: 'Rates',     href: '#rates' },
     { label: 'Features',  href: '#features' },
     { label: 'Roadmap',   href: '#roadmap' },
+    { label: 'Donate',    href: '#donate' },
     { label: 'Download',  href: '#download' },
   ]
 
@@ -26,14 +27,14 @@ export default function Navbar({ onRegisterClick }) {
       left: 0,
       width: '100%',
       zIndex: 1000,
-      transition: 'all 0.4s ease',
-      background: 'rgba(5, 5, 10, 0.98)', // Fundo escuro sólido para melhor visibilidade
-      backdropFilter: 'blur(16px)',
+      background: scrolled ? 'rgba(5, 5, 10, 0.8)' : 'transparent',
+      backdropFilter: scrolled ? 'blur(16px)' : 'none',
       borderBottom: scrolled ? '1px solid rgba(197, 160, 89, 0.2)' : '1px solid rgba(255, 255, 255, 0.05)',
-      padding: scrolled ? '0.3rem 2rem' : '0.5rem 2rem',
-      height: '45px', // Reduzido pela metade (aprox) para um menu mais slim
+      padding: scrolled ? '0.5rem 2rem' : '1rem 2rem',
+      height: '85px', // Aumentado para combinar com o botão e dar aspecto premium
       display: 'flex',
       alignItems: 'center',
+      transition: 'all 0.3s ease',
     }}>
       <div style={{
         width: '100%',
@@ -43,30 +44,13 @@ export default function Navbar({ onRegisterClick }) {
         alignItems: 'center',
         justifyContent: 'space-between',
       }}>
-        {/* LOGO FINAL (Section 9) */}
+        {/* LADO ESQUERDO (EQUILIBRAR CENTRO) */}
         <div style={{ 
           display: 'flex', 
           alignItems: 'center', 
-          lineHeight: 1,
           flex: 1
         }}>
-          <div style={{ position: 'relative', height: '30px', display: 'flex', alignItems: 'center', marginLeft: '-1rem' }}>
-            <img 
-              src="/assets/Section 11.png" 
-              alt="Ikarus Logo" 
-              style={{
-                height: scrolled ? '140px' : '95px',
-                width: 'auto',
-                transition: 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
-                transform: scrolled ? 'translateY(50px)' : 'translateY(22px)',
-                filter: 'drop-shadow(0 0 20px rgba(255, 255, 255, 0.15))',
-                zIndex: 2000,
-                pointerEvents: 'none',
-                transformOrigin: 'top left',
-                objectFit: 'contain'
-              }}
-            />
-          </div>
+          {/* Espaço vazio para manter o menu centralizado */}
         </div>
 
         {/* NAV DESKTOP */}
@@ -107,9 +91,15 @@ export default function Navbar({ onRegisterClick }) {
           </button>
         </nav>
 
-        {/* CTA */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <a href="#download" className="btn-primary" style={{ fontSize: '0.7rem', padding: '0.6rem 1.5rem' }}>
+        {/* CTA (LADO DIREITO - EQUILIBRAR CENTRO) */}
+        <div style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'flex-end', 
+          gap: '1rem',
+          flex: 1 
+        }}>
+          <a href="#download" className="btn-primary" style={{ fontSize: '0.85rem', padding: '0.8rem 2.2rem' }}>
             ▶ PLAY NOW
           </a>
 
