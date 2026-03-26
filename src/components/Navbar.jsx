@@ -30,8 +30,8 @@ export default function Navbar({ onRegisterClick }) {
       background: scrolled ? 'rgba(5, 5, 10, 0.8)' : 'transparent',
       backdropFilter: scrolled ? 'blur(16px)' : 'none',
       borderBottom: scrolled ? '1px solid rgba(197, 160, 89, 0.2)' : '1px solid rgba(255, 255, 255, 0.05)',
-      padding: scrolled ? '0.5rem 2rem' : '1rem 2rem',
-      height: '70px',
+      padding: scrolled ? '0.5rem 1.5rem' : '0.8rem 2rem',
+      height: scrolled ? '64px' : '84px',
       display: 'flex',
       alignItems: 'center',
       transition: 'all 0.3s ease',
@@ -54,13 +54,13 @@ export default function Navbar({ onRegisterClick }) {
         </div>
 
         {/* NAV DESKTOP */}
-        <nav style={{ display: 'flex', gap: '2rem' }} className="nav-desktop">
+        <nav style={{ display: 'flex', gap: '1.2rem' }} className="nav-desktop">
           {links.map(l => (
             <a key={l.href} href={l.href} style={{
               fontFamily: "'Outfit', sans-serif",
               fontWeight: 600,
-              fontSize: '0.75rem',
-              letterSpacing: '2px',
+              fontSize: '0.72rem',
+              letterSpacing: '1.5px',
               textTransform: 'uppercase',
               color: 'rgba(224,230,237,0.8)',
               transition: 'color 0.3s ease',
@@ -78,8 +78,8 @@ export default function Navbar({ onRegisterClick }) {
               cursor: 'pointer',
               fontFamily: "'Outfit', sans-serif",
               fontWeight: 600,
-              fontSize: '0.75rem',
-              letterSpacing: '2px',
+              fontSize: '0.72rem',
+              letterSpacing: '1.5px',
               textTransform: 'uppercase',
               color: '#c5a059',
               transition: 'all 0.3s ease',
@@ -99,7 +99,7 @@ export default function Navbar({ onRegisterClick }) {
           gap: '1rem',
           flex: 1 
         }}>
-          <a href="#download" className="btn-primary" style={{ fontSize: '0.8rem', padding: '0.5rem 1.8rem' }}>
+          <a href="#download" className="btn-primary" style={{ fontSize: '0.75rem', padding: '0.5rem 1.5rem' }}>
             ▶ PLAY NOW
           </a>
 

@@ -58,7 +58,6 @@ export default function HeroSection({ onRegisterClick }) {
         <div style={{
           animation: 'fadeUp 0.8s 0.2s ease both',
           marginBottom: '1rem',
-          transform: 'translateY(60vh)' 
         }}>
           <span style={{
             fontFamily: "'Cinzel', serif",
@@ -74,7 +73,6 @@ export default function HeroSection({ onRegisterClick }) {
         <div className="ornament" style={{ 
           animation:'fadeUp 0.8s 0.3s ease both', 
           margin:'0 auto 2.5rem',
-          transform: 'translateY(60vh)' 
         }}>
           <div className="ornament-diamond" />
         </div>
@@ -85,7 +83,6 @@ export default function HeroSection({ onRegisterClick }) {
           justifyContent:'center',
           flexWrap:'wrap',
           animation:'fadeUp 0.9s 0.4s ease both',
-          transform: 'translateY(60vh)' 
         }}>
           <a href="#download" className="btn-primary">▶ JOGAR AGORA</a>
           <button 

@@ -118,10 +118,10 @@ h1, h2, h3, h4, .cinzel {
   color: #0a0800;
   font-family: var(--font-main);
   font-weight: 700;
-  font-size: 0.9rem;
-  letter-spacing: 2px;
+  font-size: 0.85rem;
+  letter-spacing: 1.5px;
   text-transform: uppercase;
-  padding: 0.85rem 2.5rem;
+  padding: 0.7rem 1.8rem;
   border: none;
   cursor: pointer;
   clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
@@ -153,10 +153,10 @@ h1, h2, h3, h4, .cinzel {
   color: var(--neon-blue);
   font-family: var(--font-main);
   font-weight: 600;
-  font-size: 0.9rem;
-  letter-spacing: 2px;
+  font-size: 0.85rem;
+  letter-spacing: 1.5px;
   text-transform: uppercase;
-  padding: 0.85rem 2.5rem;
+  padding: 0.7rem 1.8rem;
   cursor: pointer;
   transition: all 0.3s ease;
   clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
@@ -202,7 +202,7 @@ h1, h2, h3, h4, .cinzel {
 
 /* ── SECTIONS ── */
 .section {
-  padding: 6rem 2rem;
+  padding: 4rem 2rem;
   position: relative;
 }
 
