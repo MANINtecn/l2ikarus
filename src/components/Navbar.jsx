@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
+import DraggableItem from './DraggableItem'
 
-export default function Navbar({ onRegisterClick }) {
+export default function Navbar({ onRegisterClick, isAdmin }) {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
 
@@ -36,18 +37,14 @@ export default function Navbar({ onRegisterClick }) {
     { label: 'Download',  href: '#download' },
   ]
 
-  return (
-    <header className={`nav-header ${scrolled ? 'scrolled' : ''}`} style={{
-      background: scrolled ? (window.innerWidth > 992 ? 'transparent' : 'rgba(5, 5, 10, 0.92)') : 'transparent',
-      backdropFilter: scrolled ? (window.innerWidth > 992 ? 'none' : 'blur(20px)') : 'none',
-      height: scrolled ? '70px' : '90px',
-      borderBottom: scrolled ? (window.innerWidth > 992 ? 'none' : '1px solid rgba(197, 160, 89, 0.2)') : '1px solid transparent',
-    }}>
+  const navContent = (
+    <>
       <div className="container-wide" style={{
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: '0 2rem'
+        padding: '0 2rem',
+        height: '100%'
       }}>
         {/* LADO ESQUERDO (EQUILIBRAR) */}
         <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
@@ -118,6 +115,41 @@ export default function Navbar({ onRegisterClick }) {
           </div>
         </div>
       )}
+    </>
+  );
+
+  if (isAdmin) {
+    return (
+      <DraggableItem 
+        id="navbar-admin" 
+        isAdmin={isAdmin} 
+        initialPos={{ x: 0, y: isAdmin ? 40 : 0 }} 
+        initialSize={{ width: '100%', height: 90 }}
+        className="nav-header-draggable"
+      >
+        <header style={{
+          width: '100%',
+          height: '100%',
+          background: scrolled ? 'rgba(5, 5, 10, 0.92)' : 'transparent',
+          backdropFilter: scrolled ? 'blur(20px)' : 'none',
+          borderBottom: '1px solid rgba(197, 160, 89, 0.2)',
+          display: 'flex',
+          alignItems: 'center'
+        }}>
+          {navContent}
+        </header>
+      </DraggableItem>
+    );
+  }
+
+  return (
+    <header className={`nav-header ${scrolled ? 'scrolled' : ''}`} style={{
+      background: scrolled ? (window.innerWidth > 992 ? 'transparent' : 'rgba(5, 5, 10, 0.92)') : 'transparent',
+      backdropFilter: scrolled ? (window.innerWidth > 992 ? 'none' : 'blur(20px)') : 'none',
+      height: scrolled ? '70px' : '90px',
+      borderBottom: scrolled ? (window.innerWidth > 992 ? 'none' : '1px solid rgba(197, 160, 89, 0.2)') : '1px solid transparent',
+    }}>
+      {navContent}
     </header>
   )
 }

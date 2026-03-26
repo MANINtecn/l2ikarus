@@ -1,5 +1,8 @@
-export default function Footer() {
+export default function Footer({ onAdminClick }) {
   const year = new Date().getFullYear()
+
+  // ... (rest of the socialLinks and navLinks remain the same)
+  // I will only change the component signature and add the trigger
 
   const socialLinks = [
     {
@@ -199,7 +202,10 @@ export default function Footer() {
           flexWrap: 'wrap',
           gap: '0.5rem',
         }}>
-          <p style={{ fontSize: '0.75rem', color: 'var(--muted)', letterSpacing: '1px' }}>
+          <p 
+            onClick={onAdminClick}
+            style={{ fontSize: '0.75rem', color: 'var(--muted)', letterSpacing: '1px', cursor: 'pointer' }}
+          >
             © {year} L2 Ikarus Arise. Todos os direitos reservados.
           </p>
           <p style={{ fontSize: '0.7rem', color: '#333', letterSpacing: '1px' }}>
