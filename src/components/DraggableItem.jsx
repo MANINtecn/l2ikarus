@@ -1,6 +1,17 @@
 import { useState, useEffect, useRef } from 'react';
 
-export default function DraggableItem({ id, children, initialPos = { x: 0, y: 0 }, initialSize = {}, isAdmin = false, className = "" }) {
+export default function DraggableItem({ 
+  id, 
+  children, 
+  initialPos = { x: 0, y: 0 }, 
+  initialSize = {}, 
+  initialStyle = { fontSize: 'inherit', fontFamily: 'inherit' },
+  initialText = '',
+  isAdmin = false, 
+  className = "",
+  onDelete = null,
+  onDuplicate = null
+}) {
   const [pos, setPos] = useState(() => {
     const saved = localStorage.getItem(`pos-${id}`);
     return saved ? JSON.parse(saved) : initialPos;
@@ -11,16 +22,34 @@ export default function DraggableItem({ id, children, initialPos = { x: 0, y: 0 
     return saved ? JSON.parse(saved) : initialSize;
   });
 
+  const [style, setStyle] = useState(() => {
+    const saved = localStorage.getItem(`style-${id}`);
+    return saved ? JSON.parse(saved) : initialStyle;
+  });
+
+  const [text, setText] = useState(() => {
+    const saved = localStorage.getItem(`text-${id}`);
+    return saved || initialText;
+  });
+
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
+  const [showToolbar, setShowToolbar] = useState(false);
   
   const offset = useRef({ x: 0, y: 0 });
   const startSize = useRef({ w: 0, h: 0 });
   const elementRef = useRef(null);
 
-  // Drag logic
+  // Persistence
+  useEffect(() => {
+    localStorage.setItem(`pos-${id}`, JSON.stringify(pos));
+    localStorage.setItem(`size-${id}`, JSON.stringify(size));
+    localStorage.setItem(`style-${id}`, JSON.stringify(style));
+    localStorage.setItem(`text-${id}`, text);
+  }, [pos, size, style, text, id]);
+
   const onMouseDown = (e) => {
-    if (!isAdmin || e.button !== 0 || e.target.classList.contains('resize-handle')) return;
+    if (!isAdmin || e.button !== 0 || e.target.closest('.builder-toolbar') || e.target.classList.contains('resize-handle')) return;
     setIsDragging(true);
     const rect = elementRef.current.getBoundingClientRect();
     offset.current = {
@@ -30,7 +59,6 @@ export default function DraggableItem({ id, children, initialPos = { x: 0, y: 0 
     e.preventDefault();
   };
 
-  // Resize logic
   const onResizeStart = (e) => {
     if (!isAdmin) return;
     setIsResizing(true);
@@ -64,14 +92,8 @@ export default function DraggableItem({ id, children, initialPos = { x: 0, y: 0 
     };
 
     const onMouseUp = () => {
-      if (isDragging) {
-        setIsDragging(false);
-        localStorage.setItem(`pos-${id}`, JSON.stringify(pos));
-      }
-      if (isResizing) {
-        setIsResizing(false);
-        localStorage.setItem(`size-${id}`, JSON.stringify(size));
-      }
+      setIsDragging(false);
+      setIsResizing(false);
     };
 
     if (isDragging || isResizing) {
@@ -83,53 +105,105 @@ export default function DraggableItem({ id, children, initialPos = { x: 0, y: 0 
       window.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('mouseup', onMouseUp);
     };
-  }, [isDragging, isResizing, pos, size, id]);
+  }, [isDragging, isResizing]);
 
-  // Reset Layout
+  // Reset Logic
   useEffect(() => {
     const handleReset = () => {
       localStorage.removeItem(`pos-${id}`);
       localStorage.removeItem(`size-${id}`);
+      localStorage.removeItem(`style-${id}`);
+      localStorage.removeItem(`text-${id}`);
       setPos(initialPos);
       setSize(initialSize);
+      setStyle(initialStyle);
+      setText(initialText);
     };
     window.addEventListener('reset-layout', handleReset);
     return () => window.removeEventListener('reset-layout', handleReset);
-  }, [id, initialPos, initialSize]);
+  }, [id, initialPos, initialSize, initialStyle, initialText]);
+
+  // Toolbar Handlers
+  const changeFontSize = (delta) => {
+    const current = parseInt(style.fontSize) || 16;
+    setStyle(prev => ({ ...prev, fontSize: `${current + delta}px` }));
+  };
+
+  const toggleFont = () => {
+    const fonts = ["'Cinzel', serif", "'Outfit', sans-serif", "inherit"];
+    const idx = fonts.indexOf(style.fontFamily);
+    setStyle(prev => ({ ...prev, fontFamily: fonts[(idx + 1) % fonts.length] }));
+  };
 
   return (
     <div
       ref={elementRef}
       onMouseDown={onMouseDown}
-      className={`${className} ${isDragging ? 'dragging' : ''} ${isAdmin ? 'builder-mode' : ''}`}
+      onMouseEnter={() => isAdmin && setShowToolbar(true)}
+      onMouseLeave={() => isAdmin && setShowToolbar(false)}
+      className={`${className} ${isAdmin ? 'builder-mode' : ''}`}
       style={{
         position: 'absolute',
         left: pos.x,
         top: pos.y,
         width: size.width || 'auto',
         height: size.height || 'auto',
+        fontSize: style.fontSize,
+        fontFamily: style.fontFamily,
         cursor: isAdmin ? (isDragging ? 'grabbing' : 'grab') : 'default',
         zIndex: isDragging || isResizing ? 2000 : (isAdmin ? 100 : 10),
-        userSelect: isAdmin ? 'none' : 'auto',
-        border: (isAdmin && (isDragging || isResizing)) ? '1px dashed var(--gold)' : 'none',
+        border: (isAdmin && (isDragging || isResizing || showToolbar)) ? '1px dashed var(--gold)' : 'none',
       }}
     >
-      {children}
+      {/* TOOLBAR */}
+      {isAdmin && showToolbar && (
+        <div className="builder-toolbar" style={{
+          position: 'absolute', top: '-45px', left: 0, 
+          background: '#111', border: '1px solid var(--gold)',
+          borderRadius: '4px', display: 'flex', gap: '8px', padding: '6px',
+          zIndex: 3000, boxShadow: '0 4px 15px rgba(0,0,0,0.5)',
+          whiteSpace: 'nowrap'
+        }}>
+          <button onClick={toggleFont} title="Mudar Fonte" style={{ background:'none', color:'var(--gold)', border:'none', cursor:'pointer', fontSize:'10px' }}>🎨 FONTE</button>
+          <button onClick={() => changeFontSize(2)} title="Aumentar" style={{ background:'none', color:'var(--gold)', border:'none', cursor:'pointer' }}>A+</button>
+          <button onClick={() => changeFontSize(-2)} title="Diminuir" style={{ background:'none', color:'var(--gold)', border:'none', cursor:'pointer' }}>A-</button>
+          <div style={{ width:1, background:'#444', margin:'0 4px' }} />
+          {onDuplicate && <button onClick={() => onDuplicate(id)} title="Copiado" style={{ background:'none', color:'var(--gold)', border:'none', cursor:'pointer' }}>📋</button>}
+          {onDelete && <button onClick={() => onDelete(id)} title="Excluir" style={{ background:'none', color:'#ff4444', border:'none', cursor:'pointer' }}>🗑️</button>}
+        </div>
+      )}
+
+      {/* CONTENT */}
+      {text ? (
+        <div 
+          contentEditable={isAdmin}
+          suppressContentEditableWarning
+          onBlur={(e) => setText(e.target.innerText)}
+          style={{ 
+            outline: 'none', 
+            width: '100%', 
+            height: '100%',
+            color: 'inherit',
+            fontFamily: 'inherit',
+            fontSize: 'inherit',
+            textAlign: 'inherit',
+            pointerEvents: isAdmin ? 'auto' : 'none'
+          }}
+        >
+          {text}
+        </div>
+      ) : (
+        children
+      )}
       
       {isAdmin && (
         <div 
           className="resize-handle"
           onMouseDown={onResizeStart}
           style={{
-            position: 'absolute',
-            bottom: 0,
-            right: 0,
-            width: '12px',
-            height: '12px',
-            background: 'var(--gold)',
-            cursor: 'nwse-resize',
-            zIndex: 10,
-            opacity: 0.7
+            position: 'absolute', bottom: 0, right: 0,
+            width: '12px', height: '12px', background: 'var(--gold)',
+            cursor: 'nwse-resize', zIndex: 10, opacity: 0.7
           }}
         />
       )}

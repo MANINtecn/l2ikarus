@@ -1,11 +1,42 @@
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import logoBranca from '../assets/LOGO BASICA BRANCA.png'
 import DraggableItem from './DraggableItem'
 
 export default function HeroSection({ onRegisterClick, isAdmin }) {
-  
+  const [dynamicItems, setDynamicItems] = useState(() => {
+    const saved = localStorage.getItem('hero-dynamic-items');
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  useEffect(() => {
+    localStorage.setItem('hero-dynamic-items', JSON.stringify(dynamicItems));
+  }, [dynamicItems]);
+
+  const handleDuplicate = (id) => {
+    const newItem = {
+      id: `copy-${Date.now()}`,
+      templateId: id.includes('copy-') ? 'text-only' : id,
+      pos: { x: window.innerWidth / 2, y: window.innerHeight / 2 },
+      text: localStorage.getItem(`text-${id}`) || '',
+      style: JSON.parse(localStorage.getItem(`style-${id}`) || '{"fontSize":"inherit","fontFamily":"inherit"}')
+    };
+    setDynamicItems([...dynamicItems, newItem]);
+  };
+
+  const handleDelete = (id) => {
+    setDynamicItems(dynamicItems.filter(item => item.id !== id));
+    localStorage.removeItem(`pos-${id}`);
+    localStorage.removeItem(`size-${id}`);
+    localStorage.removeItem(`style-${id}`);
+    localStorage.removeItem(`text-${id}`);
+  };
+
   const handleReset = () => {
-    window.dispatchEvent(new CustomEvent('reset-layout'));
+    if (window.confirm('Deseja resetar todo o layout e remover as cópias criadas?')) {
+      setDynamicItems([]);
+      localStorage.removeItem('hero-dynamic-items');
+      window.dispatchEvent(new CustomEvent('reset-layout'));
+    }
   };
 
   return (
@@ -42,54 +73,74 @@ export default function HeroSection({ onRegisterClick, isAdmin }) {
       <div style={{ position:'absolute',bottom:0,left:0,right:0,height:'40%',zIndex:3,pointerEvents:'none',
         background:'linear-gradient(to top, var(--bg) 0%, transparent 100%)' }} />
 
-      {/* DRAGGABLE LOGO */}
-      <DraggableItem id="hero-logo" isAdmin={isAdmin} initialPos={{ x: window.innerWidth * 0.7, y: 100 }} initialSize={{ width: 300 }}>
+      {/* LOGO */}
+      <DraggableItem 
+        id="hero-logo" isAdmin={isAdmin} 
+        initialPos={{ x: window.innerWidth * 0.7, y: 100 }} initialSize={{ width: 300 }}
+        onDuplicate={handleDuplicate}
+      >
         <div style={{ width: '100%', pointerEvents: 'none' }}>
            <img src={logoBranca} alt="L2 Ikarus Logo" style={{ width: '100%', filter: 'drop-shadow(0 0 30px rgba(197, 160, 89, 0.3))' }} />
         </div>
       </DraggableItem>
 
-      {/* DRAGGABLE SEASON LABEL */}
-      <DraggableItem id="season-label" isAdmin={isAdmin} initialPos={{ x: window.innerWidth / 2 - 100, y: window.innerHeight * 0.45 }}>
-        <div style={{ textAlign: 'center', width: '100%', pointerEvents: 'none' }}>
-           <span style={{
-            fontFamily: "'Cinzel', serif",
-            fontSize: '1.2rem',
-            fontWeight: 700,
-            letterSpacing: '6px',
-            color: 'var(--gold)',
-            textTransform: 'uppercase',
-            textShadow: '0 0 20px rgba(197, 160, 89, 0.4)'
-          }}>Season 1 BETA</span>
-        </div>
+      {/* SEASON LABEL */}
+      <DraggableItem 
+        id="season-label" isAdmin={isAdmin} 
+        initialPos={{ x: window.innerWidth / 2 - 100, y: window.innerHeight * 0.45 }}
+        initialText="Season 1 BETA"
+        initialStyle={{ fontSize: '1.2rem', fontFamily: "'Cinzel', serif" }}
+        onDuplicate={handleDuplicate}
+      >
+        {/* Children handled by initialText */}
       </DraggableItem>
 
-      {/* DRAGGABLE ORNAMENT */}
-      <DraggableItem id="ornament" isAdmin={isAdmin} initialPos={{ x: window.innerWidth / 2 - 15, y: window.innerHeight * 0.52 }}>
+      {/* ORNAMENT */}
+      <DraggableItem 
+        id="ornament" isAdmin={isAdmin} 
+        initialPos={{ x: window.innerWidth / 2 - 15, y: window.innerHeight * 0.52 }}
+        onDuplicate={handleDuplicate}
+      >
          <div className="ornament-diamond" style={{ pointerEvents: 'none' }} />
       </DraggableItem>
 
-      {/* DRAGGABLE BUTTONS */}
-      <DraggableItem id="hero-actions" isAdmin={isAdmin} initialPos={{ x: window.innerWidth / 2 - 250, y: window.innerHeight * 0.65 }}>
-        <div style={{ 
-          display:'flex',
-          gap:'1.5rem',
-          justifyContent:'center',
-          flexWrap:'wrap',
-          width: '100%'
-        }}>
-          <a href="#download" className="btn btn-primary btn-glow" style={{ padding: '0.9rem 3rem', fontSize: '1rem' }}>
-            ▶ JOGAR AGORA
-          </a>
-          <button 
-            onClick={onRegisterClick}
-            className="btn btn-outline"
-            style={{ padding: '0.9rem 2.8rem', fontSize: '1rem' }}
-          >
-            CRIAR CONTA
-          </button>
+      {/* BUTTONS */}
+      <DraggableItem 
+        id="hero-actions" isAdmin={isAdmin} 
+        initialPos={{ x: window.innerWidth / 2 - 250, y: window.innerHeight * 0.65 }}
+        onDuplicate={handleDuplicate}
+      >
+        <div style={{ display:'flex', gap:'1.5rem', justifyContent:'center', flexWrap:'wrap', width: '100%' }}>
+          <a href="#download" className="btn btn-primary btn-glow" style={{ padding: '0.9rem 3rem', fontSize: '1rem' }}>▶ JOGAR AGORA</a>
+          <button onClick={onRegisterClick} className="btn btn-outline" style={{ padding: '0.9rem 2.8rem', fontSize: '1rem' }}>CRIAR CONTA</button>
         </div>
       </DraggableItem>
+
+      {/* DYNAMIC COPIES */}
+      {dynamicItems.map(item => (
+        <DraggableItem
+          key={item.id}
+          id={item.id}
+          isAdmin={isAdmin}
+          initialPos={item.pos}
+          initialText={item.text}
+          initialStyle={item.style}
+          onDelete={handleDelete}
+          onDuplicate={handleDuplicate}
+        >
+          {item.templateId === 'hero-logo' && (
+            <div style={{ width: '100%', pointerEvents: 'none' }}>
+               <img src={logoBranca} alt="Logo Copy" style={{ width: '100%', filter: 'drop-shadow(0 0 30px rgba(197, 160, 89, 0.3))' }} />
+            </div>
+          )}
+          {item.templateId === 'ornament' && <div className="ornament-diamond" style={{ pointerEvents: 'none' }} />}
+          {item.templateId === 'hero-actions' && (
+             <div style={{ display:'flex', gap:'1.5rem', justifyContent:'center', flexWrap:'wrap', width: '100%' }}>
+                <a href="#download" className="btn btn-primary btn-glow" style={{ padding: '0.5rem 1.5rem', fontSize: '0.8rem' }}>▶ COPY BUTTON</a>
+             </div>
+          )}
+        </DraggableItem>
+      ))}
 
       {/* SCROLL INDICATOR (NOT DRAGGABLE) */}
       <div style={{ 
@@ -124,7 +175,7 @@ export default function HeroSection({ onRegisterClick, isAdmin }) {
           onMouseEnter={e => e.target.style.background = 'rgba(197, 160, 89, 0.3)'}
           onMouseLeave={e => e.target.style.background = 'rgba(197, 160, 89, 0.15)'}
         >
-          RESTAURAR LAYOUT (HERO)
+          RESTAURAR TUDO (BUILDER)
         </button>
       )}
 
