@@ -3,7 +3,6 @@ import './index.css'
 import Navbar from './components/Navbar'
 import HeroSection from './components/HeroSection'
 import StatusSection from './components/StatusSection'
-import RatesSection from './components/RatesSection'
 import FeaturesSection from './components/FeaturesSection'
 import RoadmapSection from './components/RoadmapSection'
 import DonateSection from './components/DonateSection'
@@ -21,8 +20,13 @@ function App() {
 
   // GLOBAL BUILDER STATE
   const [dynamicItems, setDynamicItems] = useState(() => {
-    const saved = localStorage.getItem('global-dynamic-items');
-    return saved ? JSON.parse(saved) : [];
+    try {
+      const saved = localStorage.getItem('global-dynamic-items');
+      return saved ? JSON.parse(saved) : [];
+    } catch (e) {
+      console.error('Error loading dynamic items:', e);
+      return [];
+    }
   });
 
   useEffect(() => {
@@ -134,12 +138,6 @@ function App() {
       />
       
       <StatusSection 
-        isAdmin={isAdmin} 
-        onDuplicate={handleDuplicate}
-      />
-      
-      <div className="section-divider" />
-      <RatesSection 
         isAdmin={isAdmin} 
         onDuplicate={handleDuplicate}
       />

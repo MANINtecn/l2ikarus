@@ -1,5 +1,14 @@
 import { useState, useEffect, useRef } from 'react';
 
+const safeJsonParse = (str, fallback) => {
+  try {
+    const parsed = JSON.parse(str);
+    return parsed !== null ? parsed : fallback;
+  } catch (e) {
+    return fallback;
+  }
+};
+
 export default function DraggableItem({ 
   id, 
   children, 
@@ -12,24 +21,34 @@ export default function DraggableItem({
   onDelete = null,
   onDuplicate = null
 }) {
+  // Ensure defaults are always objects
+  const safeInitialPos = initialPos || { x: 0, y: 0 };
+  const safeInitialSize = initialSize || {};
+  const safeInitialStyle = initialStyle || { fontSize: 'inherit', fontFamily: 'inherit', color: 'inherit' };
+
   const [pos, setPos] = useState(() => {
     const saved = localStorage.getItem(`pos-${id}`);
-    return saved ? JSON.parse(saved) : initialPos;
+    return saved ? safeJsonParse(saved, safeInitialPos) : safeInitialPos;
   });
   
   const [size, setSize] = useState(() => {
     const saved = localStorage.getItem(`size-${id}`);
-    return saved ? JSON.parse(saved) : initialSize;
+    return saved ? safeJsonParse(saved, safeInitialSize) : safeInitialSize;
   });
 
   const [style, setStyle] = useState(() => {
     const saved = localStorage.getItem(`style-${id}`);
-    return saved ? JSON.parse(saved) : initialStyle;
+    if (saved) {
+        const parsed = safeJsonParse(saved, safeInitialStyle);
+        // Merge with initial style to ensure all keys exist
+        return { ...safeInitialStyle, ...parsed };
+    }
+    return safeInitialStyle;
   });
 
   const [text, setText] = useState(() => {
     const saved = localStorage.getItem(`text-${id}`);
-    return saved || initialText;
+    return (saved !== null && saved !== undefined) ? saved : initialText;
   });
 
   const [isDragging, setIsDragging] = useState(false);
@@ -42,6 +61,7 @@ export default function DraggableItem({
 
   // Persistence
   useEffect(() => {
+    if (!id) return;
     localStorage.setItem(`pos-${id}`, JSON.stringify(pos));
     localStorage.setItem(`size-${id}`, JSON.stringify(size));
     localStorage.setItem(`style-${id}`, JSON.stringify(style));
@@ -66,7 +86,7 @@ export default function DraggableItem({
     
     setIsSelected(true);
     
-    // Only prevent default if we're not clicking into an editable area
+    // Only prevent default and start dragging if we're not clicking into an editable area
     if (e.target.getAttribute('contenteditable') !== 'true') {
       setIsDragging(true);
       const rect = elementRef.current.getBoundingClientRect();
@@ -134,14 +154,14 @@ export default function DraggableItem({
       localStorage.removeItem(`size-${id}`);
       localStorage.removeItem(`style-${id}`);
       localStorage.removeItem(`text-${id}`);
-      setPos(initialPos);
-      setSize(initialSize);
-      setStyle(initialStyle);
+      setPos(safeInitialPos);
+      setSize(safeInitialSize);
+      setStyle(safeInitialStyle);
       setText(initialText);
     };
     window.addEventListener('reset-layout', handleReset);
     return () => window.removeEventListener('reset-layout', handleReset);
-  }, [id, initialPos, initialSize, initialStyle, initialText]);
+  }, [id, safeInitialPos, safeInitialSize, safeInitialStyle, initialText]);
 
   // Toolbar Handlers
   const changeFontSize = (delta) => {
@@ -151,15 +171,19 @@ export default function DraggableItem({
 
   const toggleFont = () => {
     const fonts = ["'Cinzel', serif", "'Outfit', sans-serif", "inherit"];
-    const idx = fonts.indexOf(style.fontFamily);
+    const currentFont = style.fontFamily || "inherit";
+    const idx = fonts.indexOf(currentFont);
     setStyle(prev => ({ ...prev, fontFamily: fonts[(idx + 1) % fonts.length] }));
   };
 
   const toggleColor = () => {
     const colors = ["var(--gold)", "#FFFFFF", "#FF4444", "#44AAFF", "#00FF00", "inherit"];
-    const idx = colors.indexOf(style.color);
+    const currentColor = style.color || "inherit";
+    const idx = colors.indexOf(currentColor);
     setStyle(prev => ({ ...prev, color: colors[(idx + 1) % colors.length] }));
   };
+
+  const displayPos = pos || { x: 0, y: 0 };
 
   return (
     <div
@@ -168,13 +192,13 @@ export default function DraggableItem({
       className={`${className} ${isAdmin ? 'builder-mode' : ''} ${isSelected ? 'is-selected' : ''}`}
       style={{
         position: 'absolute',
-        left: pos.x,
-        top: pos.y,
-        width: size.width || 'auto',
-        height: size.height || 'auto',
-        fontSize: style.fontSize,
-        fontFamily: style.fontFamily,
-        color: style.color,
+        left: displayPos.x,
+        top: displayPos.y,
+        width: size?.width || 'auto',
+        height: size?.height || 'auto',
+        fontSize: style?.fontSize,
+        fontFamily: style?.fontFamily,
+        color: style?.color,
         cursor: isAdmin ? (isDragging ? 'grabbing' : 'grab') : 'default',
         zIndex: isDragging || isResizing || isSelected ? 2000 : (isAdmin ? 100 : 10),
         border: (isAdmin && (isDragging || isResizing || isSelected)) ? '2px solid var(--gold)' : 'none',
