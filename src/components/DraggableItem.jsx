@@ -5,7 +5,7 @@ export default function DraggableItem({
   children, 
   initialPos = { x: 0, y: 0 }, 
   initialSize = {}, 
-  initialStyle = { fontSize: 'inherit', fontFamily: 'inherit' },
+  initialStyle = { fontSize: 'inherit', fontFamily: 'inherit', color: 'inherit' },
   initialText = '',
   isAdmin = false, 
   className = "",
@@ -63,14 +63,19 @@ export default function DraggableItem({
 
   const onMouseDown = (e) => {
     if (!isAdmin || e.button !== 0 || e.target.closest('.builder-toolbar') || e.target.classList.contains('resize-handle')) return;
-    setIsDragging(true);
+    
     setIsSelected(true);
-    const rect = elementRef.current.getBoundingClientRect();
-    offset.current = {
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
-    };
-    e.preventDefault();
+    
+    // Only prevent default if we're not clicking into an editable area
+    if (e.target.getAttribute('contenteditable') !== 'true') {
+      setIsDragging(true);
+      const rect = elementRef.current.getBoundingClientRect();
+      offset.current = {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top,
+      };
+      e.preventDefault();
+    }
   };
 
   const onResizeStart = (e) => {
@@ -150,6 +155,12 @@ export default function DraggableItem({
     setStyle(prev => ({ ...prev, fontFamily: fonts[(idx + 1) % fonts.length] }));
   };
 
+  const toggleColor = () => {
+    const colors = ["var(--gold)", "#FFFFFF", "#FF4444", "#44AAFF", "#00FF00", "inherit"];
+    const idx = colors.indexOf(style.color);
+    setStyle(prev => ({ ...prev, color: colors[(idx + 1) % colors.length] }));
+  };
+
   return (
     <div
       ref={elementRef}
@@ -163,6 +174,7 @@ export default function DraggableItem({
         height: size.height || 'auto',
         fontSize: style.fontSize,
         fontFamily: style.fontFamily,
+        color: style.color,
         cursor: isAdmin ? (isDragging ? 'grabbing' : 'grab') : 'default',
         zIndex: isDragging || isResizing || isSelected ? 2000 : (isAdmin ? 100 : 10),
         border: (isAdmin && (isDragging || isResizing || isSelected)) ? '2px solid var(--gold)' : 'none',
@@ -179,6 +191,7 @@ export default function DraggableItem({
           whiteSpace: 'nowrap'
         }}>
           <button onClick={(e) => { e.stopPropagation(); toggleFont(); }} title="Mudar Fonte" style={{ background:'none', color:'var(--gold)', border:'none', cursor:'pointer', fontSize:'11px', fontWeight:'700' }}>🎨 FONTE</button>
+          <button onClick={(e) => { e.stopPropagation(); toggleColor(); }} title="Mudar Cor" style={{ background:'none', color:style.color === 'inherit' ? 'var(--gold)' : style.color, border:'none', cursor:'pointer', fontWeight:'700' }}>☀ COR</button>
           <button onClick={(e) => { e.stopPropagation(); changeFontSize(2); }} title="Aumentar" style={{ background:'none', color:'var(--gold)', border:'none', cursor:'pointer', fontWeight:'700', padding:'0 5px' }}>A+</button>
           <button onClick={(e) => { e.stopPropagation(); changeFontSize(-2); }} title="Diminuir" style={{ background:'none', color:'var(--gold)', border:'none', cursor:'pointer', fontWeight:'700', padding:'0 5px' }}>A-</button>
           <div style={{ width:2, background:'rgba(197,160,89,0.3)', margin:'0 4px' }} />
@@ -202,7 +215,8 @@ export default function DraggableItem({
             fontFamily: 'inherit',
             fontSize: 'inherit',
             textAlign: 'inherit',
-            pointerEvents: isAdmin ? 'auto' : 'none'
+            pointerEvents: isAdmin ? 'auto' : 'none',
+            whiteSpace: 'pre-wrap'
           }}
         >
           {text}
@@ -217,8 +231,9 @@ export default function DraggableItem({
           onMouseDown={onResizeStart}
           style={{
             position: 'absolute', bottom: 0, right: 0,
-            width: '12px', height: '12px', background: 'var(--gold)',
-            cursor: 'nwse-resize', zIndex: 10, opacity: 0.7
+            width: '14px', height: '14px', background: 'var(--gold)',
+            cursor: 'nwse-resize', zIndex: 10, opacity: 0.8,
+            borderRadius: '2px'
           }}
         />
       )}

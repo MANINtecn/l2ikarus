@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './index.css'
 import Navbar from './components/Navbar'
 import HeroSection from './components/HeroSection'
@@ -10,6 +10,7 @@ import DonateSection from './components/DonateSection'
 import DownloadSection from './components/DownloadSection'
 import Footer from './components/Footer'
 import RegisterModal from './components/RegisterModal'
+import DraggableItem from './components/DraggableItem'
 
 function App() {
   const [isRegisterOpen, setIsRegisterOpen] = useState(false)
@@ -17,6 +18,61 @@ function App() {
   const [showLogin, setShowLogin] = useState(false)
   const [loginForm, setLoginForm] = useState({ email: '', password: '' })
   const [error, setError] = useState('')
+
+  // GLOBAL BUILDER STATE
+  const [dynamicItems, setDynamicItems] = useState(() => {
+    const saved = localStorage.getItem('global-dynamic-items');
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  useEffect(() => {
+    localStorage.setItem('global-dynamic-items', JSON.stringify(dynamicItems));
+  }, [dynamicItems]);
+
+  const addTextItem = () => {
+    const newItem = {
+      id: `text-${Date.now()}`,
+      type: 'text',
+      pos: { x: window.innerWidth / 2 - 100, y: window.scrollY + 200 },
+      text: 'Novo Texto Editável',
+      style: { fontSize: '24px', fontFamily: "'Cinzel', serif", color: 'var(--gold)' }
+    };
+    setDynamicItems([...dynamicItems, newItem]);
+  };
+
+  const handleDuplicate = (id) => {
+    const original = dynamicItems.find(item => item.id === id);
+    const newItem = {
+      ...original,
+      id: `copy-${Date.now()}`,
+      pos: { x: (original?.pos?.x || 0) + 20, y: (original?.pos?.y || 0) + 20 },
+    };
+    
+    // If it's a template from a section, we need to get its current state from localstorage
+    if (!original) {
+      const savedText = localStorage.getItem(`text-${id}`) || '';
+      const savedStyle = JSON.parse(localStorage.getItem(`style-${id}`) || '{"fontSize":"inherit","fontFamily":"inherit"}');
+      const copy = {
+        id: `copy-${Date.now()}`,
+        type: 'text',
+        pos: { x: window.innerWidth / 2, y: window.scrollY + 100 },
+        text: savedText,
+        style: savedStyle
+      };
+      setDynamicItems([...dynamicItems, copy]);
+      return;
+    }
+
+    setDynamicItems([...dynamicItems, newItem]);
+  };
+
+  const handleDelete = (id) => {
+    setDynamicItems(dynamicItems.filter(item => item.id !== id));
+    localStorage.removeItem(`pos-${id}`);
+    localStorage.removeItem(`size-${id}`);
+    localStorage.removeItem(`style-${id}`);
+    localStorage.removeItem(`text-${id}`);
+  };
 
   const handleLogin = (e) => {
     e.preventDefault()
@@ -36,51 +92,98 @@ function App() {
   }
 
   const handleReset = () => {
-    if (window.confirm('Deseja realmente restaurar as posições originais de todo o site?')) {
+    if (window.confirm('Deseja realmente restaurar as posições originais e REMOVER todos os elementos novos criados?')) {
+      setDynamicItems([]);
+      localStorage.removeItem('global-dynamic-items');
       window.dispatchEvent(new CustomEvent('reset-layout'))
     }
   }
 
   return (
-    <main>
+    <main style={{ position: 'relative' }}>
       {/* ADMIN TOOLBAR */}
       {isAdmin && (
         <div style={{
-          position: 'fixed', top: 0, left: 0, right: 0, height: '40px',
-          background: 'rgba(197, 160, 89, 0.95)', color: '#000',
+          position: 'fixed', top: 0, left: 0, right: 0, height: '50px',
+          background: 'rgba(197, 160, 89, 0.98)', color: '#000',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '0 2rem', zIndex: 10000, fontWeight: 700, fontSize: '0.8rem',
-          boxShadow: '0 2px 10px rgba(0,0,0,0.5)'
+          padding: '0 2rem', zIndex: 10000, fontWeight: 700, fontSize: '0.85rem',
+          boxShadow: '0 4px 15px rgba(0,0,0,0.6)', borderBottom: '2px solid #000'
         }}>
-          <div>PAINEL DO DESENVOLVEDOR (MODO EDIÇÃO ATIVO)</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+            <span>BUILDER IKARUS ATIVO</span>
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
+              <button onClick={addTextItem} style={{ background: '#000', color: 'var(--gold)', border: 'none', padding: '6px 15px', cursor: 'pointer', borderRadius: '4px', fontSize: '0.75rem' }}>+ ADICIONAR TEXTO</button>
+            </div>
+          </div>
+          
           <div style={{ display: 'flex', gap: '1rem' }}>
-            <button onClick={handleReset} style={{ background: '#000', color: '#fff', border: 'none', padding: '4px 12px', cursor: 'pointer', borderRadius: '4px' }}>RESTAURAR TUDO</button>
-            <button onClick={handleLogout} style={{ background: 'transparent', border: '1px solid #000', padding: '4px 12px', cursor: 'pointer', borderRadius: '4px' }}>SAIR</button>
+            <button onClick={handleReset} style={{ background: '#000', color: '#fff', border: 'none', padding: '6px 15px', cursor: 'pointer', borderRadius: '4px' }}>RESTAURAR TUDO</button>
+            <button onClick={handleLogout} style={{ background: 'transparent', border: '2px solid #000', padding: '5px 15px', cursor: 'pointer', borderRadius: '4px' }}>SAIR</button>
           </div>
         </div>
       )}
 
       <Navbar isAdmin={isAdmin} onRegisterClick={() => setIsRegisterOpen(true)} />
-      <HeroSection isAdmin={isAdmin} onRegisterClick={() => setIsRegisterOpen(true)} />
-      <StatusSection isAdmin={isAdmin} />
+      
+      {/* Sections with Admin Props */}
+      <HeroSection 
+        isAdmin={isAdmin} 
+        onRegisterClick={() => setIsRegisterOpen(true)} 
+        onDuplicate={handleDuplicate}
+      />
+      
+      <StatusSection 
+        isAdmin={isAdmin} 
+        onDuplicate={handleDuplicate}
+      />
       
       <div className="section-divider" />
-      <RatesSection />
+      <RatesSection 
+        isAdmin={isAdmin} 
+        onDuplicate={handleDuplicate}
+      />
       
       <div className="section-divider" />
-      <FeaturesSection />
+      <FeaturesSection 
+        isAdmin={isAdmin} 
+        onDuplicate={handleDuplicate}
+      />
       
       <div className="section-divider" />
-      <RoadmapSection />
+      <RoadmapSection 
+        isAdmin={isAdmin} 
+        onDuplicate={handleDuplicate}
+      />
       
       <div className="section-divider" />
-      <DonateSection />
+      <DonateSection 
+        isAdmin={isAdmin} 
+        onDuplicate={handleDuplicate}
+      />
       
       <div className="section-divider" />
-      <DownloadSection />
+      <DownloadSection 
+        isAdmin={isAdmin} 
+        onDuplicate={handleDuplicate}
+      />
       
-      <Footer onAdminClick={() => setShowLogin(true)} />
+      <Footer onAdminClick={() => setShowLogin(true)} isAdmin={isAdmin} />
       
+      {/* GLOBAL DYNAMIC ITEMS LAYER */}
+      {dynamicItems.map(item => (
+        <DraggableItem
+          key={item.id}
+          id={item.id}
+          isAdmin={isAdmin}
+          initialPos={item.pos}
+          initialText={item.text}
+          initialStyle={item.style}
+          onDelete={handleDelete}
+          onDuplicate={handleDuplicate}
+        />
+      ))}
+
       <RegisterModal 
         isOpen={isRegisterOpen} 
         onClose={() => setIsRegisterOpen(false)} 

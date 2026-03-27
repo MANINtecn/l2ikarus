@@ -1,8 +1,7 @@
-export default function Footer({ onAdminClick }) {
-  const year = new Date().getFullYear()
+import DraggableItem from "./DraggableItem"
 
-  // ... (rest of the socialLinks and navLinks remain the same)
-  // I will only change the component signature and add the trigger
+export default function Footer({ onAdminClick, isAdmin, onDuplicate }) {
+  const year = new Date().getFullYear()
 
   const socialLinks = [
     {
@@ -53,90 +52,51 @@ export default function Footer({ onAdminClick }) {
     }}>
       {/* TOP LINE ORNAMENT */}
       <div style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        height: 1,
+        position: 'absolute', top: 0, left: 0, right: 0, height: 1,
         background: 'linear-gradient(to right, transparent, var(--gold), transparent)',
         opacity: 0.4,
       }} />
 
       {/* BG GRID */}
       <div style={{
-        position: 'absolute',
-        inset: 0,
-        backgroundImage: `
-          linear-gradient(rgba(197,160,89,0.02) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(197,160,89,0.02) 1px, transparent 1px)
-        `,
-        backgroundSize: '60px 60px',
-        pointerEvents: 'none',
+        position: 'absolute', inset: 0,
+        backgroundImage: `linear-gradient(rgba(197,160,89,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(197,160,89,0.02) 1px, transparent 1px)`,
+        backgroundSize: '60px 60px', pointerEvents: 'none',
       }} />
 
       <div className="container" style={{ position: 'relative' }}>
         {/* MAIN FOOTER CONTENT */}
         <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-          gap: '3rem',
-          marginBottom: '3rem',
+          display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+          gap: '3rem', marginBottom: '3rem',
         }}>
           {/* BRAND */}
           <div>
             <div style={{ marginBottom: '1rem' }}>
               <div style={{
-                fontFamily: "'Cinzel', serif",
-                fontWeight: 900,
-                fontSize: '1.8rem',
-                letterSpacing: '6px',
-                background: 'linear-gradient(90deg, #c5a059, #f0d080, #c5a059)',
-                backgroundSize: '200% auto',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
+                fontFamily: "'Cinzel', serif", fontWeight: 900, fontSize: '1.8rem',
+                letterSpacing: '6px', background: 'linear-gradient(90deg, #c5a059, #f0d080, #c5a059)',
+                backgroundSize: '200% auto', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
                 animation: 'shimmer 3s linear infinite',
               }}>IKARUS</div>
               <div style={{
-                fontFamily: "'Outfit', sans-serif",
-                fontWeight: 300,
-                fontSize: '0.65rem',
-                letterSpacing: '5px',
-                color: 'rgba(0, 210, 255, 0.7)',
-                textTransform: 'uppercase',
+                fontFamily: "'Outfit', sans-serif", fontWeight: 300, fontSize: '0.65rem',
+                letterSpacing: '5px', color: 'rgba(0, 210, 255, 0.7)', textTransform: 'uppercase',
               }}>ARISE</div>
             </div>
-            <p style={{
-              color: 'var(--muted)',
-              fontSize: '0.85rem',
-              lineHeight: 1.7,
-              maxWidth: 220,
-            }}>
-              Ascenda das trevas. Torne-se lenda.<br />
-              Lineage 2 × Solo Leveling.
+            <p style={{ color: 'var(--muted)', fontSize: '0.85rem', lineHeight: 1.7, maxWidth: 220 }}>
+              Ascenda das trevas. Torne-se lenda.<br />Lineage 2 × Solo Leveling.
             </p>
           </div>
 
           {/* NAV */}
           <div>
-            <h5 style={{
-              fontFamily: "'Cinzel', serif",
-              fontSize: '0.75rem',
-              letterSpacing: '4px',
-              color: 'var(--gold)',
-              marginBottom: '1.2rem',
-              textTransform: 'uppercase',
-            }}>Navegação</h5>
+            <h5 style={{ fontFamily: "'Cinzel', serif", fontSize: '0.75rem', letterSpacing: '4px', color: 'var(--gold)', marginBottom: '1.2rem', textTransform: 'uppercase' }}>Navegação</h5>
             <ul style={{ display: 'flex', flexDirection: 'column', gap: '0.7rem' }}>
               {navLinks.map(l => (
                 <li key={l.href}>
-                  <a href={l.href} style={{
-                    color: 'var(--muted)',
-                    fontSize: '0.875rem',
-                    letterSpacing: '1px',
-                    transition: 'color 0.25s ease',
-                  }}
-                  onMouseEnter={e => e.target.style.color = '#fff'}
-                  onMouseLeave={e => e.target.style.color = ''}
+                  <a href={l.href} style={{ color: 'var(--muted)', fontSize: '0.875rem', letterSpacing: '1px', transition: 'color 0.25s ease' }}
+                  onMouseEnter={e => e.target.style.color = '#fff'} onMouseLeave={e => e.target.style.color = ''}
                   >{l.label}</a>
                 </li>
               ))}
@@ -145,46 +105,13 @@ export default function Footer({ onAdminClick }) {
 
           {/* COMMUNITY */}
           <div>
-            <h5 style={{
-              fontFamily: "'Cinzel', serif",
-              fontSize: '0.75rem',
-              letterSpacing: '4px',
-              color: 'var(--gold)',
-              marginBottom: '1.2rem',
-              textTransform: 'uppercase',
-            }}>Comunidade</h5>
+            <h5 style={{ fontFamily: "'Cinzel', serif", fontSize: '0.75rem', letterSpacing: '4px', color: 'var(--gold)', marginBottom: '1.2rem', textTransform: 'uppercase' }}>Comunidade</h5>
             <div style={{ display: 'flex', gap: '0.75rem' }}>
               {socialLinks.map(s => (
-                <a
-                  key={s.label}
-                  href={s.href}
-                  target="_blank"
-                  rel="noreferrer"
-                  title={s.label}
-                  style={{
-                    width: 42,
-                    height: 42,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    borderRadius: '8px',
-                    background: 'rgba(197,160,89,0.07)',
-                    border: '1px solid rgba(197,160,89,0.15)',
-                    color: 'var(--muted)',
-                    transition: 'all 0.3s ease',
-                  }}
-                  onMouseEnter={e => {
-                    e.currentTarget.style.color = 'var(--gold)'
-                    e.currentTarget.style.borderColor = 'rgba(197,160,89,0.4)'
-                    e.currentTarget.style.background = 'rgba(197,160,89,0.12)'
-                    e.currentTarget.style.transform = 'translateY(-3px)'
-                  }}
-                  onMouseLeave={e => {
-                    e.currentTarget.style.color = ''
-                    e.currentTarget.style.borderColor = ''
-                    e.currentTarget.style.background = ''
-                    e.currentTarget.style.transform = ''
-                  }}
+                <a key={s.label} href={s.href} target="_blank" rel="noreferrer" title={s.label}
+                  style={{ width: 42, height: 42, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '8px', background: 'rgba(197,160,89,0.07)', border: '1px solid rgba(197,160,89,0.15)', color: 'var(--muted)', transition: 'all 0.3s ease' }}
+                  onMouseEnter={e => { e.currentTarget.style.color = 'var(--gold)'; e.currentTarget.style.borderColor = 'rgba(197,160,89,0.4)'; e.currentTarget.style.background = 'rgba(197,160,89,0.12)'; e.currentTarget.style.transform = 'translateY(-3px)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.color = ''; e.currentTarget.style.borderColor = ''; e.currentTarget.style.background = ''; e.currentTarget.style.transform = ''; }}
                 >{s.icon}</a>
               ))}
             </div>
@@ -195,22 +122,21 @@ export default function Footer({ onAdminClick }) {
         <div style={{ height: 1, background: 'rgba(197,160,89,0.08)', margin: '0 0 1.5rem' }} />
 
         {/* COPYRIGHT */}
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          gap: '0.5rem',
-        }}>
-          <p 
-            onClick={onAdminClick}
-            style={{ fontSize: '0.75rem', color: 'var(--muted)', letterSpacing: '1px', cursor: 'pointer' }}
+        <div style={{ position: 'relative', height: '100px' }}>
+           <DraggableItem 
+            id="footer-copyright" isAdmin={isAdmin} 
+            initialPos={{ x: 0, y: 0 }}
+            onDuplicate={onDuplicate}
           >
-            © {year} L2 Ikarus Arise. Todos os direitos reservados.
-          </p>
-          <p style={{ fontSize: '0.7rem', color: '#333', letterSpacing: '1px' }}>
-            Lineage 2 é marca registrada da NCSoft Corporation
-          </p>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem', width: '100%' }}>
+              <p onClick={onAdminClick} style={{ fontSize: '0.75rem', color: 'var(--muted)', letterSpacing: '1px', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                © {year} L2 Ikarus Arise. Todos os direitos reservados.
+              </p>
+              <p style={{ fontSize: '0.7rem', color: '#333', letterSpacing: '1px', whiteSpace: 'nowrap' }}>
+                Lineage 2 é marca registrada da NCSoft Corporation
+              </p>
+            </div>
+          </DraggableItem>
         </div>
       </div>
     </footer>
