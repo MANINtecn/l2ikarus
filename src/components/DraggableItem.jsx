@@ -250,16 +250,53 @@ export default function DraggableItem({
       )}
       
       {isAdmin && (
-        <div 
-          className="resize-handle"
-          onMouseDown={onResizeStart}
-          style={{
-            position: 'absolute', bottom: 0, right: 0,
-            width: '14px', height: '14px', background: 'var(--gold)',
-            cursor: 'nwse-resize', zIndex: 10, opacity: 0.8,
-            borderRadius: '2px'
-          }}
-        />
+        <>
+          <div 
+            className="resize-handle"
+            onMouseDown={onResizeStart}
+            style={{
+              position: 'absolute', bottom: 0, right: 0,
+              width: '14px', height: '14px', background: 'var(--gold)',
+              cursor: 'nwse-resize', zIndex: 10, opacity: 0.8,
+              borderRadius: '2px'
+            }}
+          />
+          
+          {/* SIZE INDICATOR */}
+          {(isResizing || isDragging) && (
+            <div style={{
+              position: 'absolute',
+              bottom: '-35px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              background: '#0a0b12',
+              color: 'var(--gold)',
+              border: '1px solid var(--gold)',
+              fontSize: '11px',
+              padding: '4px 12px',
+              borderRadius: '20px',
+              fontWeight: '800',
+              zIndex: 5000,
+              pointerEvents: 'none',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.8)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              whiteSpace: 'nowrap',
+              fontFamily: 'var(--font-main)'
+            }}>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.8 }}>
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              </svg>
+              <span>
+                {Math.round(elementRef.current?.offsetWidth || 0)} 
+                <span style={{ opacity: 0.4, margin: '0 4px' }}>×</span> 
+                {Math.round(elementRef.current?.offsetHeight || 0)}
+                <span style={{ fontSize: '9px', opacity: 0.6, marginLeft: '2px' }}>PX</span>
+              </span>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
