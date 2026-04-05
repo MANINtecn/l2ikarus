@@ -1,155 +1,148 @@
 import { useEffect, useState } from 'react'
-import DraggableItem from './DraggableItem'
 
-export default function Navbar({ onRegisterClick, isAdmin }) {
+export default function Navbar({ onRegisterClick }) {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 40)
-    const handleResize = () => {
-      if (window.innerWidth > 992) setMenuOpen(false)
-    }
-    
     window.addEventListener('scroll', handleScroll)
-    window.addEventListener('resize', handleResize)
-    return () => {
-      window.removeEventListener('scroll', handleScroll)
-      window.removeEventListener('resize', handleResize)
-    }
+    return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  // Lock scroll when menu is open
-  useEffect(() => {
-    if (menuOpen) {
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = 'unset'
-    }
-  }, [menuOpen])
-
   const links = [
-    { label: 'Início',    href: '#hero' },
-    { label: 'Rates',     href: '#rates' },
-    { label: 'Features',  href: '#features' },
-    { label: 'Roadmap',   href: '#roadmap' },
-    { label: 'Donate',    href: '#donate' },
-    { label: 'Download',  href: '#download' },
+    { label: 'INÍCIO',    href: '#hero' },
+    { label: 'TARIFAS',     href: '#rates' },
+    { label: 'CARACTERÍSTICAS',  href: '#features' },
+    { label: 'DOAR',    href: '#donate' },
+    { label: 'DOWNLOAD',  href: '#download' },
   ]
 
-  const navContent = (
-    <>
+  return (
+    <header style={{
+      position: 'fixed',
+      top: 0, left: 0,
+      width: '100%',
+      height: scrolled ? '70px' : '100px', // Aumentado um pouco a altura inicial
+      zIndex: 1000,
+      transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+      background: scrolled ? 'rgba(5, 5, 8, 0.92)' : 'transparent',
+      backdropFilter: scrolled ? 'blur(20px)' : 'none',
+      borderBottom: scrolled ? '1px solid rgba(197, 160, 89, 0.4)' : '1px solid transparent',
+      display: 'flex',
+      alignItems: 'center',
+      overflow: 'visible' // Garante que a logo possa sair do header
+    }}>
       <div className="container-wide" style={{
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: '0 2rem',
-        height: '100%'
+        padding: '0 4rem', // Um pouco mais de padding nas laterais
+        width: '100%',
+        position: 'relative'
       }}>
-        {/* LADO ESQUERDO (EQUILIBRAR) */}
-        <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
-          {/* Logo could go here if requested, currently empty to center menu */}
+        {/* LOGO AREA - COM EFEITO DE CRESCIMENTO E OVERFLOW */}
+        <div style={{ flex: 1, display: 'flex', alignItems: 'center', position: 'relative' }}>
+          <div style={{
+             position: 'relative',
+             zIndex: 10,
+             transition: 'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)' // Efeito elástico suave
+          }}>
+            <img 
+              src="/assets/images/logo.png" 
+              alt="L2 Ikarus Logo" 
+              style={{ 
+                height: scrolled ? '85px' : '70px', // CRESCER AO DAR SCROLL!
+                position: 'absolute',
+                top: scrolled ? '-42px' : '-35px', // Centraliza verticalmente na transição
+                left: 0,
+                transition: 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                mixBlendMode: 'screen',
+                filter: scrolled ? 'brightness(1.2) contrast(1.2)' : 'brightness(1.1) contrast(1.1)',
+                cursor: 'pointer',
+                transform: scrolled ? 'scale(1.15) translateY(10px)' : 'scale(1) translateY(0)'
+              }} 
+              onClick={() => window.location.href = '#hero'}
+            />
+          </div>
+          
+          <h1 className="cinzel" style={{ 
+            fontSize: '1.4rem', 
+            color: 'var(--gold)', 
+            margin: '0 0 0 90px', // Espaço maior para a logo que cresce
+            letterSpacing: '4px',
+            textShadow: '0 0 20px rgba(197,160,89,0.4)',
+            transition: 'opacity 0.4s, transform 0.4s',
+            opacity: scrolled ? 0.3 : 1, // Suaviza o texto para dar foco na logo épica
+            transform: scrolled ? 'translateX(10px)' : 'translateX(0)',
+            pointerEvents: 'none'
+          }}>
+            L2 IKARUS
+          </h1>
         </div>
 
-        {/* NAV DESKTOP */}
-        <nav className="nav-desktop" style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
+        {/* HUD NAVIGATION */}
+        <nav style={{ 
+          display: 'flex', 
+          gap: scrolled ? '1.5rem' : '2.5rem', 
+          alignItems: 'center',
+          background: 'rgba(255,255,255,0.03)',
+          padding: scrolled ? '0.6rem 2rem' : '0.8rem 3rem',
+          borderRadius: '50px',
+          border: '1px solid rgba(255,255,255,0.05)',
+          backdropFilter: 'blur(10px)',
+          transition: 'all 0.4s',
+          boxShadow: scrolled ? '0 4px 30px rgba(0,0,0,0.5)' : 'none'
+        }}>
           {links.map(l => (
-            <a key={l.href} href={l.href} className="nav-link">
+            <a 
+              key={l.href} 
+              href={l.href} 
+              style={{
+                fontSize: '0.65rem',
+                fontWeight: '800',
+                letterSpacing: '2px',
+                textTransform: 'uppercase',
+                color: 'rgba(255,255,255,0.7)',
+                transition: '0.3s'
+              }}
+              onMouseEnter={(e) => e.target.style.color = 'var(--gold)'}
+              onMouseLeave={(e) => e.target.style.color = 'rgba(255,255,255,0.7)'}
+            >
               {l.label}
             </a>
           ))}
-          <button onClick={onRegisterClick} className="nav-link" style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
-            CADASTRO
-          </button>
         </nav>
 
-        {/* CTA DIREITO */}
-        <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '1.5rem' }}>
-          <a href="#download" className="btn btn-primary btn-glow" style={{ fontSize: '0.75rem', padding: '0.6rem 1.5rem' }}>
-            ▶ PLAY NOW
-          </a>
-
-          {/* HAMBURGER */}
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="hamburger-btn"
-            style={{
-              background: 'none',
-              border: 'none',
+        {/* CTA AREA */}
+        <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', gap: '2rem' }}>
+          <button 
+            onClick={onRegisterClick}
+            style={{ 
+              background: 'none', 
+              border: 'none', 
+              color: 'rgba(255,255,255,0.6)', 
+              fontSize: '0.7rem', 
+              fontWeight: '700', 
+              letterSpacing: '2px',
               cursor: 'pointer',
-              padding: '6px',
-              zIndex: 2100,
-              display: 'none'
+              transition: '0.3s'
             }}
-          >
-            <div style={{ width: 26, height: 2, background: '#c5a059', margin: '6px 0', transition: '0.3s', transform: menuOpen ? 'rotate(45deg) translate(6px, 6px)' : '' }} />
-            <div style={{ width: 26, height: 2, background: '#c5a059', margin: '6px 0', transition: '0.3s', opacity: menuOpen ? 0 : 1 }} />
-            <div style={{ width: 26, height: 2, background: '#c5a059', margin: '6px 0', transition: '0.3s', transform: menuOpen ? 'rotate(-45deg) translate(6px, -6px)' : '' }} />
-          </button>
-        </div>
-      </div>
-
-      {/* MOBILE MENU */}
-      {menuOpen && (
-        <div className="mobile-overlay">
-          {links.map(l => (
-            <a key={l.href} href={l.href} className="mobile-nav-link" onClick={() => setMenuOpen(false)}>
-              {l.label}
-            </a>
-          ))}
-          <button
-            className="mobile-nav-link"
-            style={{ background: 'none', border: 'none', textAlign: 'left', cursor: 'pointer' }}
-            onClick={() => {
-              setMenuOpen(false);
-              onRegisterClick();
-            }}
+            onMouseEnter={(e) => e.target.style.color = '#fff'}
+            onMouseLeave={(e) => e.target.style.color = 'rgba(255,255,255,0.6)'}
           >
             CADASTRO
           </button>
-          
-          <div style={{ marginTop: 'auto', padding: '2rem 1rem', textAlign: 'center' }}>
-             <a href="#download" className="btn btn-primary" style={{ width: '100%' }} onClick={() => setMenuOpen(false)}>
-                ▶ COMEÇAR AGORA
-             </a>
-          </div>
+          <a href="#download" className="btn btn-primary" style={{ 
+            padding: scrolled ? '0.6rem 2rem' : '0.8rem 2.8rem', 
+            fontSize: '0.8rem',
+            clipPath: 'polygon(10% 0, 100% 0, 90% 100%, 0 100%)',
+            boxShadow: '0 0 20px rgba(197,160,89,0.2)'
+          }}>
+            JOGAR AGORA
+          </a>
         </div>
-      )}
-    </>
-  );
-
-  if (isAdmin) {
-    return (
-      <DraggableItem 
-        id="navbar-admin" 
-        isAdmin={isAdmin} 
-        initialPos={{ x: 0, y: isAdmin ? 40 : 0 }} 
-        initialSize={{ width: '100%', height: 90 }}
-        className="nav-header-draggable"
-      >
-        <header style={{
-          width: '100%',
-          height: '100%',
-          background: scrolled ? 'rgba(5, 5, 10, 0.92)' : 'transparent',
-          backdropFilter: scrolled ? 'blur(20px)' : 'none',
-          borderBottom: '1px solid rgba(197, 160, 89, 0.2)',
-          display: 'flex',
-          alignItems: 'center'
-        }}>
-          {navContent}
-        </header>
-      </DraggableItem>
-    );
-  }
-
-  return (
-    <header className={`nav-header ${scrolled ? 'scrolled' : ''}`} style={{
-      background: scrolled ? (window.innerWidth > 992 ? 'transparent' : 'rgba(5, 5, 10, 0.92)') : 'transparent',
-      backdropFilter: scrolled ? (window.innerWidth > 992 ? 'none' : 'blur(20px)') : 'none',
-      height: scrolled ? '70px' : '90px',
-      borderBottom: scrolled ? (window.innerWidth > 992 ? 'none' : '1px solid rgba(197, 160, 89, 0.2)') : '1px solid transparent',
-    }}>
-      {navContent}
+      </div>
     </header>
   )
 }
