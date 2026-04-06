@@ -7,12 +7,11 @@ export default function ArenaDuality() {
   const sets = {
     antharas: {
       id: 'antharas',
-      name: 'ANTHARAS BOSS',
+      name: 'CHEFE DE ANTHARAS',
       description: 'O Dragão da Terra. Sua pele de obsidiana e ossos de diamante emanam uma aura de morte eterna.',
       modelUrl: '/assets/skins/antharas/antharas.glb',
-      bg: '/assets/images/white_bg.png', // Fundo de alto contraste para a skin escura
-      color: '#c5a059',
-      glow: 'rgba(197, 160, 89, 0.4)',
+      color: '#4ade80', // Verde para combinar com a aura solicitada
+      glow: 'rgba(74, 222, 128, 0.4)',
       stats: [
         { label: 'P. ATK', value: '+1500' },
         { label: 'P. DEF', value: '+3200' },
@@ -21,10 +20,9 @@ export default function ArenaDuality() {
     },
     valakas: {
       id: 'valakas',
-      name: 'VALAKAS BOSS',
+      name: 'CHEFE DE VALAKAS',
       description: 'O Dragão de Fogo. Nascido das entranhas do vulcão Godard, seu sopro derrete até o aço lendário.',
       modelUrl: '/assets/skins/valakas/valakas.glb',
-      bg: '/assets/images/lava_bg.png', // Fundo épico vulcânico
       color: '#ff4d00',
       glow: 'rgba(255, 77, 0, 0.4)',
       stats: [
@@ -70,7 +68,7 @@ export default function ArenaDuality() {
         {/* LEFT: BOSS DETAILS */}
         <div style={{ flex: '1', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
           <div className="reveal-delay-2 animate-fadeLeft">
-            <span style={{ fontSize: '0.7rem', color: 'var(--gold)', letterSpacing: '4px', fontWeight: '800' }}>DOMÍNIO DOS DRAGÕES</span>
+            <span style={{ fontSize: '0.7rem', color: current.color, letterSpacing: '4px', fontWeight: '800', transition: 'color 0.4s' }}>DOMÍNIO DOS DRAGÕES</span>
             <h3 className="cinzel" style={{ fontSize: '4rem', color: '#fff', margin: '0.8rem 0', textShadow: `0 0 20px ${current.glow}` }}>{current.name}</h3>
             <p style={{ color: 'var(--text-mute)', fontSize: '1rem', lineHeight: '1.8', marginBottom: '3rem', maxWidth: '500px' }}>
               {current.description}
@@ -97,7 +95,8 @@ export default function ArenaDuality() {
                     fontSize: '0.7rem',
                     borderColor: activeSet === key ? sets[key].color : 'rgba(255,255,255,0.1)',
                     background: activeSet === key ? sets[key].color : 'none',
-                    boxShadow: activeSet === key ? `0 0 20px ${sets[key].glow}` : 'none'
+                    boxShadow: activeSet === key ? `0 0 20px ${sets[key].glow}` : 'none',
+                    color: activeSet === key ? (key === 'antharas' ? '#000' : '#fff') : '#fff'
                   }}
                 >
                   {sets[key].id.toUpperCase()}
@@ -107,31 +106,36 @@ export default function ArenaDuality() {
           </div>
         </div>
 
-        {/* RIGHT: 3D SHOWCASE - AGORA SEM LIMITES DE CAIXA */}
+        {/* RIGHT: 3D SHOWCASE - COM AURA AO INVÉS DE IMAGEM */}
         <div style={{ 
           flex: '1.5', 
           position: 'relative', 
           borderRadius: '30px', 
           overflow: 'visible', // Permite que o modelo pop out se necessário
-          transition: '0.6s cubic-bezier(0.4, 0, 0.2, 1)'
+          transition: '0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center'
         }}>
-          {/* BACKGROUND ADAPTATIVO */}
+          {/* BACKGROUND AURA (SUTIL PARA AMBIENTE) */}
           <div style={{
             position: 'absolute',
-            inset: '-20px',
-            borderRadius: '50px',
-            backgroundImage: `url(${current.bg})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            opacity: 0.8,
-            boxShadow: `inset 0 0 100px #000, 0 0 50px ${current.glow}`,
+            inset: '0',
+            borderRadius: '20px',
+            background: `radial-gradient(circle at center, ${current.glow} 0%, transparent 70%)`,
+            opacity: 0.5,
             transition: 'all 0.6s ease',
             zIndex: 0
           }} />
 
           {/* 3D VIEWER */}
           <div style={{ position: 'relative', width: '100%', height: '100%', zIndex: 1 }}>
-            <ModelViewer3D modelUrl={current.modelUrl} backgroundUrl={null} />
+            <ModelViewer3D 
+              modelUrl={current.modelUrl} 
+              backgroundUrl={null} 
+              interactive={true} 
+              glowColor={current.color}
+            />
           </div>
 
           {/* HUD OVERLAY ELEMENTS */}

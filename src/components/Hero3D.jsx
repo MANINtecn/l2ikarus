@@ -23,10 +23,9 @@ export default function Hero3D({ onRegisterClick }) {
         transform: 'translateY(-50%)',
         width: '60%', 
         height: '90%', 
-        zIndex: 1,
-        pointerEvents: 'none'
+        zIndex: 5
       }}>
-        <ModelViewer3D modelUrl={modelUrl} interactive={false} />
+        <ModelViewer3D modelUrl={modelUrl} interactive={true} />
       </div>
 
       {/* HUD OVERLAY LEFT: SERVER IDENTITY */}
