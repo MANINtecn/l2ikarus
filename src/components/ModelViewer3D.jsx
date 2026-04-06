@@ -79,7 +79,7 @@ function Model({ url }) {
   }, [actions, url])
 
   return (
-    <Float speed={2} rotationIntensity={0.5} floatIntensity={2} floatingRange={[-0.2, 0.2]}>
+    <Float speed={2} rotationIntensity={0.5} floatIntensity={0.3} floatingRange={[-0.05, 0.05]}>
       <Center top>
         <primitive object={scene} />
       </Center>
@@ -123,12 +123,12 @@ export default function ModelViewer3D({ modelUrl, backgroundUrl, interactive = t
               polar={[-Math.PI / 3, Math.PI / 3]}
               azimuth={[-Math.PI / 1.4, Math.PI / 1.4]}
             >
-              <Stage environment="city" intensity={0.9} contactShadow={false} adjustCamera={1.5}>
+              <Stage environment="city" intensity={0.9} contactShadow={false} adjustCamera={1.05}>
                 {modelUrl ? <Model url={modelUrl} /> : null}
               </Stage>
             </PresentationControls>
           ) : (
-            <Stage environment="city" intensity={1.1} contactShadow={false} adjustCamera={1.5}>
+            <Stage environment="city" intensity={1.1} contactShadow={false} adjustCamera={1.05}>
                {modelUrl ? <Model url={modelUrl} /> : null}
             </Stage>
           )}
