@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import ModelViewer3D from './ModelViewer3D'
 
 export default function Hero3D({ onRegisterClick }) {
-  const [modelUrl, setModelUrl] = useState('/assets/skins/antharas/antharas.glb')
+  const [modelUrl, setModelUrl] = useState(`/assets/skins/antharas/ikarus_promo.glb?v=${Date.now()}`)
 
   return (
     <section id="hero" style={{ 
@@ -16,16 +16,27 @@ export default function Hero3D({ onRegisterClick }) {
       background: 'radial-gradient(circle at center, #0a0b12 0%, #050508 100%)'
     }}>
       {/* 3D STAGE - POSICIONADO NO VÃO À DIREITA DO TEXTO PARA MAIOR VISIBILIDADE */}
+      {/* 🐉 MODELO 3D - COMO CENÁRIO DE FUNDO (Z-INDEX 1) */}
       <div style={{ 
         position: 'absolute', 
-        right: '5%', // Ajustado para centralizar no vão visível
-        top: '50%', 
-        transform: 'translateY(-50%)',
-        width: '60%', 
-        height: '90%', 
-        zIndex: 5
+        inset: 0, 
+        width: '100%', 
+        height: '100%', 
+        zIndex: 1,
+        opacity: 0.9,
       }}>
-        <ModelViewer3D modelUrl={modelUrl} interactive={true} />
+        <ModelViewer3D 
+          modelUrl={modelUrl} 
+          interactive={true} 
+          glowColor="#4ade80" 
+        />
+        {/* Camada de Gradiente para suavizar bordas e Contrastar Texto */}
+        <div style={{ 
+          position: 'absolute', 
+          inset: 0, 
+          background: 'linear-gradient(90deg, rgba(5,5,8,0.8) 0%, rgba(5,5,8,0.2) 50%, rgba(5,5,8,0.8) 100%), linear-gradient(0deg, rgba(5,5,8,0.5) 0%, transparent 40%, rgba(5,5,8,0.3) 100%)',
+          pointerEvents: 'none' 
+        }} />
       </div>
 
       {/* HUD OVERLAY LEFT: SERVER IDENTITY */}
@@ -35,27 +46,29 @@ export default function Hero3D({ onRegisterClick }) {
         top: '50%', 
         transform: 'translateY(-50%)', 
         zIndex: 10,
-        maxWidth: '520px'
+        maxWidth: '550px',
+        textShadow: '0 0 40px rgba(0,0,0,0.8)' // Sombra extra para legibilidade sobre o 3D
       }}>
         <div className="reveal-delay-1 animate-fadeUp">
-          <p className="section-subtitle" style={{ textAlign: 'left', marginBottom: '0.8rem', letterSpacing: '5px' }}>LEGENDA • ASCENSÃO • PODER</p>
+          <p className="section-subtitle" style={{ textAlign: 'left', marginBottom: '0.8rem', letterSpacing: '5px', color: 'var(--gold)' }}>SEJA RECONHECIDO POR ONDE FARMA</p>
           <h1 className="cinzel" style={{ 
             fontSize: '5.5rem', 
             lineHeight: '0.9', 
             color: '#fff', 
             marginBottom: '1.5rem',
-            textShadow: '0 0 30px rgba(197, 160, 89, 0.4)'
+            textShadow: '0 10px 30px rgba(0, 0, 0, 0.9), 0 0 20px rgba(197, 160, 89, 0.3)'
           }}>
             L2<br />
             <span style={{ color: 'var(--gold)' }}>IKARUS</span>
           </h1>
-          <p style={{ color: 'var(--text-white)', fontSize: '1.2rem', letterSpacing: '1px', marginBottom: '3.5rem', opacity: 0.8, lineHeight: '1.6' }}>
-            Experimente o Lineage 2 em uma nova dimensão. 3D High-End, economia estável e o PVP mais equilibrado do Brasil.
+          <p style={{ color: '#fff', fontSize: '1.2rem', letterSpacing: '1px', marginBottom: '3.5rem', opacity: 0.9, lineHeight: '1.6', fontWeight: '500' }}>
+            Experimente o Lineage 2 em uma nova dimensão. 3D High-End. <br/>
+            <span style={{ color: 'var(--gold)', fontWeight: '700' }}>Conjunto Antharas disponível na estreia.</span>
           </p>
           
           <div style={{ display: 'flex', gap: '1.5rem' }}>
-             <button onClick={onRegisterClick} className="btn btn-primary" style={{ padding: '1.3rem 3.5rem', fontSize: '0.9rem' }}>INICIAR JORNADA</button>
-             <a href="#rates" className="btn btn-ghost" style={{ padding: '1.3rem 3.5rem', fontSize: '0.75rem' }}>VER TAXAS</a>
+             <button onClick={onRegisterClick} className="btn btn-primary" style={{ padding: '1.3rem 3.5rem', fontSize: '0.9rem', boxShadow: '0 15px 35px rgba(197,160,89,0.3)' }}>INICIALIZAR JORNADA</button>
+             <a href="#rates" className="btn btn-ghost" style={{ padding: '1.3rem 3.5rem', fontSize: '0.75rem', backdropFilter: 'blur(10px)' }}>RECURSOS ELITE</a>
           </div>
         </div>
       </div>

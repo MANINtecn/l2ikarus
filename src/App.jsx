@@ -8,7 +8,6 @@ import Hero3D from './components/Hero3D'
 import StatusHolo from './components/StatusHolo'
 import RatesGrid from './components/RatesGrid'
 import FeaturesTerminal from './components/FeaturesTerminal'
-import ArenaDuality from './components/ArenaDuality'
 import RoadmapHolo from './components/RoadmapHolo'
 import DownloadTerminal from './components/DownloadTerminal'
 import AudioController from './components/AudioController'
@@ -37,9 +36,6 @@ function App() {
 
       {/* 🏰 SEÇÃO FEATURES - MECÂNICAS AAA */}
       <FeaturesTerminal />
-
-      {/* 🐉 SEÇÃO DUALITY - O DUELO DE TITÃS (3D) */}
-      <ArenaDuality />
 
       {/* 📅 SEÇÃO ROADMAP - EVOLUÇÃO ESTRATÉGICA */}
       <RoadmapHolo />

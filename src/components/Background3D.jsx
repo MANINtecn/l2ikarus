@@ -2,7 +2,7 @@ import { useRef, useMemo } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 
-function Particles({ count = 1500 }) {
+function Particles({ count = 500 }) {
   const mesh = useRef()
   const light = useRef()
   
