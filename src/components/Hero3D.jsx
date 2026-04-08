@@ -20,18 +20,18 @@ export default function Hero3D({ onRegisterClick }) {
 
   return (
     <section id="hero" className="hero-section" style={{ 
-      flexDirection: isMobile ? 'column' : 'row',
-      padding: isMobile ? '2rem 1rem' : '0'
+      padding: '0'
     }}>
       {/* 🐉 MODELO 3D - POSICIONAMENTO DINÂMICO */}
       <div className="hero-3d-container" style={{ 
-        position: isMobile ? 'relative' : 'absolute',
-        right: '0', 
-        width: '100%', 
-        height: isMobile ? '50vh' : '100%',
+        position: 'absolute',
+        right: isMobile ? '-35%' : '0', 
+        top: isMobile ? '10%' : '0',
+        width: isMobile ? '120%' : '100%', 
+        height: isMobile ? '80vh' : '100%',
         opacity: isMobile ? 1 : 0.9,
-        zIndex: isMobile ? 2 : 1,
-        marginTop: isMobile ? '1rem' : '0'
+        zIndex: isMobile ? 1 : 1,
+        pointerEvents: 'none'
       }}>
         <ModelViewer3D 
           modelUrl={modelUrl} 
@@ -54,14 +54,14 @@ export default function Hero3D({ onRegisterClick }) {
       </div>
 
       <div className="container hero-container" style={{ 
-        flexDirection: isMobile ? 'column' : 'row', 
-        alignItems: isMobile ? 'center' : 'center',
+        flexDirection: 'row', 
+        alignItems: isMobile ? 'flex-start' : 'center',
         justifyContent: isMobile ? 'flex-start' : 'space-between',
-        textAlign: isMobile ? 'center' : 'left',
-        height: isMobile ? 'auto' : '100%',
-        position: isMobile ? 'relative' : 'relative',
+        textAlign: 'left',
+        height: '100%',
+        position: 'relative',
         zIndex: 10,
-        paddingTop: isMobile ? '80px' : '0'
+        paddingTop: isMobile ? '120px' : '0'
       }}>
         {/* HUD OVERLAY LEFT: SERVER IDENTITY */}
         <div className="hero-identity reveal-delay-1 animate-fadeUp" style={{ 
@@ -69,7 +69,7 @@ export default function Hero3D({ onRegisterClick }) {
           zIndex: 10,
           position: 'relative'
         }}>
-          <p className="section-subtitle" style={{ textAlign: isMobile ? 'center' : 'left' }}>
+          <p className="section-subtitle" style={{ textAlign: 'left' }}>
             {isMobile ? 'IKARUS MOBILE ELITE' : 'SEJA RECONHECIDO POR ONDE FARMA'}
           </p>
           <h1 className="cinzel hero-title" style={{ 
@@ -80,9 +80,9 @@ export default function Hero3D({ onRegisterClick }) {
             <span style={{ color: 'var(--gold)' }}>IKARUS</span>
           </h1>
           <p className="hero-description" style={{ 
-            fontSize: isMobile ? '0.82rem' : 'clamp(0.9rem, 1.5vw, 1.2rem)',
+            fontSize: isMobile ? '0.8rem' : 'clamp(0.9rem, 1.5vw, 1.2rem)',
             marginBottom: isMobile ? '2.4rem' : '3.5rem',
-            maxWidth: isMobile ? '100%' : '550px'
+            maxWidth: isMobile ? '200px' : '550px'
           }}>
             {isMobile 
               ? 'O Elfo Antharas agora na palma da sua mão. Performance Otimizada.'
@@ -90,8 +90,8 @@ export default function Hero3D({ onRegisterClick }) {
           </p>
           
           <div className="hero-actions" style={{ 
-            flexDirection: isMobile ? 'row' : 'row', 
-            justifyContent: isMobile ? 'center' : 'flex-start',
+            flexDirection: 'row', 
+            justifyContent: 'flex-start',
             alignItems: 'center',
             gap: isMobile ? '10px' : '1.5rem'
           }}>
