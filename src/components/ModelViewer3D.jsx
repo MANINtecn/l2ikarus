@@ -186,10 +186,10 @@ function Model({ url, animIndex }) {
 // 🚀 PRE-CARREGAMENTO
 useGLTF.preload('/assets/skins/antharas/ikarus_promo.glb')
 
-export default function ModelViewer3D({ modelUrl, backgroundUrl, interactive = true, glowColor = "#c5a059", animIndex }) {
+export default function ModelViewer3D({ modelUrl, backgroundUrl, interactive = true, glowColor = "#c5a059", animIndex, isMobileProp }) {
   const containerRef = useRef()
   const [loading, setLoading] = useState(true)
-  const isMobile = window.innerWidth <= 768
+  const isMobile = isMobileProp !== undefined ? isMobileProp : window.innerWidth <= 1024
 
   return (
     <div ref={containerRef} style={{ 

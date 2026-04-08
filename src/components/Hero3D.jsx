@@ -2,15 +2,15 @@ import { useState, useEffect } from 'react'
 import ModelViewer3D from './ModelViewer3D'
 
 export default function Hero3D({ onRegisterClick }) {
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 1024)
   const desktopModel = `/assets/skins/antharas/ikarus_promo.glb?v=${Date.now()}`
-  const mobileModel = `/assets/skins/antharas/antharasmobile.glb`
+  const mobileModel = `/assets/skins/antharas/antharasmobile.glb?v=${Date.now()}`
   
   const [modelUrl, setModelUrl] = useState(isMobile ? mobileModel : desktopModel)
 
   useEffect(() => {
     const handleResize = () => {
-      const mobile = window.innerWidth <= 768
+      const mobile = window.innerWidth <= 1024
       setIsMobile(mobile)
       setModelUrl(mobile ? mobileModel : desktopModel)
     }
@@ -35,6 +35,7 @@ export default function Hero3D({ onRegisterClick }) {
           interactive={true} 
           glowColor="#4ade80" 
           animIndex={isMobile ? 8 : undefined}
+          isMobileProp={isMobile}
         />
         <div className="hero-gradient-overlay" style={{ 
           background: isMobile 
