@@ -20,7 +20,6 @@ export default function Hero3D({ onRegisterClick }) {
 
   return (
     <section id="hero" className="hero-section" style={{ 
-      flexDirection: isMobile ? 'row' : 'column',
       padding: isMobile ? '0 1rem' : '0'
     }}>
       {/* 🐉 MODELO 3D - POSICIONAMENTO DINÂMICO */}
@@ -47,8 +46,11 @@ export default function Hero3D({ onRegisterClick }) {
       <div className="container hero-container" style={{ 
         flexDirection: 'row', 
         alignItems: 'center',
-        justifyContent: 'flex-start',
-        textAlign: 'left'
+        justifyContent: isMobile ? 'flex-start' : 'space-between',
+        textAlign: 'left',
+        height: '100%',
+        position: 'relative',
+        zIndex: 10
       }}>
         {/* HUD OVERLAY LEFT: SERVER IDENTITY */}
         <div className="hero-identity reveal-delay-1 animate-fadeUp" style={{ 
@@ -56,7 +58,9 @@ export default function Hero3D({ onRegisterClick }) {
           zIndex: 10,
           position: 'relative'
         }}>
-          <p className="section-subtitle" style={{ textAlign: 'left' }}>IKARUS MOBILE ELITE</p>
+          <p className="section-subtitle" style={{ textAlign: 'left' }}>
+            {isMobile ? 'IKARUS MOBILE ELITE' : 'SEJA RECONHECIDO POR ONDE FARMA'}
+          </p>
           <h1 className="cinzel hero-title" style={{ 
             fontSize: isMobile ? '2.4rem' : 'clamp(3rem, 10vw, 5.5rem)',
             marginBottom: '1rem'
@@ -65,56 +69,62 @@ export default function Hero3D({ onRegisterClick }) {
             <span style={{ color: 'var(--gold)' }}>IKARUS</span>
           </h1>
           <p className="hero-description" style={{ 
-            fontSize: isMobile ? '0.8rem' : 'clamp(0.9rem, 1.5vw, 1.2rem)',
-            marginBottom: '2.4rem'
+            fontSize: isMobile ? '0.82rem' : 'clamp(0.9rem, 1.5vw, 1.2rem)',
+            marginBottom: isMobile ? '2.4rem' : '3.5rem',
+            maxWidth: isMobile ? '100%' : '550px'
           }}>
-            O Elfo Antharas {isMobile ? '' : 'disponível'} agora na palma da sua mão. 
-            <span style={{ color: 'var(--gold)', fontWeight: '700', display: 'block', marginTop: '5px' }}>
-              Performance Otimizada.
-            </span>
+            {isMobile 
+              ? 'O Elfo Antharas agora na palma da sua mão. Performance Otimizada.'
+              : 'Experimente o Lineage 2 em uma nova dimensão. 3D High-End. Conjunto Antharas disponível na estreia.'}
           </p>
           
           <div className="hero-actions" style={{ 
-            flexDirection: 'column', 
-            alignItems: 'flex-start',
-            gap: '1rem'
+            flexDirection: isMobile ? 'column' : 'row', 
+            alignItems: isMobile ? 'flex-start' : 'center',
+            gap: isMobile ? '1rem' : '1.5rem'
           }}>
-             <button onClick={onRegisterClick} className="btn btn-primary" style={{ padding: '0.8rem 1.6rem', width: 'auto' }}>JOGAR AGORA</button>
-             <a href="#rates" className="btn btn-ghost" style={{ padding: '0.8rem 1.6rem', width: 'auto' }}>RATES</a>
+             <button onClick={onRegisterClick} className="btn btn-primary" style={{ padding: '0.8rem 1.6rem', width: isMobile ? '100%' : 'auto' }}>
+               {isMobile ? 'JOGAR AGORA' : 'INICIALIZAR JORNADA'}
+             </button>
+             <a href="#rates" className="btn btn-ghost" style={{ padding: '0.8rem 1.6rem', width: isMobile ? '100%' : 'auto' }}>
+               {isMobile ? 'RATES' : 'RECURSOS ELITE'}
+             </a>
           </div>
         </div>
 
-        {/* HUD OVERLAY RIGHT: SERVER STATUS CARDS */}
-        <div className="hero-status hide-mobile">
-          {/* STATUS CARD */}
-          <div className="glass-panel hero-status-card" style={{ borderLeft: '4px solid #4ade80' }}>
-            <div className="status-header">
-              <span className="status-label">STATUS</span>
-              <div className="status-dot" style={{ background: '#4ade80', boxShadow: '0 0 10px #4ade80' }} />
+        {/* HUD OVERLAY RIGHT: SERVER STATUS CARDS (Apenas Desktop) */}
+        {!isMobile && (
+          <div className="hero-status animate-fadeUp" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', width: '220px' }}>
+            {/* STATUS CARD */}
+            <div className="glass-panel hero-status-card" style={{ borderLeft: '4px solid #4ade80', padding: '1.5rem' }}>
+              <div className="status-header">
+                <span className="status-label">STATUS</span>
+                <div className="status-dot" style={{ background: '#4ade80', boxShadow: '0 0 10px #4ade80' }} />
+              </div>
+              <div className="status-value">ON-LINE</div>
+              <p className="status-meta">1.240 Jogadores Ativos</p>
             </div>
-            <div className="status-value">ON-LINE</div>
-            <p className="status-meta">1.240 Jogadores Ativos</p>
-          </div>
 
-          {/* RATES HUD */}
-          <div className="glass-panel hero-status-card" style={{ borderLeft: '4px solid var(--gold)' }}>
-            <span className="status-label" style={{ marginBottom: '1.2rem', display: 'block' }}>DADOS DO REINO</span>
-            <div className="rates-list">
-              <div className="rate-item">
-                <span>TAXA DE XP</span>
-                <span className="rate-value">x1000</span>
-              </div>
-              <div className="rate-item">
-                <span>TAXA SP</span>
-                <span className="rate-value">x1000</span>
-              </div>
-              <div className="rate-item">
-                <span>ADENA</span>
-                <span className="rate-value">x500</span>
+            {/* RATES HUD */}
+            <div className="glass-panel hero-status-card" style={{ borderLeft: '4px solid var(--gold)', padding: '1.5rem' }}>
+              <span className="status-label" style={{ marginBottom: '1.2rem', display: 'block' }}>DADOS DO REINO</span>
+              <div className="rates-list">
+                <div className="rate-item">
+                  <span>TAXA DE XP</span>
+                  <span className="rate-value">x1000</span>
+                </div>
+                <div className="rate-item">
+                  <span>TAXA SP</span>
+                  <span className="rate-value">x1000</span>
+                </div>
+                <div className="rate-item">
+                  <span>ADENA</span>
+                  <span className="rate-value">x500</span>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* SCANLINE OVERLAY */}
