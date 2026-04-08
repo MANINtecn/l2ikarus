@@ -272,26 +272,35 @@ export default function ModelViewer3D({ modelUrl, backgroundUrl, interactive = t
         <OrbitControls enableZoom={false} enablePan={false} makeDefault />
       </Canvas>
 
-      {/* 🔘 INDICADOR DE CÂMERA 360° (Overlay Premium Centralizado) */}
+      {/* 🔘 INDICADOR DE CÂMERA 360° (Prioridade Máxima) */}
       <div style={{
-        position: 'absolute', top: isMobile ? '12%' : '15%', left: '50%',
+        position: 'absolute', top: isMobile ? '15%' : '20%', left: '50%',
         transform: 'translateX(-50%)',
         display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px',
         color: 'var(--gold)', pointerEvents: 'none',
-        fontSize: '0.7rem', letterSpacing: '4px', fontWeight: '900',
+        fontSize: '0.75rem', letterSpacing: '4px', fontWeight: '900',
         fontFamily: 'var(--font-heading)',
-        zIndex: 10,
-        textShadow: '0 0 15px rgba(197, 160, 89, 0.6)',
-        animation: 'ledPulse 5s infinite ease-in-out', // Usando a animação de pulso já existente
-        opacity: 0.8
+        zIndex: 100, // 👈 Camada mais alta para não sumir
+        textShadow: '0 0 20px rgba(197, 160, 89, 0.8)',
+        animation: 'ledPulse 4s infinite ease-in-out', 
+        opacity: 0.9,
+        textAlign: 'center'
       }}>
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '5px' }}>
-          <circle cx="12" cy="12" r="10"/>
-          <path d="M12 2v20M2 12h20M7.75 7.75l8.5 8.5M7.75 16.25l8.5-8.5"/>
+        {/* Ícone de Seta Circular 360° */}
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '5px' }}>
+          <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+          <path d="M3 3v5h5"/>
+          <text x="12" y="15" fontSize="4" fontWeight="bold" fill="currentColor" textAnchor="middle">360°</text>
         </svg>
-        <span style={{ background: 'rgba(5,5,8,0.4)', padding: '2px 8px', borderRadius: '4px' }}>
-          INTERAÇÃO 360° VR
-        </span>
+        <div style={{ 
+          background: 'rgba(5,5,8,0.6)', 
+          padding: '4px 12px', 
+          borderRadius: '50px',
+          border: '1px solid rgba(197, 160, 89, 0.3)',
+          backdropFilter: 'blur(4px)'
+        }}>
+          VISÃO 360° VR
+        </div>
       </div>
     </div>
   )
