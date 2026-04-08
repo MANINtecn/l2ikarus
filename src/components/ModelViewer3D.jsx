@@ -182,7 +182,11 @@ function Model({ url, animIndex }) {
   return (
     <group>
       <Center>
-        <primitive object={scene} scale={0.6} />
+        <primitive 
+          object={scene} 
+          scale={0.6} 
+          rotation={[-Math.PI / 2, 0, 0]} // 🔄 ANTI-COCHILO: Acorda o personagem
+        />
       </Center>
       
       {/* 💡 LUZES DINÂMICAS (Uma para cada "coração" identificado) */}
