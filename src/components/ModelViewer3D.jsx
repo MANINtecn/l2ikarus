@@ -1,6 +1,6 @@
 import { Canvas, useFrame } from '@react-three/fiber'
-import { Center, OrbitControls, Stage, useGLTF, Environment, ContactShadows, PresentationControls, Html, useAnimations, Float } from '@react-three/drei'
-import { Suspense, useRef, useEffect, useMemo } from 'react'
+import { Center, OrbitControls, Stage, useGLTF, Environment, ContactShadows, PresentationControls, useAnimations, Float } from '@react-three/drei'
+import { Suspense, useRef, useEffect, useMemo, useState } from 'react'
 import * as THREE from 'three'
 
 function HeroParticles({ count = 200, color = "#4ade80" }) {
@@ -188,6 +188,8 @@ useGLTF.preload('/assets/skins/antharas/ikarus_promo.glb')
 
 export default function ModelViewer3D({ modelUrl, backgroundUrl, interactive = true, glowColor = "#c5a059", animIndex }) {
   const containerRef = useRef()
+  const [loading, setLoading] = useState(true)
+  const isMobile = window.innerWidth <= 768
 
   return (
     <div ref={containerRef} style={{ 
@@ -196,42 +198,57 @@ export default function ModelViewer3D({ modelUrl, backgroundUrl, interactive = t
       cursor: interactive ? 'grab' : 'default', 
       position: 'relative',
       overflow: 'hidden',
-      pointerEvents: interactive ? 'auto' : 'none'
+      pointerEvents: interactive ? 'auto' : 'none',
+      background: '#050508'
     }}>
+      {/* 🔮 OVERLAY DE CARREGAMENTO EXTERNO (Fiavel no Mobile) */}
+      {loading && (
+        <div style={{
+          position: 'absolute', inset: 0, zIndex: 100,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          background: 'rgba(5,5,8,0.8)', backdropFilter: 'blur(10px)',
+          color: 'var(--gold)', letterSpacing: '4px', fontSize: '0.8rem',
+          fontFamily: 'var(--font-heading)'
+        }}>
+          INICIALIZANDO ALMA...
+        </div>
+      )}
+
       <Canvas 
-        shadows 
-        dpr={[1, 2]} 
-        camera={{ position: [0, -2, 60], fov: 45 }} // Distância ideal para enquadramento full-body sem cortes
+        shadows={!isMobile} 
+        dpr={isMobile ? 1 : [1, 2]} 
+        camera={{ position: [0, -2, 60], fov: 45 }} 
         gl={{ 
           antialias: true, 
           alpha: true, 
-          logarithmicDepthBuffer: true,
+          logarithmicDepthBuffer: !isMobile, // Muito pesado para mobile
           powerPreference: "high-performance"
         }}
+        onCreated={() => setLoading(false)}
       >
-        <Suspense fallback={<Html center><div style={{ color: 'var(--gold)', whiteSpace: 'nowrap', fontSize: '1rem', letterSpacing: '4px' }}>INICIALIZANDO...</div></Html>}>
+        <Suspense fallback={null}>
           <PresentationControls
             global={false}
             config={{ mass: 2, tension: 500 }}
             snap={{ mass: 4, tension: 1500 }}
-            rotation={[0, -Math.PI / 1.5, 0]} // Ângulo idêntico ao da foto de referência
+            rotation={[0, -Math.PI / 1.5, 0]} 
             polar={[-Math.PI / 4, Math.PI / 4]}
             azimuth={[-Math.PI / 2, Math.PI / 2]}
           >
              {modelUrl ? <Model key={modelUrl} url={modelUrl} animIndex={animIndex} /> : null}
           </PresentationControls>
 
-          {/* 🏔️ AMBIENTE CINEMATOGRÁFICO - PARTÍCULAS DE AURA */}
-          <HeroParticles color={glowColor} />
+          {/* 🏔️ AMBIENTE CINEMATOGRÁFICO - Desativado no Mobile se muito pesado */}
+          {!isMobile && <HeroParticles color={glowColor} />}
 
-          {/* LUZES MANUAIS (Evita que o Stage esconda o modelo) */}
-          <ambientLight intensity={1.5} />
-          <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} intensity={2500} castShadow />
-          <pointLight position={[0, 5, 10]} intensity={1500} color={glowColor} />
-          <pointLight position={[-5, 5, -5]} intensity={600} color="#fff" />
+          {/* LUZES MANUAIS */}
+          <ambientLight intensity={isMobile ? 2 : 1.5} />
+          <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} intensity={isMobile ? 1500 : 2500} castShadow={!isMobile} />
+          <pointLight position={[0, 5, 10]} intensity={isMobile ? 1000 : 1500} color={glowColor} />
+          
           <Environment preset="city" />
           
-          <ContactShadows position={[0, -1.8, 0]} opacity={0.4} scale={15} blur={2.5} far={4} color="#000" />
+          {!isMobile && <ContactShadows position={[0, -1.8, 0]} opacity={0.4} scale={15} blur={2.5} far={4} color="#000" />}
         </Suspense>
 
         <OrbitControls enableZoom={false} enablePan={false} makeDefault />
