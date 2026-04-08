@@ -20,6 +20,7 @@ export default function Hero3D({ onRegisterClick }) {
 
   return (
     <section id="hero" className="hero-section" style={{ 
+      height: isMobile ? '700px' : '100vh',
       padding: '0'
     }}>
       {/* 🐉 MODELO 3D - POSICIONAMENTO DINÂMICO */}
@@ -28,7 +29,7 @@ export default function Hero3D({ onRegisterClick }) {
         right: isMobile ? '-35%' : '0', 
         top: isMobile ? '10%' : '0',
         width: isMobile ? '120%' : '100%', 
-        height: isMobile ? '80vh' : '100%',
+        height: isMobile ? '550px' : '100%',
         opacity: isMobile ? 1 : 0.9,
         zIndex: isMobile ? 1 : 1,
         pointerEvents: 'none'
