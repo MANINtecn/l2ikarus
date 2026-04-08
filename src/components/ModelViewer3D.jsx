@@ -122,8 +122,8 @@ function Model({ url, animIndex }) {
         const n = obj.name.toLowerCase()
         if (!obj.userData.initRot) obj.userData.initRot = obj.rotation.clone()
         
-        // Identificar ossos do peito para as luzes (Spine2 ou Spine1 são ideais)
-        if (n.includes('spine02') || n.includes('spine_02') || (n.includes('spine') && !coreBones.current.length)) {
+        // 🟢 IDENTIFICAR TODOS OS NÚCLEOS (Duo Support)
+        if (n.includes('spine02') || n.includes('spine_02')) {
           coreBones.current.push(obj)
         }
 
@@ -132,6 +132,10 @@ function Model({ url, animIndex }) {
         }
       }
     })
+
+    // 🔄 FORÇAR ROTAÇÃO UPRIGHT NA CENA (Resolve o 'cochilo')
+    scene.rotation.set(-Math.PI / 2, 0, 0)
+
   }, [scene, animations])
 
   useFrame((state) => {
@@ -185,7 +189,6 @@ function Model({ url, animIndex }) {
         <primitive 
           object={scene} 
           scale={0.6} 
-          rotation={[-Math.PI / 2, 0, 0]} // 🔄 ANTI-COCHILO: Acorda o personagem
         />
       </Center>
       
