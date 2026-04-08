@@ -36,17 +36,7 @@ export default function ArenaDuality() {
   const current = sets[activeSet]
 
   return (
-    <section id="arena" style={{ 
-      minHeight: '100vh', 
-      width: '100%', 
-      position: 'relative',
-      background: '#050508',
-      padding: '6rem 0',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      overflow: 'hidden'
-    }}>
+    <section id="arena" className="arena-section">
       {/* SECTION HEADER */}
       <div className="reveal-delay-1 animate-fadeDown" style={{ textAlign: 'center', marginBottom: '4rem', zIndex: 10 }}>
         <h2 className="cinzel" style={{ fontSize: '3rem', color: '#fff', marginBottom: '1rem' }}>ARENA <span style={{ color: 'var(--gold)' }}>DUALITY</span></h2>
@@ -54,82 +44,52 @@ export default function ArenaDuality() {
       </div>
 
       {/* DUALITY CONTAINER */}
-      <div style={{ 
-        width: '100%', 
-        maxWidth: '1400px', 
-        height: '750px', 
-        display: 'flex', 
-        gap: '2rem',
-        padding: '0 4rem',
-        position: 'relative',
-        zIndex: 5
-      }}>
+      <div className="container arena-duality-container">
         
         {/* LEFT: BOSS DETAILS */}
-        <div style={{ flex: '1', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-          <div className="reveal-delay-2 animate-fadeLeft">
-            <span style={{ fontSize: '0.7rem', color: current.color, letterSpacing: '4px', fontWeight: '800', transition: 'color 0.4s' }}>DOMÍNIO DOS DRAGÕES</span>
-            <h3 className="cinzel" style={{ fontSize: '4rem', color: '#fff', margin: '0.8rem 0', textShadow: `0 0 20px ${current.glow}` }}>{current.name}</h3>
-            <p style={{ color: 'var(--text-mute)', fontSize: '1rem', lineHeight: '1.8', marginBottom: '3rem', maxWidth: '500px' }}>
-              {current.description}
-            </p>
+        <div className="arena-details reveal-delay-2 animate-fadeLeft">
+          <span className="arena-subtitle" style={{ color: current.color }}>DOMÍNIO DOS DRAGÕES</span>
+          <h3 className="cinzel arena-name" style={{ textShadow: `0 0 20px ${current.glow}` }}>{current.name}</h3>
+          <p className="arena-description">
+            {current.description}
+          </p>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem', marginBottom: '4rem' }}>
-              {current.stats.map(s => (
-                <div key={s.label} className="glass-panel" style={{ padding: '1rem', textAlign: 'center', borderBottom: `2px solid ${current.color}` }}>
-                  <div style={{ fontSize: '0.6rem', color: '#888', marginBottom: '0.5rem' }}>{s.label}</div>
-                  <div style={{ fontSize: '1.2rem', color: '#fff', fontWeight: '800' }}>{s.value}</div>
-                </div>
-              ))}
-            </div>
+          <div className="arena-stats-grid">
+            {current.stats.map(s => (
+              <div key={s.label} className="glass-panel arena-stat-card" style={{ borderBottom: `2px solid ${current.color}` }}>
+                <div className="stat-label">{s.label}</div>
+                <div className="stat-value">{s.value}</div>
+              </div>
+            ))}
+          </div>
 
-            {/* SELECTOR HUD */}
-            <div style={{ display: 'flex', gap: '1.5rem' }}>
-              {Object.keys(sets).map(key => (
-                <button 
-                  key={key}
-                  onClick={() => setActiveSet(key)}
-                  className={activeSet === key ? 'btn btn-primary' : 'btn btn-ghost'}
-                  style={{ 
-                    padding: '1rem 2rem', 
-                    fontSize: '0.7rem',
-                    borderColor: activeSet === key ? sets[key].color : 'rgba(255,255,255,0.1)',
-                    background: activeSet === key ? sets[key].color : 'none',
-                    boxShadow: activeSet === key ? `0 0 20px ${sets[key].glow}` : 'none',
-                    color: activeSet === key ? (key === 'antharas' ? '#000' : '#fff') : '#fff'
-                  }}
-                >
-                  {sets[key].id.toUpperCase()}
-                </button>
-              ))}
-            </div>
+          {/* SELECTOR HUD */}
+          <div className="arena-selectors">
+            {Object.keys(sets).map(key => (
+              <button 
+                key={key}
+                onClick={() => setActiveSet(key)}
+                className={activeSet === key ? 'btn btn-primary' : 'btn btn-ghost'}
+                style={{ 
+                  borderColor: activeSet === key ? sets[key].color : 'rgba(255,255,255,0.1)',
+                  background: activeSet === key ? sets[key].color : 'none',
+                  boxShadow: activeSet === key ? `0 0 20px ${sets[key].glow}` : 'none',
+                  color: activeSet === key ? (key === 'antharas' ? '#000' : '#fff') : '#fff'
+                }}
+              >
+                {sets[key].id.toUpperCase()}
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* RIGHT: 3D SHOWCASE - COM AURA AO INVÉS DE IMAGEM */}
-        <div style={{ 
-          flex: '1.5', 
-          position: 'relative', 
-          borderRadius: '30px', 
-          overflow: 'visible', // Permite que o modelo pop out se necessário
-          transition: '0.6s cubic-bezier(0.4, 0, 0.2, 1)',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center'
-        }}>
-          {/* BACKGROUND AURA (SUTIL PARA AMBIENTE) */}
-          <div style={{
-            position: 'absolute',
-            inset: '0',
-            borderRadius: '20px',
-            background: `radial-gradient(circle at center, ${current.glow} 0%, transparent 70%)`,
-            opacity: 0.5,
-            transition: 'all 0.6s ease',
-            zIndex: 0
-          }} />
+        {/* RIGHT: 3D SHOWCASE */}
+        <div className="arena-showcase">
+          {/* BACKGROUND AURA */}
+          <div className="arena-aura" style={{ background: `radial-gradient(circle at center, ${current.glow} 0%, transparent 70%)` }} />
 
           {/* 3D VIEWER */}
-          <div style={{ position: 'relative', width: '100%', height: '100%', zIndex: 1 }}>
+          <div className="arena-3d-wrapper">
             <ModelViewer3D 
               modelUrl={current.modelUrl} 
               backgroundUrl={null} 
@@ -138,14 +98,12 @@ export default function ArenaDuality() {
             />
           </div>
 
-          {/* HUD OVERLAY ELEMENTS */}
-          <div style={{ position: 'absolute', top: '2rem', right: '2rem', zIndex: 5 }}>
-             <div className="glass-panel" style={{ padding: '0.8rem 1.5rem', fontSize: '0.6rem', color: 'var(--gold)', letterSpacing: '2px' }}>
+          <div className="arena-live-tag">
+             <div className="glass-panel arena-tag-inner">
                 LIVE PREVIEW: HIGH-END 3D
              </div>
           </div>
         </div>
-
       </div>
 
       {/* BACKGROUND PARTICLES/DETAILS */}

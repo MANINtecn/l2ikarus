@@ -11,8 +11,8 @@ export default function FeaturesTerminal() {
   ])
 
   return (
-    <section id="features" style={{ padding: '8rem 2rem', background: '#050508', position: 'relative' }}>
-      <div className="container" style={{ position: 'relative', zIndex: 2 }}>
+    <section id="features" className="status-section">
+      <div className="container">
         <div style={{ textAlign: 'center', marginBottom: '6rem' }}>
           <p className="section-subtitle">TECNOLOGIA & MECÂNICAS</p>
           <h2 className="section-title">NÚCLEO DO <span style={{ color: 'var(--gold)' }}>SISTEMA</span></h2>

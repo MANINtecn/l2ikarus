@@ -10,8 +10,8 @@ export default function RatesGrid() {
   ])
 
   return (
-    <section id="rates" style={{ padding: '6rem 2rem', background: 'linear-gradient(to bottom, #050508 0%, #0a0b12 100%)', position: 'relative' }}>
-      <div className="container" style={{ position: 'relative', zIndex: 2 }}>
+    <section id="rates" className="rates-section">
+      <div className="container">
         <div style={{ textAlign: 'center', marginBottom: '5rem' }}>
           <p className="section-subtitle">CONFIGURAÇÕES DO REINO</p>
           <h2 className="section-title">RATES DE <span style={{ color: 'var(--gold)' }}>ELITE</span></h2>

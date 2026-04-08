@@ -86,7 +86,7 @@ function HeroParticles({ count = 200, color = "#4ade80" }) {
   )
 }
 
-function Model({ url }) {
+function Model({ url, animIndex }) {
   const { scene, animations } = useGLTF(url)
   const { actions } = useAnimations(animations, scene)
 
@@ -160,12 +160,20 @@ function Model({ url }) {
 
   useEffect(() => {
     if (actions) {
-      // TOCAR TODAS AS ANIMAÇÕES (Essencial para modelos Duais onde cada personagem tem sua track)
-      Object.keys(actions).forEach(key => {
-        actions[key].reset().fadeIn(0.5).play()
-      })
+      if (animIndex !== undefined && animations[animIndex]) {
+        // Tocar apenas a animação solicitada por índice
+        const animName = animations[animIndex].name
+        if (actions[animName]) {
+          actions[animName].reset().fadeIn(0.5).play()
+        }
+      } else {
+        // Comportamento padrão: Tocar todas (para modelos duais)
+        Object.keys(actions).forEach(key => {
+          actions[key].reset().fadeIn(0.5).play()
+        })
+      }
     }
-  }, [actions, url])
+  }, [actions, url, animIndex, animations])
 
   // 🎬 RENDERIZAÇÃO AUTOMÁTICA (Centraliza qualquer modelo)
   return (
@@ -210,7 +218,7 @@ export default function ModelViewer3D({ modelUrl, backgroundUrl, interactive = t
             polar={[-Math.PI / 4, Math.PI / 4]}
             azimuth={[-Math.PI / 2, Math.PI / 2]}
           >
-             {modelUrl ? <Model key={modelUrl} url={modelUrl} /> : null}
+             {modelUrl ? <Model key={modelUrl} url={modelUrl} animIndex={animIndex} /> : null}
           </PresentationControls>
 
           {/* 🏔️ AMBIENTE CINEMATOGRÁFICO - PARTÍCULAS DE AURA */}

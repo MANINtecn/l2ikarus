@@ -11,8 +11,8 @@ export default function StatusHolo() {
   // Lógica de fetch real seria aqui, vamos manter o estilo AAA fixo por agora
   
   return (
-    <section id="status" style={{ padding: '6rem 2rem', background: '#050508', position: 'relative' }}>
-      <div className="container" style={{ position: 'relative', zIndex: 2 }}>
+    <section id="status" className="status-section">
+      <div className="container">
         <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
           <p className="section-subtitle">DADOS EM TEMPO REAL</p>
           <h2 className="section-title">STATUS DO <span style={{ color: 'var(--gold)' }}>REINO</span></h2>

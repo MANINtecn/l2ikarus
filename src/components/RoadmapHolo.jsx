@@ -8,8 +8,8 @@ export default function RoadmapHolo() {
   ])
 
   return (
-    <section id="roadmap" style={{ padding: '8rem 2rem', background: '#050508', position: 'relative', overflow: 'hidden' }}>
-      <div className="container" style={{ position: 'relative', zIndex: 2 }}>
+    <section id="roadmap" className="status-section" style={{ overflow: 'hidden' }}>
+      <div className="container">
         <div style={{ textAlign: 'center', marginBottom: '6rem' }}>
           <p className="section-subtitle">LINHA DO TEMPO</p>
           <h2 className="section-title">ROADMAP DE <span style={{ color: 'var(--gold)' }}>EVOLUÇÃO</span></h2>

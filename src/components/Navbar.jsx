@@ -23,76 +23,62 @@ export default function Navbar({ onRegisterClick }) {
       position: 'fixed',
       top: 0, left: 0,
       width: '100%',
-      height: scrolled ? '70px' : '100px', // Aumentado um pouco a altura inicial
+      height: scrolled ? '70px' : '90px',
       zIndex: 1000,
-      transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
-      background: scrolled ? 'rgba(5, 5, 8, 0.92)' : 'transparent',
-      backdropFilter: scrolled ? 'blur(20px)' : 'none',
-      borderBottom: scrolled ? '1px solid rgba(197, 160, 89, 0.4)' : '1px solid transparent',
+      transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+      background: scrolled || menuOpen ? 'rgba(5, 5, 8, 0.95)' : 'transparent',
+      backdropFilter: scrolled || menuOpen ? 'blur(20px)' : 'none',
+      borderBottom: scrolled || menuOpen ? '1px solid rgba(197, 160, 89, 0.3)' : '1px solid transparent',
       display: 'flex',
-      alignItems: 'center',
-      overflow: 'visible' // Garante que a logo possa sair do header
+      alignItems: 'center'
     }}>
-      <div className="container-wide" style={{
+      <div className="container" style={{
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: '0 4rem', // Um pouco mais de padding nas laterais
         width: '100%',
         position: 'relative'
       }}>
-        {/* LOGO AREA - COM EFEITO DE CRESCIMENTO E OVERFLOW */}
-        <div style={{ flex: 1, display: 'flex', alignItems: 'center', position: 'relative' }}>
-          <div style={{
-             position: 'relative',
-             zIndex: 10,
-             transition: 'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)' // Efeito elástico suave
-          }}>
-            <img 
-              src="/assets/images/logo.png" 
-              alt="L2 Ikarus Logo" 
-              style={{ 
-                height: scrolled ? '85px' : '70px', // CRESCER AO DAR SCROLL!
-                position: 'absolute',
-                top: scrolled ? '-42px' : '-35px', // Centraliza verticalmente na transição
-                left: 0,
-                transition: 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                mixBlendMode: 'screen',
-                filter: scrolled ? 'brightness(1.2) contrast(1.2)' : 'brightness(1.1) contrast(1.1)',
-                cursor: 'pointer',
-                transform: scrolled ? 'scale(1.15) translateY(10px)' : 'scale(1) translateY(0)'
-              }} 
-              onClick={() => window.location.href = '#hero'}
-            />
-          </div>
+        {/* LOGO AREA */}
+        <div style={{ display: 'flex', alignItems: 'center', zIndex: 1100 }}>
+          <img 
+            src="/assets/images/logo.png" 
+            alt="L2 Ikarus Logo" 
+            style={{ 
+              height: scrolled ? '65px' : '75px',
+              transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
+              mixBlendMode: 'screen',
+              filter: 'brightness(1.1) contrast(1.1)',
+              cursor: 'pointer',
+              transform: scrolled ? 'scale(1)' : 'scale(1.1)'
+            }} 
+            onClick={() => window.location.href = '#hero'}
+          />
           
-          <h1 className="cinzel" style={{ 
-            fontSize: '1.4rem', 
+          <h1 className="cinzel hide-mobile" style={{ 
+            fontSize: '1.2rem', 
             color: 'var(--gold)', 
-            margin: '0 0 0 90px', // Espaço maior para a logo que cresce
+            marginLeft: '15px',
             letterSpacing: '4px',
             textShadow: '0 0 20px rgba(197,160,89,0.4)',
-            transition: 'opacity 0.4s, transform 0.4s',
-            opacity: scrolled ? 0.3 : 1, // Suaviza o texto para dar foco na logo épica
-            transform: scrolled ? 'translateX(10px)' : 'translateX(0)',
-            pointerEvents: 'none'
+            opacity: scrolled ? 0.5 : 1,
+            transition: 'opacity 0.4s'
           }}>
             L2 IKARUS
           </h1>
         </div>
 
-        {/* HUD NAVIGATION */}
-        <nav style={{ 
+        {/* DESKTOP HUD NAVIGATION */}
+        <nav className="hide-mobile" style={{ 
           display: 'flex', 
-          gap: scrolled ? '1.5rem' : '2.5rem', 
+          gap: '2rem', 
           alignItems: 'center',
           background: 'rgba(255,255,255,0.03)',
-          padding: scrolled ? '0.6rem 2rem' : '0.8rem 3rem',
+          padding: '0.6rem 2.5rem',
           borderRadius: '50px',
           border: '1px solid rgba(255,255,255,0.05)',
           backdropFilter: 'blur(10px)',
-          transition: 'all 0.4s',
-          boxShadow: scrolled ? '0 4px 30px rgba(0,0,0,0.5)' : 'none'
+          transition: 'all 0.4s'
         }}>
           {links.map(l => (
             <a 
@@ -104,7 +90,8 @@ export default function Navbar({ onRegisterClick }) {
                 letterSpacing: '2px',
                 textTransform: 'uppercase',
                 color: 'rgba(255,255,255,0.7)',
-                transition: '0.3s'
+                transition: '0.3s',
+                textDecoration: 'none'
               }}
               onMouseEnter={(e) => e.target.style.color = 'var(--gold)'}
               onMouseLeave={(e) => e.target.style.color = 'rgba(255,255,255,0.7)'}
@@ -115,7 +102,7 @@ export default function Navbar({ onRegisterClick }) {
         </nav>
 
         {/* CTA AREA */}
-        <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', gap: '2rem' }}>
+        <div className="hide-mobile" style={{ display: 'flex', justifyContent: 'flex-end', gap: '1.5rem', alignItems: 'center' }}>
           <button 
             onClick={onRegisterClick}
             style={{ 
@@ -133,14 +120,71 @@ export default function Navbar({ onRegisterClick }) {
           >
             CADASTRO
           </button>
-          <a href="#download" className="btn btn-primary" style={{ 
-            padding: scrolled ? '0.6rem 2rem' : '0.8rem 2.8rem', 
-            fontSize: '0.8rem',
-            clipPath: 'polygon(10% 0, 100% 0, 90% 100%, 0 100%)',
-            boxShadow: '0 0 20px rgba(197,160,89,0.2)'
-          }}>
+          <a href="#download" className="btn btn-primary" style={{ padding: '0.7rem 1.8rem' }}>
             JOGAR AGORA
           </a>
+        </div>
+
+        {/* MOBILE TOGGLE */}
+        <button 
+          className="show-mobile"
+          onClick={() => setMenuOpen(!menuOpen)}
+          style={{
+            background: 'none',
+            border: 'none',
+            color: 'var(--gold)',
+            fontSize: '1.5rem',
+            cursor: 'pointer',
+            zIndex: 2000,
+            padding: '1rem'
+          }}
+        >
+          {menuOpen ? '✕' : '☰'}
+        </button>
+
+        {/* MOBILE MENU OVERLAY */}
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100vh',
+          background: 'rgba(5, 5, 8, 0.98)',
+          display: menuOpen ? 'flex' : 'none',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '2rem',
+          zIndex: 1500,
+          transition: 'all 0.4s ease',
+          opacity: menuOpen ? 1 : 0
+        }}>
+          {links.map(l => (
+            <a 
+              key={l.href}
+              href={l.href}
+              onClick={() => setMenuOpen(false)}
+              className="cinzel"
+              style={{
+                fontSize: '1.5rem',
+                color: '#fff',
+                textDecoration: 'none',
+                letterSpacing: '4px'
+              }}
+            >
+              {l.label}
+            </a>
+          ))}
+          <button 
+            onClick={() => {
+              setMenuOpen(false);
+              onRegisterClick();
+            }}
+            className="btn btn-primary"
+            style={{ marginTop: '2rem', width: '200px' }}
+          >
+            INICIAR AGORA
+          </button>
         </div>
       </div>
     </header>
