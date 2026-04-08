@@ -32,7 +32,7 @@ export default function Hero3D({ onRegisterClick }) {
         height: isMobile ? '550px' : '100%',
         opacity: isMobile ? 1 : 0.9,
         zIndex: isMobile ? 1 : 1,
-        pointerEvents: 'none'
+        pointerEvents: 'auto'
       }}>
         <ModelViewer3D 
           modelUrl={modelUrl} 
@@ -94,7 +94,9 @@ export default function Hero3D({ onRegisterClick }) {
             flexDirection: 'row', 
             justifyContent: 'flex-start',
             alignItems: 'center',
-            gap: isMobile ? '10px' : '1.5rem'
+            gap: isMobile ? '10px' : '1.5rem',
+            position: 'relative',
+            zIndex: 100
           }}>
              <button onClick={onRegisterClick} className="btn btn-primary" style={{ padding: isMobile ? '0.6rem 1rem' : '0.8rem 1.6rem', width: 'auto', fontSize: isMobile ? '0.7rem' : '0.9rem' }}>
                {isMobile ? 'JOGAR' : 'INICIALIZAR JORNADA'}
