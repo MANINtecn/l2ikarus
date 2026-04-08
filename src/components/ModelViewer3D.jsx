@@ -159,7 +159,9 @@ function Model({ url, animIndex }) {
   })
 
   useEffect(() => {
-    if (actions) {
+    if (actions && animations.length > 0) {
+      console.log("IKARUS ANIMATIONS:", animations.map((a, i) => `${i}: ${a.name}`))
+      
       if (animIndex !== undefined && animations[animIndex]) {
         // Tocar apenas a animação solicitada por índice
         const animName = animations[animIndex].name
@@ -231,7 +233,7 @@ export default function ModelViewer3D({ modelUrl, backgroundUrl, interactive = t
             global={false}
             config={{ mass: 2, tension: 500 }}
             snap={{ mass: 4, tension: 1500 }}
-            rotation={[0, -Math.PI / 1.5, 0]} 
+            rotation={[0, Math.PI / 8, 0]} 
             polar={[-Math.PI / 4, Math.PI / 4]}
             azimuth={[-Math.PI / 2, Math.PI / 2]}
           >

@@ -20,15 +20,18 @@ export default function Hero3D({ onRegisterClick }) {
 
   return (
     <section id="hero" className="hero-section" style={{ 
-      padding: isMobile ? '0 1rem' : '0'
+      flexDirection: isMobile ? 'column' : 'row',
+      padding: isMobile ? '2rem 1rem' : '0'
     }}>
       {/* 🐉 MODELO 3D - POSICIONAMENTO DINÂMICO */}
       <div className="hero-3d-container" style={{ 
-        position: 'absolute',
-        right: isMobile ? '-15%' : '0', // No mobile, desloca levemente para a direita
-        width: isMobile ? '75%' : '100%', 
+        position: isMobile ? 'relative' : 'absolute',
+        right: '0', 
+        width: '100%', 
+        height: isMobile ? '50vh' : '100%',
         opacity: isMobile ? 1 : 0.9,
-        zIndex: isMobile ? 2 : 1
+        zIndex: isMobile ? 2 : 1,
+        marginTop: isMobile ? '1rem' : '0'
       }}>
         <ModelViewer3D 
           modelUrl={modelUrl} 
@@ -39,19 +42,20 @@ export default function Hero3D({ onRegisterClick }) {
         />
         <div className="hero-gradient-overlay" style={{ 
           background: isMobile 
-            ? 'linear-gradient(90deg, rgba(5,5,8,1) 0%, rgba(5,5,8,0.5) 40%, rgba(5,5,8,0) 80%)' 
+            ? 'linear-gradient(0deg, rgba(5,5,8,1) 0%, rgba(5,5,8,0) 50%, rgba(5,5,8,1) 100%)' 
             : undefined 
         }} />
       </div>
 
       <div className="container hero-container" style={{ 
-        flexDirection: 'row', 
-        alignItems: 'center',
+        flexDirection: isMobile ? 'column' : 'row', 
+        alignItems: isMobile ? 'center' : 'center',
         justifyContent: isMobile ? 'flex-start' : 'space-between',
-        textAlign: 'left',
-        height: '100%',
-        position: 'relative',
-        zIndex: 10
+        textAlign: isMobile ? 'center' : 'left',
+        height: isMobile ? 'auto' : '100%',
+        position: isMobile ? 'relative' : 'relative',
+        zIndex: 10,
+        paddingTop: isMobile ? '80px' : '0'
       }}>
         {/* HUD OVERLAY LEFT: SERVER IDENTITY */}
         <div className="hero-identity reveal-delay-1 animate-fadeUp" style={{ 
@@ -59,7 +63,7 @@ export default function Hero3D({ onRegisterClick }) {
           zIndex: 10,
           position: 'relative'
         }}>
-          <p className="section-subtitle" style={{ textAlign: 'left' }}>
+          <p className="section-subtitle" style={{ textAlign: isMobile ? 'center' : 'left' }}>
             {isMobile ? 'IKARUS MOBILE ELITE' : 'SEJA RECONHECIDO POR ONDE FARMA'}
           </p>
           <h1 className="cinzel hero-title" style={{ 
@@ -80,14 +84,15 @@ export default function Hero3D({ onRegisterClick }) {
           </p>
           
           <div className="hero-actions" style={{ 
-            flexDirection: isMobile ? 'column' : 'row', 
-            alignItems: isMobile ? 'flex-start' : 'center',
-            gap: isMobile ? '1rem' : '1.5rem'
+            flexDirection: isMobile ? 'row' : 'row', 
+            justifyContent: isMobile ? 'center' : 'flex-start',
+            alignItems: 'center',
+            gap: isMobile ? '10px' : '1.5rem'
           }}>
-             <button onClick={onRegisterClick} className="btn btn-primary" style={{ padding: '0.8rem 1.6rem', width: isMobile ? '100%' : 'auto' }}>
-               {isMobile ? 'JOGAR AGORA' : 'INICIALIZAR JORNADA'}
+             <button onClick={onRegisterClick} className="btn btn-primary" style={{ padding: isMobile ? '0.6rem 1rem' : '0.8rem 1.6rem', width: 'auto', fontSize: isMobile ? '0.7rem' : '0.9rem' }}>
+               {isMobile ? 'JOGAR' : 'INICIALIZAR JORNADA'}
              </button>
-             <a href="#rates" className="btn btn-ghost" style={{ padding: '0.8rem 1.6rem', width: isMobile ? '100%' : 'auto' }}>
+             <a href="#rates" className="btn btn-ghost" style={{ padding: isMobile ? '0.6rem 1rem' : '0.8rem 1.6rem', width: 'auto', fontSize: isMobile ? '0.7rem' : '0.9rem' }}>
                {isMobile ? 'RATES' : 'RECURSOS ELITE'}
              </a>
           </div>
