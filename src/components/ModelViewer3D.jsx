@@ -162,9 +162,12 @@ function Model({ url, animIndex }) {
     if (actions && animations.length > 0) {
       console.log("IKARUS ANIMATIONS:", animations.map((a, i) => `${i}: ${a.name}`))
       
-      if (animIndex !== undefined && animations[animIndex]) {
-        // Tocar apenas a animação solicitada por índice
-        const animName = animations[animIndex].name
+      // 🔍 BUSCA POR NOME (Provoke) OU ÍNDICE
+      const provokeIndex = animations.findIndex(a => a.name.toLowerCase().includes('provoke'))
+      const finalIndex = provokeIndex !== -1 ? provokeIndex : animIndex
+
+      if (finalIndex !== undefined && animations[finalIndex]) {
+        const animName = animations[finalIndex].name
         if (actions[animName]) {
           actions[animName].reset().fadeIn(0.5).play()
         }
