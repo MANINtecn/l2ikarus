@@ -89,9 +89,11 @@ function Model({ url, animIndex }) {
   const { scene, animations } = useGLTF(url)
   const { actions } = useAnimations(animations, scene)
   const bones = useRef([])
+  const coreBones = useRef([]) // 🦴 Ossos que servirão de fonte de luz (Peito/Spine)
 
   useMemo(() => {
     bones.current = []
+    coreBones.current = []
     const hasAnimations = animations && animations.length > 0;
 
     scene.traverse((obj) => {
@@ -99,13 +101,32 @@ function Model({ url, animIndex }) {
         obj.frustumCulled = false
         obj.castShadow = true
         obj.receiveShadow = true
+        
+        if (obj.material) {
+          const color = obj.material.color
+          const isGreenish = color.g > color.r && color.g > color.b
+          
+          if (isGreenish || obj.material.emissiveMap) {
+            obj.material.emissive = new THREE.Color("#4ade80")
+            obj.material.emissiveIntensity = 2.5
+            obj.material.toneMapped = false
+          }
+        }
+
         if (obj.name.toLowerCase().includes('cube') || obj.name.toLowerCase().includes('helper')) {
           obj.visible = false
         }
       }
+      
       if (obj.isBone) {
         const n = obj.name.toLowerCase()
         if (!obj.userData.initRot) obj.userData.initRot = obj.rotation.clone()
+        
+        // Identificar ossos do peito para as luzes (Spine2 ou Spine1 são ideais)
+        if (n.includes('spine02') || n.includes('spine_02') || (n.includes('spine') && !coreBones.current.length)) {
+          coreBones.current.push(obj)
+        }
+
         if (n.includes('spine') || n.includes('head') || n.includes('arm')) {
           bones.current.push(obj)
         }
@@ -115,6 +136,14 @@ function Model({ url, animIndex }) {
 
   useFrame((state) => {
     const t = state.clock.getElapsedTime()
+    
+    // 🌊 PULSAÇÃO DOS MATERIAIS
+    scene.traverse((obj) => {
+      if (obj.isMesh && obj.material && obj.material.emissiveIntensity > 0) {
+        obj.material.emissiveIntensity = 2 + Math.sin(t * 1.5) * 1
+      }
+    })
+
     const hasAnimations = animations && animations.length > 0;
     if (hasAnimations) return;
 
@@ -151,9 +180,23 @@ function Model({ url, animIndex }) {
   }, [actions, url, animIndex, animations])
 
   return (
-    <Center>
-      <primitive object={scene} scale={0.6} />
-    </Center>
+    <group>
+      <Center>
+        <primitive object={scene} scale={0.6} />
+      </Center>
+      
+      {/* 💡 LUZES DINÂMICAS (Uma para cada "coração" identificado) */}
+      {coreBones.current.map((bone, idx) => (
+        <primitive key={idx} object={bone}>
+           <pointLight 
+            color="#4ade80" 
+            intensity={1500} 
+            distance={8} 
+            decay={2}
+          />
+        </primitive>
+      ))}
+    </group>
   )
 }
 
