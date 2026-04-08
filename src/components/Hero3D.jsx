@@ -62,13 +62,15 @@ export default function Hero3D({ onRegisterClick }) {
         height: '100%',
         position: 'relative',
         zIndex: 10,
-        paddingTop: isMobile ? '120px' : '0'
+        paddingTop: isMobile ? '120px' : '0',
+        pointerEvents: 'none' // 👈 HUD não bloqueia o clique no 3D
       }}>
         {/* HUD OVERLAY LEFT: SERVER IDENTITY */}
         <div className="hero-identity reveal-delay-1 animate-fadeUp" style={{ 
           maxWidth: isMobile ? '230px' : '550px', 
           zIndex: 10,
-          position: 'relative'
+          position: 'relative',
+          pointerEvents: 'auto' // 👈 Reativa clique apenas nos elementos de UI
         }}>
           <p className="section-subtitle" style={{ textAlign: 'left' }}>
             {isMobile ? 'IKARUS MOBILE ELITE' : 'SEJA RECONHECIDO POR ONDE FARMA'}
@@ -109,7 +111,13 @@ export default function Hero3D({ onRegisterClick }) {
 
         {/* HUD OVERLAY RIGHT: SERVER STATUS CARDS (Apenas Desktop) */}
         {!isMobile && (
-          <div className="hero-status animate-fadeUp" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', width: '220px' }}>
+          <div className="hero-status animate-fadeUp" style={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            gap: '1.5rem', 
+            width: '220px',
+            pointerEvents: 'auto' // 👈 Reativa clique nos cards de status
+          }}>
             {/* STATUS CARD */}
             <div className="glass-panel hero-status-card" style={{ borderLeft: '4px solid #4ade80', padding: '1.5rem' }}>
               <div className="status-header">

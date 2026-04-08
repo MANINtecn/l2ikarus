@@ -223,19 +223,26 @@ export default function ModelViewer3D({ modelUrl, backgroundUrl, interactive = t
         <OrbitControls enableZoom={false} enablePan={false} makeDefault />
       </Canvas>
 
-      {/* 🔘 INDICADOR DE CÂMERA 360° (Overlay sutil) */}
+      {/* 🔘 INDICADOR DE CÂMERA 360° (Overlay Premium Centralizado) */}
       <div style={{
-        position: 'absolute', bottom: '1.5rem', right: '1.5rem',
-        display: 'flex', alignItems: 'center', gap: '8px',
-        opacity: 0.4, color: 'var(--gold)', pointerEvents: 'none',
-        fontSize: '0.6rem', letterSpacing: '2px', fontWeight: 'bold',
-        fontFamily: 'var(--font-main)',
-        zIndex: 10
+        position: 'absolute', top: isMobile ? '12%' : '15%', left: '50%',
+        transform: 'translateX(-50%)',
+        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px',
+        color: 'var(--gold)', pointerEvents: 'none',
+        fontSize: '0.7rem', letterSpacing: '4px', fontWeight: '900',
+        fontFamily: 'var(--font-heading)',
+        zIndex: 10,
+        textShadow: '0 0 15px rgba(197, 160, 89, 0.6)',
+        animation: 'ledPulse 5s infinite ease-in-out', // Usando a animação de pulso já existente
+        opacity: 0.8
       }}>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '5px' }}>
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M12 2v20M2 12h20M7.75 7.75l8.5 8.5M7.75 16.25l8.5-8.5"/>
         </svg>
-        360° VR VIEW
+        <span style={{ background: 'rgba(5,5,8,0.4)', padding: '2px 8px', borderRadius: '4px' }}>
+          INTERAÇÃO 360° VR
+        </span>
       </div>
     </div>
   )
