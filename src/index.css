@@ -626,4 +626,37 @@ h1, h2, h3, h4, .cinzel {
 ::-webkit-scrollbar-track { background: var(--bg-deep); }
 ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 2px; }
 
+/* ── LED GLOW EFFECT (MOBILE) ── */
+.mobile-led-glow {
+  position: absolute;
+  top: 55%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 320px;
+  height: 320px;
+  background: radial-gradient(circle, 
+    rgba(74, 222, 128, 0.4) 0%, 
+    rgba(74, 222, 128, 0.15) 35%, 
+    transparent 70%
+  );
+  filter: blur(40px);
+  z-index: 1;
+  pointer-events: none;
+  animation: ledPulse 5s infinite ease-in-out;
+  opacity: 0.6;
+}
+
+@keyframes ledPulse {
+  0%, 100% { 
+    transform: translate(-50%, -50%) scale(0.9); 
+    opacity: 0.4; 
+    filter: blur(30px);
+  }
+  50% { 
+    transform: translate(-50%, -50%) scale(1.15); 
+    opacity: 0.7; 
+    filter: blur(50px);
+  }
+}
+
 ::selection { background: var(--purple); color: #fff; }

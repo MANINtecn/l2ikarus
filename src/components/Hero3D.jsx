@@ -40,6 +40,12 @@ export default function Hero3D({ onRegisterClick }) {
           animIndex={isMobile ? 8 : undefined}
           isMobileProp={isMobile}
         />
+        
+        {/* 🟢 EFEITO LED BACKLIGHT (Aura de Destaque) */}
+        {isMobile && (
+          <div className="mobile-led-glow" />
+        )}
+
         <div className="hero-gradient-overlay" style={{ 
           background: isMobile 
             ? 'linear-gradient(0deg, rgba(5,5,8,1) 0%, rgba(5,5,8,0) 50%, rgba(5,5,8,1) 100%)' 
