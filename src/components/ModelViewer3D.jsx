@@ -251,7 +251,7 @@ export default function ModelViewer3D({ modelUrl, backgroundUrl, interactive = t
             global={false}
             config={{ mass: 2, tension: 500 }}
             snap={{ mass: 4, tension: 1500 }}
-            rotation={[0, isMobile ? Math.PI / 8 : Math.PI / 6, 0] } 
+            rotation={[0, 0, 0]} 
             polar={[-Math.PI / 4, Math.PI / 4]}
             azimuth={[-Math.PI / 2, Math.PI / 2]}
           >
@@ -272,32 +272,35 @@ export default function ModelViewer3D({ modelUrl, backgroundUrl, interactive = t
         <OrbitControls enableZoom={false} enablePan={false} makeDefault />
       </Canvas>
 
-      {/* 🔘 INDICADOR DE CÂMERA 360° (Prioridade Máxima) */}
+      {/* 🔘 INDICADOR DE CÂMERA 360° (Prioridade Máxima e Posição 'X') */}
       <div style={{
-        position: 'absolute', top: isMobile ? '15%' : '20%', left: '50%',
+        position: 'absolute', 
+        top: isMobile ? '15%' : '18%', 
+        left: isMobile ? '50%' : '72%', // 📍 Posicionamento no 'X' solicitado
         transform: 'translateX(-50%)',
         display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px',
         color: 'var(--gold)', pointerEvents: 'none',
         fontSize: '0.75rem', letterSpacing: '4px', fontWeight: '900',
         fontFamily: 'var(--font-heading)',
-        zIndex: 100, // 👈 Camada mais alta para não sumir
+        zIndex: 999, // 👈 Blindagem contra sobreposição
         textShadow: '0 0 20px rgba(197, 160, 89, 0.8)',
         animation: 'ledPulse 4s infinite ease-in-out', 
         opacity: 0.9,
         textAlign: 'center'
       }}>
         {/* Ícone de Seta Circular 360° */}
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '5px' }}>
+        <svg width="45" height="45" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '5px' }}>
           <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
           <path d="M3 3v5h5"/>
-          <text x="12" y="15" fontSize="4" fontWeight="bold" fill="currentColor" textAnchor="middle">360°</text>
+          <text x="12" y="15" fontSize="3.5" fontWeight="bold" fill="currentColor" textAnchor="middle">360°</text>
         </svg>
         <div style={{ 
-          background: 'rgba(5,5,8,0.6)', 
-          padding: '4px 12px', 
+          background: 'rgba(5,5,8,0.7)', 
+          padding: '4px 14px', 
           borderRadius: '50px',
-          border: '1px solid rgba(197, 160, 89, 0.3)',
-          backdropFilter: 'blur(4px)'
+          border: '1px solid rgba(197, 160, 89, 0.4)',
+          backdropFilter: 'blur(8px)',
+          boxShadow: '0 0 20px rgba(197, 160, 89, 0.2)'
         }}>
           VISÃO 360° VR
         </div>
