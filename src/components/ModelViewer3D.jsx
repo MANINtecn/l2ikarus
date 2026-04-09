@@ -185,10 +185,11 @@ function Model({ url, animIndex }) {
         <primitive 
           object={scene} 
           scale={0.6} 
-          // 🔄 FRONTAL SUPREME: De pé e encarando o usuário (180°)
-          rotation={[-Math.PI / 2, 0, Math.PI]} 
+          // 🔄 FRONTAL SUPREME: De pé e encarando o usuário (Frontal/Lateral)
+          rotation={[0, Math.PI, 0]} 
         />
       </Center>
+
 
 
       
@@ -238,7 +239,7 @@ export default function ModelViewer3D({ modelUrl, backgroundUrl, interactive = t
       <Canvas 
         shadows={!isMobile} 
         dpr={isMobile ? 1 : [1, 2]} 
-        camera={{ position: [0, -2, 60], fov: 45 }} 
+        camera={{ position: [0, 0.5, 5.5], fov: 45 }} 
         gl={{ 
           antialias: true, 
           alpha: true, 

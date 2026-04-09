@@ -33,7 +33,8 @@ export default function Hero3D({ onRegisterClick }) {
         height: isMobile ? '550px' : '100%',
         opacity: isMobile ? 1 : 0.9,
         zIndex: isMobile ? 1 : 1,
-        pointerEvents: 'auto'
+        pointerEvents: 'auto',
+        overflow: 'visible' // 👈 Garante que o ícone 360 apareça
       }}>
         <ModelViewer3D 
           modelUrl={modelUrl} 
