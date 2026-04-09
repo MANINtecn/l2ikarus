@@ -185,10 +185,11 @@ function Model({ url, animIndex }) {
         <primitive 
           object={scene} 
           scale={0.6} 
-          // 🔄 RESET: Retornando ao eixo original para evitar 'capotamentos'
-          rotation={[0, 0, 0]} 
+          // 🔄 FRONTAL SUPREME: De pé e encarando o usuário (180°)
+          rotation={[-Math.PI / 2, 0, Math.PI]} 
         />
       </Center>
+
 
       
       {/* 💡 LUZES DINÂMICAS (Uma para cada "coração" identificado) */}
@@ -276,13 +277,13 @@ export default function ModelViewer3D({ modelUrl, backgroundUrl, interactive = t
       <div style={{
         position: 'absolute', 
         top: isMobile ? '15%' : '18%', 
-        left: isMobile ? '50%' : '72%', // 📍 Posicionamento no 'X' solicitado
+        left: isMobile ? '50%' : '20%', // 📍 Posicionamento no foco da esquerda
         transform: 'translateX(-50%)',
         display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px',
         color: 'var(--gold)', pointerEvents: 'none',
         fontSize: '0.75rem', letterSpacing: '4px', fontWeight: '900',
         fontFamily: 'var(--font-heading)',
-        zIndex: 999, // 👈 Blindagem contra sobreposição
+        zIndex: 2000, // 👈 Blindagem absoluta contra sobreposição
         textShadow: '0 0 20px rgba(197, 160, 89, 0.8)',
         animation: 'ledPulse 4s infinite ease-in-out', 
         opacity: 0.9,

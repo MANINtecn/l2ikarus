@@ -26,7 +26,8 @@ export default function Hero3D({ onRegisterClick }) {
       {/* 🐉 MODELO 3D - POSICIONAMENTO DINÂMICO */}
       <div className="hero-3d-container" style={{ 
         position: 'absolute',
-        right: isMobile ? '-35%' : '0', 
+        left: isMobile ? '-35%' : '-10%', 
+        right: 'auto',
         top: isMobile ? '10%' : '0',
         width: isMobile ? '120%' : '100%', 
         height: isMobile ? '550px' : '100%',
@@ -55,10 +56,10 @@ export default function Hero3D({ onRegisterClick }) {
       </div>
 
       <div className="container hero-container" style={{ 
-        flexDirection: 'row', 
+        flexDirection: isMobile ? 'column' : 'row-reverse', 
         alignItems: isMobile ? 'flex-start' : 'center',
         justifyContent: isMobile ? 'flex-start' : 'space-between',
-        textAlign: 'left',
+        textAlign: isMobile ? 'left' : 'right',
         height: '100%',
         position: 'relative',
         zIndex: 10,
@@ -72,7 +73,7 @@ export default function Hero3D({ onRegisterClick }) {
           position: 'relative',
           pointerEvents: 'auto' // 👈 Reativa clique apenas nos elementos de UI
         }}>
-          <p className="section-subtitle" style={{ textAlign: 'left' }}>
+          <p className="section-subtitle" style={{ textAlign: isMobile ? 'left' : 'right' }}>
             {isMobile ? 'IKARUS MOBILE ELITE' : 'SEJA RECONHECIDO POR ONDE FARMA'}
           </p>
           <h1 className="cinzel hero-title" style={{ 
@@ -94,7 +95,7 @@ export default function Hero3D({ onRegisterClick }) {
           
           <div className="hero-actions" style={{ 
             flexDirection: 'row', 
-            justifyContent: 'flex-start',
+            justifyContent: isMobile ? 'flex-start' : 'flex-end',
             alignItems: 'center',
             gap: isMobile ? '10px' : '1.5rem',
             position: 'relative',
