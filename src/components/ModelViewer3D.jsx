@@ -184,11 +184,12 @@ function Model({ url, animIndex }) {
       <Center>
         <primitive 
           object={scene} 
-          scale={0.6} 
-          // 🔄 FRONTAL SUPREME: De pé e encarando o usuário (Frontal/Lateral)
-          rotation={[0, Math.PI, 0]} 
+          scale={0.4} 
+          // 🔄 FRONTAL DYNAMIC: De pé e encarando o usuário em diagonal
+          rotation={[0, Math.PI - 0.4, 0]} 
         />
       </Center>
+
 
 
 
@@ -239,7 +240,7 @@ export default function ModelViewer3D({ modelUrl, backgroundUrl, interactive = t
       <Canvas 
         shadows={!isMobile} 
         dpr={isMobile ? 1 : [1, 2]} 
-        camera={{ position: [0, 0.5, 5.5], fov: 45 }} 
+        camera={{ position: [0, -0.5, 12], fov: 45 }} 
         gl={{ 
           antialias: true, 
           alpha: true, 
@@ -278,7 +279,7 @@ export default function ModelViewer3D({ modelUrl, backgroundUrl, interactive = t
       <div style={{
         position: 'absolute', 
         top: isMobile ? '15%' : '18%', 
-        left: isMobile ? '50%' : '20%', // 📍 Posicionamento no foco da esquerda
+        left: '50%', // 📍 Centralizado no container 3D
         transform: 'translateX(-50%)',
         display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px',
         color: 'var(--gold)', pointerEvents: 'none',
