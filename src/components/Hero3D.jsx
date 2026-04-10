@@ -8,14 +8,27 @@ export default function Hero3D({ onRegisterClick }) {
   
   const [modelUrl, setModelUrl] = useState(isMobile ? mobileModel : desktopModel)
 
+  const [scrollProgress, setScrollProgress] = useState(0)
+
   useEffect(() => {
     const handleResize = () => {
       const mobile = window.innerWidth <= 1024
       setIsMobile(mobile)
       setModelUrl(mobile ? mobileModel : desktopModel)
     }
+
+    const handleScroll = () => {
+      const scrollY = window.scrollY
+      const maxScroll = 600
+      setScrollProgress(Math.min(1, scrollY / maxScroll))
+    }
+
     window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => {
+      window.removeEventListener('resize', handleResize)
+      window.removeEventListener('scroll', handleScroll)
+    }
   }, [])
 
   return (
@@ -69,8 +82,9 @@ export default function Hero3D({ onRegisterClick }) {
         zIndex: 15000, // 👈 Hierarquia Suprema
         textShadow: '0 0 20px rgba(197, 160, 89, 0.8)',
         animation: 'ledPulse 4s infinite ease-in-out', 
-        opacity: 0.9,
-        textAlign: 'center'
+        opacity: (1 - scrollProgress) * 0.9,
+        textAlign: 'center',
+        transition: 'opacity 0.1s linear'
       }}>
         {/* Ícone de Seta Circular 360° */}
         <svg width="45" height="45" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '5px' }}>
@@ -99,7 +113,10 @@ export default function Hero3D({ onRegisterClick }) {
         position: 'relative',
         zIndex: 10,
         paddingTop: isMobile ? '120px' : '0',
-        pointerEvents: 'none' // 👈 HUD não bloqueia o clique no 3D
+        pointerEvents: 'none', // 👈 HUD não bloqueia o clique no 3D
+        opacity: 1 - scrollProgress,
+        transform: `translateY(${scrollProgress * -50}px)`,
+        transition: 'opacity 0.1s linear'
       }}>
         {/* HUD OVERLAY LEFT: SERVER IDENTITY */}
         <div className="hero-identity reveal-delay-1 animate-fadeUp" style={{ 

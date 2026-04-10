@@ -85,7 +85,7 @@ function HeroParticles({ count = 200, color = "#4ade80" }) {
   )
 }
 
-function Model({ url, animIndex }) {
+function Model({ url, animIndex, isHovered, isTouched, isMobile }) {
   const { scene, animations } = useGLTF(url)
   const { actions } = useAnimations(animations, scene)
   const bones = useRef([])
@@ -157,12 +157,18 @@ function Model({ url, animIndex }) {
       }
       if (n.includes('arm')) bone.rotation.x = bone.userData.initRot.x + Math.sin(t * 2) * 0.1
     })
+
+    // 🔄 ROTAÇÃO 360 AO HOVER (Desktop)
+    if (isHovered && !isMobile) {
+      scene.rotation.y += 0.015
+    }
   })
 
   useEffect(() => {
     if (actions && animations.length > 0) {
-      console.log("IKARUS ANIMATIONS:", animations.map((a, i) => `${i}: ${a.name}`))
-      
+      // Se for mobile, espera o toque se não tiver tocando
+      if (isMobile && !isTouched) return;
+
       const provokeIndex = animations.findIndex(a => a.name.toLowerCase().includes('provoke'))
       const finalIndex = provokeIndex !== -1 ? provokeIndex : animIndex
 
@@ -177,7 +183,7 @@ function Model({ url, animIndex }) {
         })
       }
     }
-  }, [actions, url, animIndex, animations])
+  }, [actions, url, animIndex, animations, isTouched, isMobile])
 
   return (
     <group>
@@ -220,17 +226,40 @@ useGLTF.preload('/assets/skins/antharas/ikarus_promo.glb')
 export default function ModelViewer3D({ modelUrl, backgroundUrl, interactive = true, glowColor = "#c5a059", animIndex, isMobileProp }) {
   const containerRef = useRef()
   const [loading, setLoading] = useState(true)
+  const [isHovered, setIsHovered] = useState(false)
+  const [isTouched, setIsTouched] = useState(false)
+  const [scrollProgress, setScrollProgress] = useState(0) // 0 a 1
   const isMobile = isMobileProp !== undefined ? isMobileProp : window.innerWidth <= 1024
 
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY
+      const maxScroll = 800 // Ponto onde some completamente
+      const progress = Math.min(1, scrollY / maxScroll)
+      setScrollProgress(progress)
+    }
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
   return (
-    <div ref={containerRef} style={{ 
-      width: '100%', 
-      height: '100%', 
-      cursor: interactive ? 'grab' : 'default', 
-      position: 'relative',
-      overflow: 'hidden',
-      background: '#050508'
-    }}>
+    <div 
+      ref={containerRef} 
+      onPointerEnter={() => !isMobile && setIsHovered(true)}
+      onPointerLeave={() => !isMobile && setIsHovered(false)}
+      onTouchStart={() => isMobile && setIsTouched(true)}
+      style={{ 
+        width: '100%', 
+        height: '100%', 
+        cursor: interactive ? 'grab' : 'default', 
+        position: 'relative',
+        overflow: 'hidden',
+        background: '#050508',
+        opacity: 1 - scrollProgress,
+        transform: `scale(${1 + scrollProgress * 0.2})`, // Sutil efeito de zoom no container também
+        transition: 'opacity 0.2s ease-out'
+      }}
+    >
       {loading && (
         <div style={{
           position: 'absolute', inset: 0, zIndex: 100,
@@ -246,7 +275,7 @@ export default function ModelViewer3D({ modelUrl, backgroundUrl, interactive = t
       <Canvas 
         shadows={!isMobile} 
         dpr={isMobile ? 1 : [1, 2]} 
-        camera={{ position: [0, -0.5, 24], fov: 45 }} 
+        camera={{ position: [0, -0.5, 24 + (scrollProgress * 40)], fov: 45 }} 
         gl={{ 
           antialias: true, 
           alpha: true, 
@@ -264,7 +293,16 @@ export default function ModelViewer3D({ modelUrl, backgroundUrl, interactive = t
             polar={[-Math.PI / 4, Math.PI / 4]}
             azimuth={[-Math.PI / 2, Math.PI / 2]}
           >
-             {modelUrl ? <Model key={modelUrl} url={modelUrl} animIndex={animIndex} /> : null}
+             {modelUrl ? (
+               <Model 
+                 key={modelUrl} 
+                 url={modelUrl} 
+                 animIndex={animIndex} 
+                 isHovered={isHovered}
+                 isTouched={isTouched}
+                 isMobile={isMobile}
+               />
+             ) : null}
           </PresentationControls>
 
           {!isMobile && <HeroParticles color={glowColor} />}
