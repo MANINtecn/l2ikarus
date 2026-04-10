@@ -184,11 +184,14 @@ function Model({ url, animIndex }) {
       <Center>
         <primitive 
           object={scene} 
-          scale={0.4} 
-          // 🔄 FRONTAL DYNAMIC: De pé e encarando o usuário em diagonal
+          scale={0.18} 
+          // 🔄 FRONTAL DYNAMIC: Enquadramento perfeito com escala reduzida
           rotation={[0, Math.PI - 0.4, 0]} 
         />
       </Center>
+
+
+
 
 
 
@@ -240,7 +243,7 @@ export default function ModelViewer3D({ modelUrl, backgroundUrl, interactive = t
       <Canvas 
         shadows={!isMobile} 
         dpr={isMobile ? 1 : [1, 2]} 
-        camera={{ position: [0, -0.5, 12], fov: 45 }} 
+        camera={{ position: [0, -0.5, 24], fov: 45 }} 
         gl={{ 
           antialias: true, 
           alpha: true, 

@@ -3,8 +3,8 @@ import ModelViewer3D from './ModelViewer3D'
 
 export default function Hero3D({ onRegisterClick }) {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 1024)
-  const desktopModel = `/assets/skins/antharas/ikarus_promo.glb?v=${Date.now()}`
-  const mobileModel = `/assets/skins/antharas/antharasmobile.glb?v=${Date.now()}`
+  const desktopModel = '/assets/skins/antharas/ikarus_promo.glb'
+  const mobileModel = '/assets/skins/antharas/antharasmobile.glb'
   
   const [modelUrl, setModelUrl] = useState(isMobile ? mobileModel : desktopModel)
 
