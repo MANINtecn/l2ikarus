@@ -5,7 +5,8 @@ export default function AudioController() {
   const audioRef = useRef(null)
 
   // Link para uma trilha épica (placeholder - você pode trocar pelo arquivo real do L2)
-  const audioUrl = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3' 
+  // 🎻 TRILHA MEDIEVAL: Tema de Dion (Lineage 2) - Nostalgia e Imersão Épica
+  const audioUrl = 'https://l2central.info/music/T06_Dion_Theme.mp3' 
 
   const toggleAudio = () => {
     if (isPlaying) {
@@ -51,7 +52,7 @@ export default function AudioController() {
         opacity: isPlaying ? 1 : 0.4,
         transition: '0.3s'
       }}>
-        {isPlaying ? 'AUDIO_ON: IKARUS_THEME' : 'AUDIO_MUTED'}
+        {isPlaying ? 'AUDIO_ON: DION_THEME' : 'AUDIO_MUTED'}
       </div>
 
       <button 
