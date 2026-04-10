@@ -184,11 +184,12 @@ function Model({ url, animIndex }) {
       <Center>
         <primitive 
           object={scene} 
-          scale={0.18} 
-          // 🔄 FRONTAL DYNAMIC: Enquadramento perfeito com escala reduzida
-          rotation={[0, Math.PI - 0.4, 0]} 
+          scale={0.25} 
+          // 🔄 POSIÇÃO DA FOTO: Ângulo lateral cinematográfico (Dwarf Left, Kamael Right)
+          rotation={[0, 0, 0]} 
         />
       </Center>
+
 
 
 
@@ -282,7 +283,7 @@ export default function ModelViewer3D({ modelUrl, backgroundUrl, interactive = t
       <div style={{
         position: 'absolute', 
         top: isMobile ? '15%' : '18%', 
-        left: '50%', // 📍 Centralizado no container 3D
+        left: isMobile ? '50%' : '75%', // 📍 Flutuando sobre os personagens na direita
         transform: 'translateX(-50%)',
         display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px',
         color: 'var(--gold)', pointerEvents: 'none',
