@@ -5,8 +5,8 @@ export default function AudioController() {
   const audioRef = useRef(null)
 
   // Link para uma trilha épica (placeholder - você pode trocar pelo arquivo real do L2)
-  // 🎻 TRILHA MEDIEVAL: Tema de Dion (Lineage 2) - Nostalgia e Imersão Épica
-  const audioUrl = 'https://l2central.info/music/T06_Dion_Theme.mp3' 
+  // 🎻 TRILHA MEDIEVAL: Tema de Dion (Lineage 2) - Fonte de Alta Disponibilidade
+  const audioUrl = 'https://www.lineage2.com.br/arquivos/musicas/T06_Dion_Theme.mp3' 
 
   const toggleAudio = () => {
     if (isPlaying) {
@@ -71,7 +71,7 @@ export default function AudioController() {
           transition: '0.4s'
         }}
       >
-        {isPlaying ? '🔇' : '🔊'}
+        {isPlaying ? '🔊' : '🔇'}
       </button>
     </div>
   )
