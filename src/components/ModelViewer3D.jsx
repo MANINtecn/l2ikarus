@@ -185,10 +185,11 @@ function Model({ url, animIndex }) {
         <primitive 
           object={scene} 
           scale={0.25} 
-          // 🔄 POSIÇÃO DA FOTO: Ângulo lateral cinematográfico (Dwarf Left, Kamael Right)
-          rotation={[0, 0, 0]} 
+          // 🔄 FRONTAL SUPREME: Forçando os heróis a encararem o usuário (Giro 180°)
+          rotation={[0, Math.PI, 0]} 
         />
       </Center>
+
 
 
 
@@ -283,13 +284,13 @@ export default function ModelViewer3D({ modelUrl, backgroundUrl, interactive = t
       <div style={{
         position: 'absolute', 
         top: isMobile ? '15%' : '18%', 
-        left: isMobile ? '50%' : '75%', // 📍 Flutuando sobre os personagens na direita
+        left: isMobile ? '50%' : '75%', // 📍 Posicionamento estratégico sobre os heróis
         transform: 'translateX(-50%)',
         display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px',
         color: 'var(--gold)', pointerEvents: 'none',
         fontSize: '0.75rem', letterSpacing: '4px', fontWeight: '900',
         fontFamily: 'var(--font-heading)',
-        zIndex: 2000, // 👈 Blindagem absoluta contra sobreposição
+        zIndex: 9999, // 👈 Blindagem absoluta: sempre no topo
         textShadow: '0 0 20px rgba(197, 160, 89, 0.8)',
         animation: 'ledPulse 4s infinite ease-in-out', 
         opacity: 0.9,
