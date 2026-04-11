@@ -111,8 +111,8 @@ function Model({ url, animIndex, isHovered, isTouched, isMobile, scrollProgress 
           
           if (isGreenish || obj.material.emissiveMap) {
             obj.material.emissive = new THREE.Color("#4ade80")
-            obj.material.emissiveIntensity = 2.5
-            obj.material.toneMapped = false
+            obj.material.emissiveIntensity = 1.2 // Reduzido de 2.5
+            obj.material.toneMapped = true // Reativado para controle de cor melhor
           }
         }
 
@@ -143,7 +143,7 @@ function Model({ url, animIndex, isHovered, isTouched, isMobile, scrollProgress 
     // 🌊 PULSAÇÃO DOS MATERIAIS
     scene.traverse((obj) => {
       if (obj.isMesh && obj.material && obj.material.emissiveIntensity > 0) {
-        obj.material.emissiveIntensity = 2 + Math.sin(t * 1.5) * 1
+        obj.material.emissiveIntensity = 0.8 + Math.sin(t * 1.5) * 0.4 // Pulsação mais discreta
       }
     })
 
@@ -238,31 +238,31 @@ function SceneManagement({ scrollProgress, isMobile }) {
     
     // 🎥 CAMERA PATH (Estilo Mont-Fort)
     // A câmera não apenas afasta, ela faz um movimento orbital suave
-    const targetX = THREE.MathUtils.lerp(0, 12 * Math.sin(t * Math.PI * 0.5), t)
-    const targetY = THREE.MathUtils.lerp(-0.5, 4, t)
-    const targetZ = 24 + (t * 86)
+    const targetX = THREE.MathUtils.lerp(0, 18 * Math.sin(t * Math.PI * 0.4), t) // Mais largo para o Duo
+    const targetY = THREE.MathUtils.lerp(-0.5, 3, t)
+    const targetZ = 24 + (t * 80)
 
     state.camera.position.x = THREE.MathUtils.lerp(state.camera.position.x, targetX, 0.1)
     state.camera.position.y = THREE.MathUtils.lerp(state.camera.position.y, targetY, 0.1)
     state.camera.position.z = THREE.MathUtils.lerp(state.camera.position.z, targetZ, 0.1)
     
-    // Mantém o foco no herói mas com um leve drift
-    state.camera.lookAt(0, targetY * 0.5, 0)
+    // Foca entre os dois (offset 0)
+    state.camera.lookAt(0, targetY * 0.4, 0)
   })
 
   return (
     <>
-      <fog attach="fog" args={['#050508', 20, 150]} />
+      <fog attach="fog" args={['#050508', 30, 160]} />
       {!isMobile && (
         <EffectComposer disableNormalPass>
           <Bloom 
-            luminanceThreshold={0.2} 
+            luminanceThreshold={0.4} // Aumentado para brilhar apenas o que for realmente luz
             mipmapBlur 
-            intensity={1.2} 
-            radius={0.4} 
+            intensity={0.8} // Reduzido de 1.2
+            radius={0.3} 
           />
-          <Noise opacity={0.05} />
-          <Vignette eskil={false} offset={0.1} darkness={1.1} />
+          <Noise opacity={0.03} />
+          <Vignette eskil={false} offset={0.2} darkness={1.2} />
         </EffectComposer>
       )}
     </>
@@ -331,7 +331,6 @@ export default function ModelViewer3D({ modelUrl, backgroundUrl, interactive = t
         }}
         onCreated={() => setLoading(false)}
       >
-        <color attach="background" args={['transparent']} />
         <SceneManagement scrollProgress={scrollProgress} isMobile={isMobile} />
 
         <Suspense fallback={null}>
@@ -344,23 +343,40 @@ export default function ModelViewer3D({ modelUrl, backgroundUrl, interactive = t
             azimuth={[-Math.PI / 2, Math.PI / 2]}
           >
              {modelUrl ? (
-               <Model 
-                 key={modelUrl} 
-                 url={modelUrl} 
-                 animIndex={animIndex} 
-                 isHovered={isHovered}
-                 isTouched={isTouched}
-                 isMobile={isMobile}
-                 scrollProgress={scrollProgress}
-               />
+               <>
+                 {/* PERSONAGEM 1 (ESQUERDA) */}
+                 <group position={[-1.2, 0, 0]} rotation={[0, 0.2, 0]}>
+                   <Model 
+                     url={modelUrl} 
+                     animIndex={animIndex} 
+                     isHovered={isHovered}
+                     isTouched={isTouched}
+                     isMobile={isMobile}
+                     scrollProgress={scrollProgress}
+                   />
+                 </group>
+                 {/* PERSONAGEM 2 (DIREITA) */}
+                 {!isMobile && (
+                   <group position={[1.2, 0, -1]} rotation={[0, -0.2, 0]}>
+                     <Model 
+                       url={modelUrl} 
+                       animIndex={animIndex} 
+                       isHovered={isHovered}
+                       isTouched={isTouched}
+                       isMobile={isMobile}
+                       scrollProgress={scrollProgress}
+                     />
+                   </group>
+                 )}
+               </>
              ) : null}
           </PresentationControls>
 
           {!isMobile && <HeroParticles color={glowColor} />}
 
-          <ambientLight intensity={isMobile ? 2 : 1.5} />
-          <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} intensity={isMobile ? 1500 : 2500} castShadow={!isMobile} />
-          <pointLight position={[0, 5, 10]} intensity={isMobile ? 1000 : 1500} color={glowColor} />
+          <ambientLight intensity={isMobile ? 0.6 : 0.4} />
+          <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} intensity={isMobile ? 1000 : 1500} castShadow={!isMobile} />
+          <pointLight position={[0, 5, 10]} intensity={isMobile ? 500 : 800} color={glowColor} />
           
           <Environment preset="city" />
           
