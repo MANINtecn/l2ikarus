@@ -1,5 +1,6 @@
 import { Canvas, useFrame } from '@react-three/fiber'
 import { Center, OrbitControls, Stage, useGLTF, Environment, ContactShadows, PresentationControls, useAnimations, Float } from '@react-three/drei'
+// Deploy trigger: 2026-04-10T21:18
 import { Suspense, useRef, useEffect, useMemo, useState } from 'react'
 import * as THREE from 'three'
 
