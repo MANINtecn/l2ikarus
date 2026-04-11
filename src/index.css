@@ -660,5 +660,54 @@ h1, h2, h3, h4, .cinzel {
     filter: blur(50px);
   }
 }
+/* 🌫️ FOG OVERLAY - AMBIÊNCIA ESTILO MONT-FORT */
+.fog-overlay-container {
+  position: fixed;
+  inset: 0;
+  z-index: 4; /* Entre o Hero e o Conteúdo */
+  pointer-events: none;
+  overflow: hidden;
+  opacity: 0.4;
+}
+
+.fog-layer {
+  position: absolute;
+  width: 250%;
+  height: 250%;
+  top: -75%;
+  left: -75%;
+  background: radial-gradient(circle at center, rgba(197, 160, 89, 0.05) 0%, transparent 40%),
+              radial-gradient(circle at 30% 20%, rgba(74, 222, 128, 0.03) 0%, transparent 30%);
+  filter: blur(80px);
+}
+
+.fog-layer-1 {
+  animation: fogDrift 60s infinite linear;
+}
+
+.fog-layer-2 {
+  opacity: 0.6;
+  background: radial-gradient(circle at 70% 80%, rgba(197, 160, 89, 0.04) 0%, transparent 35%);
+  animation: fogDrift 45s infinite linear reverse;
+}
+
+.fog-layer-3 {
+  opacity: 0.3;
+  animation: fogDrift 120s infinite ease-in-out;
+}
+
+@keyframes fogDrift {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  25% { transform: translate(-5%, 5%) rotate(5deg); }
+  50% { transform: translate(5%, -5%) rotate(-5deg); }
+  75% { transform: translate(-3%, -3%) rotate(3deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+/* 🚀 SCROLL ZOOM TARGETS */
+.scroll-content-container > section {
+  transform-origin: center center;
+  will-change: transform, opacity;
+}
 
 ::selection { background: var(--purple); color: #fff; }

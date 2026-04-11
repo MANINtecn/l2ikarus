@@ -1,4 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import { gsap } from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import './index.css'
 import Navbar from './components/Navbar'
 import Background3D from './components/Background3D'
@@ -11,15 +13,46 @@ import FeaturesTerminal from './components/FeaturesTerminal'
 import RoadmapHolo from './components/RoadmapHolo'
 import DownloadTerminal from './components/DownloadTerminal'
 import AudioController from './components/AudioController'
+import FogOverlay from './components/FogOverlay'
+
+gsap.registerPlugin(ScrollTrigger)
 
 function App() {
   const [isRegisterOpen, setIsRegisterOpen] = useState(false)
   const [showLogin, setShowLogin] = useState(false)
+  const containerRef = useRef(null)
+
+  useEffect(() => {
+    const sections = containerRef.current.querySelectorAll('section')
+    
+    sections.forEach((section) => {
+      // 🚀 EFEITO ZOOM OUT GERAL (Estilo Mont-Fort)
+      // Cada seção encolhe e apaga conforme o usuário rola para a próxima
+      gsap.to(section, {
+        scrollTrigger: {
+          trigger: section,
+          start: "top top", // Quando o topo da seção chega no topo da tela
+          end: "bottom top", // Até o fundo da seção chegar no topo
+          scrub: true,
+          pin: false // Não trava, apenas anima a saída
+        },
+        scale: 0.8,
+        opacity: 0.1,
+        filter: 'blur(10px)',
+        ease: "none"
+      })
+    })
+
+    return () => {
+      ScrollTrigger.getAll().forEach(t => t.kill())
+    }
+  }, [])
 
   return (
     <main style={{ position: 'relative', background: '#050508', minHeight: '100vh' }}>
       {/* 🔮 ELEMENTOS FIXOS (HUD) */}
       <Background3D />
+      <FogOverlay />
       <Navbar onRegisterClick={() => setIsRegisterOpen(true)} />
       <AudioController />
       
@@ -27,7 +60,7 @@ function App() {
       <Hero3D onRegisterClick={() => setIsRegisterOpen(true)} />
       
       {/* 📜 CONTEÚDO QUE ROLA SOBRE O HERO */}
-      <div style={{ position: 'relative', zIndex: 5, background: 'transparent' }}>
+      <div ref={containerRef} className="scroll-content-container" style={{ position: 'relative', zIndex: 5, background: 'transparent' }}>
         {/* Espaçador para o Hero */}
         <div style={{ height: '100vh', pointerEvents: 'none' }} />
         
