@@ -2,6 +2,7 @@ import { Canvas, useFrame } from '@react-three/fiber'
 import { Center, OrbitControls, Stage, useGLTF, Environment, ContactShadows, PresentationControls, useAnimations, Float } from '@react-three/drei'
 // Deploy trigger: 2026-04-10T21:18
 import { Suspense, useRef, useEffect, useMemo, useState } from 'react'
+import { EffectComposer, Bloom, Noise, Vignette } from '@react-three/postprocessing'
 import * as THREE from 'three'
 
 function HeroParticles({ count = 200, color = "#4ade80" }) {
@@ -86,7 +87,7 @@ function HeroParticles({ count = 200, color = "#4ade80" }) {
   )
 }
 
-function Model({ url, animIndex, isHovered, isTouched, isMobile }) {
+function Model({ url, animIndex, isHovered, isTouched, isMobile, scrollProgress }) {
   const { scene, animations } = useGLTF(url)
   const { actions } = useAnimations(animations, scene)
   const groupRef = useRef()
@@ -231,6 +232,43 @@ function Model({ url, animIndex, isHovered, isTouched, isMobile }) {
 
 useGLTF.preload('/assets/skins/antharas/ikarus_promo.glb')
 
+function SceneManagement({ scrollProgress, isMobile }) {
+  useFrame((state) => {
+    const t = scrollProgress
+    
+    // 🎥 CAMERA PATH (Estilo Mont-Fort)
+    // A câmera não apenas afasta, ela faz um movimento orbital suave
+    const targetX = THREE.MathUtils.lerp(0, 12 * Math.sin(t * Math.PI * 0.5), t)
+    const targetY = THREE.MathUtils.lerp(-0.5, 4, t)
+    const targetZ = 24 + (t * 86)
+
+    state.camera.position.x = THREE.MathUtils.lerp(state.camera.position.x, targetX, 0.1)
+    state.camera.position.y = THREE.MathUtils.lerp(state.camera.position.y, targetY, 0.1)
+    state.camera.position.z = THREE.MathUtils.lerp(state.camera.position.z, targetZ, 0.1)
+    
+    // Mantém o foco no herói mas com um leve drift
+    state.camera.lookAt(0, targetY * 0.5, 0)
+  })
+
+  return (
+    <>
+      <fog attach="fog" args={['#050508', 20, 150]} />
+      {!isMobile && (
+        <EffectComposer disableNormalPass>
+          <Bloom 
+            luminanceThreshold={0.2} 
+            mipmapBlur 
+            intensity={1.2} 
+            radius={0.4} 
+          />
+          <Noise opacity={0.05} />
+          <Vignette eskil={false} offset={0.1} darkness={1.1} />
+        </EffectComposer>
+      )}
+    </>
+  )
+}
+
 export default function ModelViewer3D({ modelUrl, backgroundUrl, interactive = true, glowColor = "#c5a059", animIndex, isMobileProp }) {
   const containerRef = useRef()
   const [loading, setLoading] = useState(true)
@@ -284,8 +322,7 @@ export default function ModelViewer3D({ modelUrl, backgroundUrl, interactive = t
       <Canvas 
         shadows={!isMobile} 
         dpr={isMobile ? 1 : [1, 2]} 
-        // 🚀 ZOOM ULTRA PROFUNDO: Vai até z=110 (antes era 80)
-        camera={{ position: [0, -0.5, 24 + (scrollProgress * 86)], fov: 45 }} 
+        camera={{ position: [0, -0.5, 24], fov: 45 }} 
         gl={{ 
           antialias: true, 
           alpha: true, 
@@ -294,6 +331,9 @@ export default function ModelViewer3D({ modelUrl, backgroundUrl, interactive = t
         }}
         onCreated={() => setLoading(false)}
       >
+        <color attach="background" args={['transparent']} />
+        <SceneManagement scrollProgress={scrollProgress} isMobile={isMobile} />
+
         <Suspense fallback={null}>
           <PresentationControls
             global={false}
@@ -311,6 +351,7 @@ export default function ModelViewer3D({ modelUrl, backgroundUrl, interactive = t
                  isHovered={isHovered}
                  isTouched={isTouched}
                  isMobile={isMobile}
+                 scrollProgress={scrollProgress}
                />
              ) : null}
           </PresentationControls>
