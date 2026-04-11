@@ -162,7 +162,13 @@ function Model({ url, animIndex, isHovered, isTouched, isMobile }) {
 
     // 🔄 ROTAÇÃO 360 AO HOVER (Desktop) - Aplicada ao Grupo
     if (isHovered && !isMobile && groupRef.current) {
-      groupRef.current.rotation.y += 0.015
+      groupRef.current.rotation.y += 0.02 // Aumentada um pouco a velocidade
+    }
+
+    // 📏 ESCALA DINÂMICA (Scroll) - Faz a skin diminuir conforme afasta
+    if (groupRef.current) {
+      const scale = 1 - (scrollProgress * 0.7) // Encolhe até 30% do tamanho original
+      groupRef.current.scale.set(scale, scale, scale)
     }
   })
 
@@ -247,6 +253,7 @@ export default function ModelViewer3D({ modelUrl, backgroundUrl, interactive = t
   return (
     <div 
       ref={containerRef} 
+      onPointerMove={() => !isMobile && !isHovered && setIsHovered(true)}
       onPointerEnter={() => !isMobile && setIsHovered(true)}
       onPointerLeave={() => !isMobile && setIsHovered(false)}
       onTouchStart={() => isMobile && setIsTouched(true)}
@@ -256,9 +263,9 @@ export default function ModelViewer3D({ modelUrl, backgroundUrl, interactive = t
         cursor: interactive ? 'grab' : 'default', 
         position: 'relative',
         overflow: 'hidden',
-        background: '#050508',
+        background: 'transparent', // 👈 Crucial para ver as partículas atrás
         opacity: 1 - scrollProgress,
-        transform: `scale(${1 + scrollProgress * 0.2})`, // Sutil efeito de zoom no container também
+        zIndex: 2,
         transition: 'opacity 0.2s ease-out'
       }}
     >
@@ -277,8 +284,8 @@ export default function ModelViewer3D({ modelUrl, backgroundUrl, interactive = t
       <Canvas 
         shadows={!isMobile} 
         dpr={isMobile ? 1 : [1, 2]} 
-        // 🚀 ZOOM MAIS PROFUNDO: Vai até z=80 (antes era 64)
-        camera={{ position: [0, -0.5, 24 + (scrollProgress * 60)], fov: 45 }} 
+        // 🚀 ZOOM ULTRA PROFUNDO: Vai até z=110 (antes era 80)
+        camera={{ position: [0, -0.5, 24 + (scrollProgress * 86)], fov: 45 }} 
         gl={{ 
           antialias: true, 
           alpha: true, 

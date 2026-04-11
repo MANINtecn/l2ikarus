@@ -121,8 +121,8 @@ export default function Hero3D({ onRegisterClick }) {
         paddingTop: isMobile ? '120px' : '0',
         pointerEvents: 'auto', // 👈 HUD e 3D reativam interação
         opacity: 1 - scrollProgress,
-        transform: `translateY(${scrollProgress * -100}px)`, // Drift ascendente mais dramático
-        transition: 'opacity 0.1s linear'
+        transform: `translateY(${scrollProgress * -150}px) scale(${1 - scrollProgress * 0.3})`, // Drift e escala
+        transition: 'opacity 0.1s linear, transform 0.1s linear'
       }}>
         {/* HUD OVERLAY LEFT: SERVER IDENTITY */}
         <div className="hero-identity reveal-delay-1 animate-fadeUp" style={{ 

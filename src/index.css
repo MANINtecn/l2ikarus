@@ -173,7 +173,7 @@ h1, h2, h3, h4, .cinzel {
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background: radial-gradient(circle at center, #0a0b12 0%, #050508 100%);
+  background: transparent; /* Removido gradient fixo */
 }
 
 .hero-3d-container {
@@ -375,12 +375,12 @@ h1, h2, h3, h4, .cinzel {
 /* ── STATUS & RATES SECTIONS ── */
 .status-section, .rates-section {
   padding: var(--section-pad) 0;
-  background: var(--bg-deep);
+  background: transparent;
   position: relative;
 }
 
 .rates-section {
-  background: linear-gradient(to bottom, #050508 0%, #0a0b12 100%);
+  background: transparent;
 }
 
 /* ── ARENA DUALITY ── */
@@ -526,7 +526,9 @@ h1, h2, h3, h4, .cinzel {
   align-items: center;
   justify-content: space-between;
   gap: 2rem;
-  border: 1px solid rgba(255,255,255,0.03);
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
   transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 

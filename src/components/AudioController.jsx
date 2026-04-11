@@ -4,9 +4,8 @@ export default function AudioController() {
   const [isPlaying, setIsPlaying] = useState(false)
   const audioRef = useRef(null)
 
-  // Link para uma trilha épica (placeholder - você pode trocar pelo arquivo real do L2)
-  // 🎻 TRILHA MEDIEVAL: Tema de Dion (Lineage 2) - Fonte de Alta Disponibilidade
-  const audioUrl = 'https://www.lineage2.com.br/arquivos/musicas/T06_Dion_Theme.mp3' 
+  // 🎻 TRILHA MEDIEVAL: Tema de Dion (Lineage 2) - Recomendado colocar o arquivo .mp3 na pasta public/assets/audio/
+  const audioUrl = '/assets/audio/dion_theme.mp3' 
 
   const toggleAudio = () => {
     if (isPlaying) {
