@@ -89,6 +89,7 @@ function HeroParticles({ count = 200, color = "#4ade80" }) {
 function Model({ url, animIndex, isHovered, isTouched, isMobile }) {
   const { scene, animations } = useGLTF(url)
   const { actions } = useAnimations(animations, scene)
+  const groupRef = useRef()
   const bones = useRef([])
   const coreBones = useRef([]) // 🦴 Ossos que servirão de fonte de luz (Peito/Spine)
 
@@ -159,9 +160,9 @@ function Model({ url, animIndex, isHovered, isTouched, isMobile }) {
       if (n.includes('arm')) bone.rotation.x = bone.userData.initRot.x + Math.sin(t * 2) * 0.1
     })
 
-    // 🔄 ROTAÇÃO 360 AO HOVER (Desktop)
-    if (isHovered && !isMobile) {
-      scene.rotation.y += 0.015
+    // 🔄 ROTAÇÃO 360 AO HOVER (Desktop) - Aplicada ao Grupo
+    if (isHovered && !isMobile && groupRef.current) {
+      groupRef.current.rotation.y += 0.015
     }
   })
 
@@ -187,7 +188,7 @@ function Model({ url, animIndex, isHovered, isTouched, isMobile }) {
   }, [actions, url, animIndex, animations, isTouched, isMobile])
 
   return (
-    <group>
+    <group ref={groupRef}>
       <Center>
         <primitive 
           object={scene} 
@@ -235,7 +236,7 @@ export default function ModelViewer3D({ modelUrl, backgroundUrl, interactive = t
   useEffect(() => {
     const handleScroll = () => {
       const scrollY = window.scrollY
-      const maxScroll = 800 // Ponto onde some completamente
+      const maxScroll = 1200 // Aumentado para o efeito durar mais
       const progress = Math.min(1, scrollY / maxScroll)
       setScrollProgress(progress)
     }
@@ -276,7 +277,8 @@ export default function ModelViewer3D({ modelUrl, backgroundUrl, interactive = t
       <Canvas 
         shadows={!isMobile} 
         dpr={isMobile ? 1 : [1, 2]} 
-        camera={{ position: [0, -0.5, 24 + (scrollProgress * 40)], fov: 45 }} 
+        // 🚀 ZOOM MAIS PROFUNDO: Vai até z=80 (antes era 64)
+        camera={{ position: [0, -0.5, 24 + (scrollProgress * 60)], fov: 45 }} 
         gl={{ 
           antialias: true, 
           alpha: true, 

@@ -23,30 +23,36 @@ function App() {
       <Navbar onRegisterClick={() => setIsRegisterOpen(true)} />
       <AudioController />
       
-      {/* 🚀 SEÇÃO HERO - O DESPERTAR (3D) */}
+      {/* 🚀 SEÇÃO HERO - O DESPERTAR (3D) (Agora Fixa no Fundo) */}
       <Hero3D onRegisterClick={() => setIsRegisterOpen(true)} />
       
-      {/* 📊 SEÇÃO STATUS - PULSO DO SERVIDOR */}
-      <StatusHolo />
+      {/* 📜 CONTEÚDO QUE ROLA SOBRE O HERO */}
+      <div style={{ position: 'relative', zIndex: 5, background: 'transparent' }}>
+        {/* Espaçador para o Hero */}
+        <div style={{ height: '100vh', pointerEvents: 'none' }} />
+        
+        {/* 📊 SEÇÃO STATUS - PULSO DO SERVIDOR */}
+        <StatusHolo />
 
-      {/* ⚔️ SEÇÃO RATES - EQUILÍBRIO DE ELITE */}
-      <RatesGrid />
-      
-      <div className="section-divider" />
+        {/* ⚔️ SEÇÃO RATES - EQUILÍBRIO DE ELITE */}
+        <RatesGrid />
+        
+        <div className="section-divider" />
 
-      {/* 🏰 SEÇÃO FEATURES - MECÂNICAS AAA */}
-      <FeaturesTerminal />
+        {/* 🏰 SEÇÃO FEATURES - MECÂNICAS AAA */}
+        <FeaturesTerminal />
 
-      {/* 📅 SEÇÃO ROADMAP - EVOLUÇÃO ESTRATÉGICA */}
-      <RoadmapHolo />
+        {/* 📅 SEÇÃO ROADMAP - EVOLUÇÃO ESTRATÉGICA */}
+        <RoadmapHolo />
 
-      {/* 📥 SEÇÃO DOWNLOAD - TERMINAL DE IMPLANTAÇÃO */}
-      <DownloadTerminal />
-      
-      <div className="section-divider" style={{ opacity: 0.1 }} />
+        {/* 📥 SEÇÃO DOWNLOAD - TERMINAL DE IMPLANTAÇÃO */}
+        <DownloadTerminal />
+        
+        <div className="section-divider" style={{ opacity: 0.1 }} />
 
-      {/* 🛡️ FOOTER - FUNDAÇÃO TECX */}
-      <Footer onAdminClick={() => setShowLogin(true)} />
+        {/* 🛡️ FOOTER - FUNDAÇÃO TECX */}
+        <Footer onAdminClick={() => setShowLogin(true)} />
+      </div>
       
       {/* 🆔 MODAL DE CADASTRO - NOVO RECRUTA */}
       <RegisterModal 

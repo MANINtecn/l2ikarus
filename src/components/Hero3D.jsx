@@ -19,7 +19,7 @@ export default function Hero3D({ onRegisterClick }) {
 
     const handleScroll = () => {
       const scrollY = window.scrollY
-      const maxScroll = 600
+      const maxScroll = 1200 // Sincronizado com ModelViewer3D
       setScrollProgress(Math.min(1, scrollY / maxScroll))
     }
 
@@ -33,8 +33,14 @@ export default function Hero3D({ onRegisterClick }) {
 
   return (
     <section id="hero" className="hero-section" style={{ 
-      height: isMobile ? '700px' : '100vh',
-      padding: '0'
+      height: '100vh',
+      width: '100%',
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      zIndex: 1,
+      padding: '0',
+      pointerEvents: 'none'
     }}>
       {/* 🐉 MODELO 3D - POSICIONAMENTO DINÂMICO */}
       <div className="hero-3d-container" style={{ 
@@ -113,9 +119,9 @@ export default function Hero3D({ onRegisterClick }) {
         position: 'relative',
         zIndex: 10,
         paddingTop: isMobile ? '120px' : '0',
-        pointerEvents: 'none', // 👈 HUD não bloqueia o clique no 3D
+        pointerEvents: 'auto', // 👈 HUD e 3D reativam interação
         opacity: 1 - scrollProgress,
-        transform: `translateY(${scrollProgress * -50}px)`,
+        transform: `translateY(${scrollProgress * -100}px)`, // Drift ascendente mais dramático
         transition: 'opacity 0.1s linear'
       }}>
         {/* HUD OVERLAY LEFT: SERVER IDENTITY */}
