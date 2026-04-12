@@ -1,35 +1,59 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { serverRates } from '../config/serverRates'
 
 export default function RatesGrid() {
-  const [rates, setRates] = useState([
-    { label: 'EXPERIENCE', value: 'x1000', sub: 'FAST PROGRESS', color: 'var(--gold)' },
-    { label: 'SKILL POINTS', value: 'x1000', sub: 'DYNAMIC SKILLS', color: 'var(--neon-blue)' },
-    { label: 'ADENA', value: 'x500', sub: 'STABLE ECONOMY', color: '#ffcc00' },
-    { label: 'DROP RATE', value: 'x10', sub: 'RARE ITEMS', color: 'var(--purple)' },
-    { label: 'SPOIL RATE', value: 'x15', sub: 'CRAFTING FOCUS', color: '#ff4444' }
-  ])
+  const [activeRates, setActiveRates] = useState(serverRates)
+  const [glitch, setGlitch] = useState(false)
+
+  // Sutil efeito de pulso aleatório para parecer "vivo"
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setGlitch(true)
+      setTimeout(() => setGlitch(false), 150)
+    }, 5000)
+    return () => clearInterval(interval)
+  }, [])
 
   return (
-    <section id="rates" className="rates-section">
+    <section id="rates" className="rates-section" style={{ position: 'relative' }}>
+      {/* SCANLINE OVERLAY */}
+      <div style={{
+        position: 'absolute',
+        inset: 0,
+        background: 'linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 118, 0.03))',
+        backgroundSize: '100% 4px, 3px 100%',
+        pointerEvents: 'none',
+        zIndex: 10,
+        opacity: 0.1
+      }} />
+
       <div className="container">
         <div style={{ textAlign: 'center', marginBottom: '5rem' }}>
-          <p className="section-subtitle">CONFIGURAÇÕES DO REINO</p>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', marginBottom: '1rem' }}>
+            <div className="pulse-dot" style={{ width: '8px', height: '8px', background: '#4ade80', borderRadius: '50%', boxShadow: '0 0 10px #4ade80' }} />
+            <p className="section-subtitle" style={{ margin: 0 }}>LIVE SERVER CONFIGURATION</p>
+          </div>
           <h2 className="section-title">RATES DE <span style={{ color: 'var(--gold)' }}>ELITE</span></h2>
         </div>
 
         <div style={{ 
           display: 'grid', 
           gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', 
-          gap: '1.5rem' 
+          gap: '1.5rem',
+          filter: glitch ? 'hue-rotate(90deg) brightness(1.2)' : 'none',
+          transition: 'filter 0.1s'
         }}>
-          {rates.map((r, i) => (
+          {activeRates.map((r, i) => (
             <div 
               key={i} 
               className="glass-panel" 
               style={{ 
                 padding: '2rem', 
                 textAlign: 'center',
-                position: 'relative'
+                position: 'relative',
+                overflow: 'hidden',
+                background: 'rgba(255,255,255,0.02)',
+                border: '1px solid rgba(197,160,89,0.1)'
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = 'translateY(-10px)';
@@ -42,13 +66,26 @@ export default function RatesGrid() {
                 e.currentTarget.style.boxShadow = 'none';
               }}
             >
+              {/* SCANNING BAR */}
+              <div style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                background: `linear-gradient(transparent, ${r.color}05, transparent)`,
+                animation: 'scan 4s linear infinite',
+                pointerEvents: 'none'
+              }} />
+
               {/* ORB DECOR */}
               <div style={{ 
                 width: '10px', height: '10px', 
                 background: r.color, 
                 borderRadius: '50%', 
                 margin: '0 auto 1.5rem',
-                boxShadow: `0 0 15px ${r.color}`
+                boxShadow: `0 0 15px ${r.color}`,
+                animation: 'pulse 2s infinite'
               }} />
 
               <div style={{ 
@@ -57,7 +94,8 @@ export default function RatesGrid() {
                 fontFamily: 'Cinzel', 
                 color: '#fff',
                 letterSpacing: '3px',
-                marginBottom: '0.2rem'
+                marginBottom: '0.2rem',
+                position: 'relative'
               }}>
                 {r.value}
               </div>
@@ -101,6 +139,18 @@ export default function RatesGrid() {
            <a href="#info" className="btn btn-ghost" style={{ padding: '1rem 3rem' }}>WIKI COMPLETA</a>
         </div>
       </div>
+
+      <style>{`
+        @keyframes scan {
+          0% { transform: translateY(-100%); }
+          100% { transform: translateY(100%); }
+        }
+        @keyframes pulse {
+          0% { transform: scale(1); opacity: 1; }
+          50% { transform: scale(1.2); opacity: 0.5; }
+          100% { transform: scale(1); opacity: 1; }
+        }
+      `}</style>
 
       {/* ENERGY WAVE DECOR */}
       <div style={{ 

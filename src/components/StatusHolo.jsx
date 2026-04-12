@@ -1,27 +1,106 @@
 import { useState, useEffect } from 'react'
+import { betaLaunchDate } from '../config/serverRates'
+
+function CountdownTimer({ targetDate }) {
+  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 })
+
+  useEffect(() => {
+    const calculateTimeLeft = () => {
+      const difference = +new Date(targetDate) - +new Date()
+      if (difference > 0) {
+        setTimeLeft({
+          days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+          hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+          minutes: Math.floor((difference / 1000 / 60) % 60),
+          seconds: Math.floor((difference / 1000) % 60)
+        })
+      }
+    }
+    const timer = setInterval(calculateTimeLeft, 1000)
+    calculateTimeLeft()
+    return () => clearInterval(timer)
+  }, [targetDate])
+
+  return (
+    <div className="beta-countdown cinzel" style={{ 
+      display: 'flex', 
+      gap: '1.5rem', 
+      justifyContent: 'center', 
+      marginBottom: '3rem',
+      color: '#fff',
+      textShadow: '0 0 15px rgba(255,255,255,0.3)'
+    }}>
+      {Object.entries(timeLeft).map(([label, value]) => (
+        <div key={label} style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: '2.5rem', fontWeight: '900', lineHeight: 1 }}>{value.toString().padStart(2, '0')}</div>
+          <div style={{ fontSize: '0.6rem', letterSpacing: '2px', opacity: 0.5, textTransform: 'uppercase', marginTop: '0.5rem' }}>{label}</div>
+        </div>
+      ))}
+    </div>
+  )
+}
 
 export default function StatusHolo() {
   const [stats, setStats] = useState([
-    { label: 'PLAYERS ONLINE', value: '1.240', icon: '👤', glow: 'var(--neon-blue)' },
-    { label: 'CONTAS CRIADAS', value: '15.892', icon: '🆔', glow: 'var(--gold)' },
-    { label: 'SERVER STATUS', value: 'ONLINE', icon: '⚡', glow: '#4ade80' },
-    { label: 'TEMPO ONLINE', value: '99.9%', icon: '⏳', glow: 'var(--purple)' }
+    { id: 'players', label: 'PLAYERS ONLINE', value: '0', icon: '👤', glow: 'var(--neon-blue)' },
+    { id: 'accounts', label: 'CONTAS CRIADAS', value: '...', icon: '🆔', glow: 'var(--gold)' },
+    { id: 'server', label: 'SERVER STATUS', value: 'OFFLINE', icon: '⚡', glow: '#ef4444' },
+    { id: 'uptime', label: 'TEMPO ONLINE', value: '100%', icon: '⏳', glow: 'var(--purple)' }
   ])
 
-  // Lógica de fetch real seria aqui, vamos manter o estilo AAA fixo por agora
-  
+  useEffect(() => {
+    const fetchStatus = async () => {
+      try {
+        const res = await fetch('/api/status')
+        const data = await res.json()
+        
+        setStats(prev => prev.map(s => {
+          if (s.id === 'players') return { ...s, value: data.players?.toLocaleString() || '0' }
+          if (s.id === 'server') return { 
+            ...s, 
+            value: data.online ? 'ONLINE' : 'OFFLINE', 
+            glow: data.online ? '#4ade80' : '#ef4444' 
+          }
+          return s
+        }))
+      } catch (e) {
+        console.error('Status fetch failed')
+      }
+    }
+
+    fetchStatus()
+    const interval = setInterval(fetchStatus, 30000)
+    return () => clearInterval(interval)
+  }, [])
+
   return (
-    <section id="status" className="status-section">
+    <section id="status" className="status-section" style={{ position: 'relative', overflow: 'hidden' }}>
       <div className="container">
-        <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
-          <p className="section-subtitle">DADOS EM TEMPO REAL</p>
-          <h2 className="section-title">STATUS DO <span style={{ color: 'var(--gold)' }}>REINO</span></h2>
+        <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
+          <div style={{ 
+            display: 'inline-block',
+            padding: '0.3rem 1.5rem',
+            background: 'rgba(197, 160, 89, 0.1)',
+            border: '1px solid rgba(197, 160, 89, 0.3)',
+            borderRadius: '50px',
+            color: 'var(--gold)',
+            fontSize: '0.65rem',
+            letterSpacing: '4px',
+            marginBottom: '1.5rem',
+            fontWeight: '800'
+          }}>BETA PHASE ACTIVE</div>
+          
+          <h2 className="section-title" style={{ marginBottom: '3rem' }}>O DESPERTAR EM <span style={{ color: 'var(--gold)' }}>CONTAGEM</span></h2>
+          
+          <CountdownTimer targetDate={betaLaunchDate} />
         </div>
 
         <div style={{ 
           display: 'grid', 
           gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', 
-          gap: '2rem' 
+          gap: '2rem',
+          position: 'relative',
+          zIndex: 2
         }}>
           {stats.map((s, i) => (
             <div 
