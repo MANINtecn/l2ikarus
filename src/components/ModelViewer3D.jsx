@@ -5,85 +5,72 @@ import { Suspense, useRef, useEffect, useMemo, useState } from 'react'
 import { EffectComposer, Bloom, Noise, Vignette } from '@react-three/postprocessing'
 import * as THREE from 'three'
 
-function HeroParticles({ count = 200, color = "#4ade80" }) {
-  const points = useRef()
+function HeroParticles({ count = 150, color = "#4ade80" }) {
+  const mesh = useRef()
   
-  const texture = useMemo(() => {
-    const canvas = document.createElement('canvas')
-    canvas.width = 64
-    canvas.height = 64
-    const context = canvas.getContext('2d')
-    const gradient = context.createRadialGradient(32, 32, 0, 32, 32, 32)
-    gradient.addColorStop(0, 'rgba(255, 255, 255, 1)')
-    gradient.addColorStop(0.2, 'rgba(255, 255, 255, 0.8)')
-    gradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.2)')
-    gradient.addColorStop(1, 'rgba(255, 255, 255, 0)')
-    context.fillStyle = gradient
-    context.fillRect(0, 0, 64, 64)
-    return new THREE.CanvasTexture(canvas)
-  }, [])
-
   const particles = useMemo(() => {
-    const pos = new Float32Array(count * 3)
-    const velocity = new Float32Array(count * 3)
+    const temp = []
     for (let i = 0; i < count; i++) {
-       const r = 5 + Math.random() * 45
-       const theta = Math.random() * Math.PI * 2
-       const phi = Math.acos(2 * Math.random() - 1)
-       
-       pos[i * 3] = r * Math.sin(phi) * Math.cos(theta)
-       pos[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta)
-       pos[i * 3 + 2] = r * Math.cos(phi)
-       
-       velocity[i * 3] = (Math.random() - 0.5) * 0.04
-       velocity[i * 3 + 1] = (Math.random() - 0.5) * 0.04
-       velocity[i * 3 + 2] = (Math.random() - 0.5) * 0.04
+      const pos = new THREE.Vector3(
+        (Math.random() - 0.5) * 80,
+        (Math.random() - 0.5) * 80,
+        (Math.random() - 0.5) * 80
+      )
+      const speed = 0.02 + Math.random() * 0.05
+      const rotation = new THREE.Euler(
+        Math.random() * Math.PI,
+        Math.random() * Math.PI,
+        Math.random() * Math.PI
+      )
+      const life = Math.random()
+      const lifeSpeed = 0.002 + Math.random() * 0.005
+      const size = 2 + Math.random() * 6
+      temp.push({ pos, speed, rotation, life, lifeSpeed, size })
     }
-    return { pos, velocity }
+    return temp
   }, [count])
 
+  const dummy = useMemo(() => new THREE.Object3D(), [])
+
   useFrame((state) => {
-    if (points.current) {
-       const positions = points.current.geometry.attributes.position.array
-       const time = state.clock.getElapsedTime()
-       
-       for (let i = 0; i < count; i++) {
-         positions[i * 3] += particles.velocity[i * 3]
-         positions[i * 3 + 1] += particles.velocity[i * 3 + 1] + Math.sin(time + i) * 0.02
-         positions[i * 3 + 2] += particles.velocity[i * 3 + 2]
-         
-         const dist = Math.sqrt(positions[i * 3] ** 2 + positions[i * 3 + 1] ** 2 + positions[i * 3 + 2] ** 2)
-         if (dist > 50) {
-            positions[i * 3] *= 0.1
-            positions[i * 3 + 1] *= 0.1
-            positions[i * 3 + 2] *= 0.1
-         }
-       }
-       points.current.geometry.attributes.position.needsUpdate = true
-    }
+    if (!mesh.current) return
+    const t = state.clock.getElapsedTime()
+    
+    particles.forEach((p, i) => {
+      p.life += p.lifeSpeed
+      if (p.life > 1) p.life = 0
+      
+      const intensity = Math.sin(p.life * Math.PI)
+      
+      dummy.position.set(
+        p.pos.x + Math.sin(t * 0.2 + i) * 2,
+        p.pos.y + Math.cos(t * 0.2 + i) * 2,
+        p.pos.z
+      )
+      
+      dummy.quaternion.setFromEuler(p.rotation)
+      // Make it a long thin line
+      dummy.scale.set(0.04, p.size * intensity, 0.04)
+      
+      dummy.updateMatrix()
+      mesh.current.setMatrixAt(i, dummy.matrix)
+    })
+    mesh.current.instanceMatrix.needsUpdate = true
   })
 
   return (
-    <points ref={points}>
-      <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          count={count}
-          array={particles.pos}
-          itemSize={3}
-        />
-      </bufferGeometry>
-      <pointsMaterial
-        size={1.8}
-        map={texture}
-        color={color}
-        transparent
-        opacity={0.9}
-        sizeAttenuation
+    <instancedMesh ref={mesh} args={[null, null, count]} frustumCulled={false}>
+      <cylinderGeometry args={[1, 1, 1, 4]} />
+      <meshStandardMaterial 
+        color={color} 
+        emissive={color} 
+        emissiveIntensity={10} 
+        transparent 
+        opacity={0.6}
         blending={THREE.AdditiveBlending}
         depthWrite={false}
       />
-    </points>
+    </instancedMesh>
   )
 }
 
@@ -302,7 +289,6 @@ export default function ModelViewer3D({ modelUrl, backgroundUrl, interactive = t
         position: 'relative',
         overflow: 'hidden',
         background: 'transparent', // 👈 Crucial para ver as partículas atrás
-        opacity: 1 - scrollProgress,
         zIndex: 2,
         transition: 'opacity 0.2s ease-out'
       }}
@@ -343,7 +329,7 @@ export default function ModelViewer3D({ modelUrl, backgroundUrl, interactive = t
             azimuth={[-Math.PI / 2, Math.PI / 2]}
           >
              {modelUrl ? (
-               <>
+               <group style={{ opacity: 1 - scrollProgress }}>
                  {/* PERSONAGEM 1 (ESQUERDA) */}
                  <group position={[-1.2, 0, 0]} rotation={[0, 0.2, 0]}>
                    <Model 
@@ -368,7 +354,7 @@ export default function ModelViewer3D({ modelUrl, backgroundUrl, interactive = t
                      />
                    </group>
                  )}
-               </>
+               </group>
              ) : null}
           </PresentationControls>
 

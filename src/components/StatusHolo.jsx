@@ -44,9 +44,11 @@ export default function StatusHolo() {
   const [stats, setStats] = useState([
     { id: 'players', label: 'PLAYERS ONLINE', value: '0', icon: '👤', glow: 'var(--neon-blue)' },
     { id: 'accounts', label: 'CONTAS CRIADAS', value: '...', icon: '🆔', glow: 'var(--gold)' },
-    { id: 'server', label: 'SERVER STATUS', value: 'OFFLINE', icon: '⚡', glow: '#ef4444' },
-    { id: 'uptime', label: 'TEMPO ONLINE', value: '100%', icon: '⏳', glow: 'var(--purple)' }
+    { id: 'discord', label: 'MEMBROS DISCORD', value: '0', icon: '💬', glow: '#5865F2' },
+    { id: 'server', label: 'SERVER STATUS', value: 'OFFLINE', icon: '⚡', glow: '#ef4444' }
   ])
+
+  const [discordData, setDiscordData] = useState(null)
 
   useEffect(() => {
     const fetchStatus = async () => {
@@ -54,8 +56,14 @@ export default function StatusHolo() {
         const res = await fetch('/api/status')
         const data = await res.json()
         
+        // Fetch Discord Status
+        const discordRes = await fetch('https://discord.com/api/guilds/1492885957517770772/widget.json')
+        const discordJson = await discordRes.json()
+        setDiscordData(discordJson)
+
         setStats(prev => prev.map(s => {
           if (s.id === 'players') return { ...s, value: data.players?.toLocaleString() || '0' }
+          if (s.id === 'discord') return { ...s, value: discordJson.presence_count?.toLocaleString() || '0' }
           if (s.id === 'server') return { 
             ...s, 
             value: data.online ? 'ONLINE' : 'OFFLINE', 
@@ -69,7 +77,7 @@ export default function StatusHolo() {
     }
 
     fetchStatus()
-    const interval = setInterval(fetchStatus, 30000)
+    const interval = setInterval(fetchStatus, 60000) // Sincronização a cada 60 segundos conforme solicitado
     return () => clearInterval(interval)
   }, [])
 
