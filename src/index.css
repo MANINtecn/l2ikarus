@@ -173,7 +173,7 @@ h1, h2, h3, h4, .cinzel {
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background: radial-gradient(circle at center, #0a0b12 0%, #050508 100%);
+  background: transparent;
 }
 
 .hero-3d-container {

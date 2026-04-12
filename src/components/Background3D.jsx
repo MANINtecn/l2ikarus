@@ -72,13 +72,13 @@ function Particles({ count = 300 }) {
 
   return (
     <instancedMesh ref={mesh} args={[null, null, count]}>
-      <boxGeometry args={[1, 1, 1]} />
+      <cylinderGeometry args={[0.04, 0.04, 1, 4]} />
       <meshStandardMaterial 
         color="#7b2cbf" 
         emissive="#7b2cbf" 
-        emissiveIntensity={4} 
+        emissiveIntensity={8} 
         transparent 
-        opacity={0.8} 
+        opacity={0.9} 
         blending={THREE.AdditiveBlending} 
       />
     </instancedMesh>

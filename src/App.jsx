@@ -12,6 +12,7 @@ import RatesGrid from './components/RatesGrid'
 import FeaturesTerminal from './components/FeaturesTerminal'
 import RoadmapHolo from './components/RoadmapHolo'
 import DownloadTerminal from './components/DownloadTerminal'
+import DonateTerminal from './components/DonateTerminal'
 import DiscordCommunity from './components/DiscordCommunity'
 import AudioController from './components/AudioController'
 import FogOverlay from './components/FogOverlay'
@@ -78,6 +79,9 @@ function App() {
 
         {/* 📅 SEÇÃO ROADMAP - EVOLUÇÃO ESTRATÉGICA */}
         <RoadmapHolo />
+
+        {/* 💰 SEÇÃO DOAÇÕES - TERMINAL TECX */}
+        <DonateTerminal />
 
         {/* 📥 SEÇÃO DOWNLOAD - TERMINAL DE IMPLANTAÇÃO */}
         <DownloadTerminal />
