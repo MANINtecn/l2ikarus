@@ -40,7 +40,6 @@ function App() {
         },
         scale: 0.8,
         opacity: 0.1,
-        filter: 'blur(10px)',
         ease: "none"
       })
     })
