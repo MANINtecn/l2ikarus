@@ -358,8 +358,6 @@ export default function ModelViewer3D({ modelUrl, backgroundUrl, interactive = t
              ) : null}
           </PresentationControls>
 
-          {!isMobile && <HeroParticles color={glowColor} />}
-
           <ambientLight intensity={isMobile ? 0.6 : 0.4} />
           <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} intensity={isMobile ? 1000 : 1500} castShadow={!isMobile} />
           <pointLight position={[0, 5, 10]} intensity={isMobile ? 500 : 800} color={glowColor} />

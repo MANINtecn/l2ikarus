@@ -98,7 +98,6 @@ export default function Background3D() {
       <Canvas camera={{ position: [0, 0, 50], fov: 75 }} gl={{ alpha: true }}>
         <ambientLight intensity={0.5} />
         <pointLight position={[10, 10, 10]} intensity={2} color="#c5a059" />
-        <Particles />
       </Canvas>
     </div>
   )
