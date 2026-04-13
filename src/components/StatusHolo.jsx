@@ -56,8 +56,8 @@ export default function StatusHolo() {
         const res = await fetch('/api/status')
         const data = await res.json()
         
-        // Fetch Discord Status
-        const discordRes = await fetch('https://discord.com/api/guilds/1492885957517770772/widget.json')
+        // Fetch Discord Status via Vercel Real-Time API
+        const discordRes = await fetch('/api/discord')
         const discordJson = await discordRes.json()
         setDiscordData(discordJson)
 

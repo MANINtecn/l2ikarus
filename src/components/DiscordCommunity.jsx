@@ -6,7 +6,7 @@ export default function DiscordCommunity() {
 
   const fetchDiscord = async () => {
     try {
-      const res = await fetch('https://discord.com/api/guilds/1492885957517770772/widget.json')
+      const res = await fetch('/api/discord')
       const json = await res.json()
       setData(json)
       setLoading(false)
