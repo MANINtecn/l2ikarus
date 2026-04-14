@@ -59,88 +59,44 @@ export default function DiscordCommunity() {
           lineHeight: '1.8',
           marginBottom: '4rem'
         }}>
-          Junte-se à nossa legião no Discord. Coordene ataques, negocie itens e participe de eventos exclusivos.
+          Participe da nossa central de controle no Discord. Coordene ataques, negocie itens e veja quem está online em tempo real.
         </p>
 
-        {/* DYNAMIC MEMBER LIST */}
-        <div className="glass-panel" style={{ 
-          padding: '2rem',
+        {/* OFFICIAL DISCORD WIDGET */}
+        <div style={{
+          width: '100%',
+          maxWidth: '800px',
           background: 'rgba(5, 5, 8, 0.6)',
           backdropFilter: 'blur(20px)',
+          padding: '2rem',
+          borderRadius: '24px',
           border: '1px solid rgba(197, 160, 89, 0.2)',
           boxShadow: '0 20px 50px rgba(0,0,0,0.5)',
-          borderRadius: '20px',
-          position: 'relative',
-          width: '100%',
-          maxWidth: '800px'
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '2rem'
         }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', padding: '0 1rem' }}>
-            <div style={{ textAlign: 'left' }}>
-              <div style={{ color: '#fff', fontWeight: 'bold', fontSize: '1.2rem' }}>{data?.name || 'L2 IKARUS'}</div>
-              <div style={{ color: '#4ade80', fontSize: '0.7rem', letterSpacing: '2px', marginTop: '5px' }}>
-                 ● {data?.presence_count || 0} GUERREIROS ONLINE
-              </div>
-            </div>
-            <div style={{ fontSize: '0.6rem', color: 'var(--text-mute)', letterSpacing: '1px' }}>
-              SYNC: 60s
-            </div>
-          </div>
-
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', 
-            gap: '1rem',
-            maxHeight: '400px',
-            overflowY: 'auto',
-            paddingRight: '10px'
-          }}>
-            {loading ? (
-              <div style={{ gridColumn: '1/-1', color: 'var(--text-mute)', padding: '2rem' }}>CARREGANDO COMUNIDADE...</div>
-            ) : data?.members?.map((member) => (
-              <div key={member.id} style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: '10px', 
-                background: 'rgba(255,255,255,0.03)',
-                padding: '10px',
-                borderRadius: '10px',
-                border: '1px solid rgba(255,255,255,0.05)'
-              }}>
-                <div style={{ position: 'relative' }}>
-                  <img 
-                    src={member.avatar_url} 
-                    alt={member.username} 
-                    style={{ width: '32px', height: '32px', borderRadius: '50%', border: '1px solid var(--gold)' }} 
-                  />
-                  <div style={{ 
-                    position: 'absolute', bottom: 0, right: 0, width: '10px', height: '10px', 
-                    background: '#4ade80', borderRadius: '50%', border: '2px solid #050508' 
-                  }} />
-                </div>
-                <div style={{ 
-                  color: '#fff', 
-                  fontSize: '0.7rem', 
-                  fontWeight: '600',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap'
-                }}>
-                  {member.username}
-                </div>
-              </div>
-            ))}
-          </div>
+          <iframe 
+            src="https://discord.com/widget?id=1254439382300098630&theme=dark" 
+            width="100%" 
+            height="500" 
+            allowtransparency="true" 
+            frameBorder="0" 
+            sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"
+            style={{ borderRadius: '12px' }}
+          ></iframe>
         </div>
 
-        {/* JOIN BUTTON */}
+        {/* JOIN BUTTON (OPTIONAL BUT GOOD FOR UX) */}
         <a 
-          href={data?.instant_invite || "https://discord.gg/uCThsAGmVR"} 
+          href="https://discord.gg/EnZJPcXZ5e" 
           target="_blank" 
           rel="noopener noreferrer"
           className="btn btn-primary"
           style={{ marginTop: '3rem', padding: '1rem 3rem' }}
         >
-          ACESSAR MISSION CONTROL
+          OPEN MISSION CONTROL
         </a>
       </div>
     </section>

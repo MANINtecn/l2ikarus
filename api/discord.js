@@ -1,7 +1,7 @@
 export default async function handler(request, response) {
   // Usamos Variável de Ambiente por segurança (evita bloqueio do GitHub)
   const token = process.env.DISCORD_BOT_TOKEN;
-  const guildId = "1492885957517770772";
+  const guildId = "1254439382300098630";
 
   if (!token) {
     return response.status(500).json({ error: "ERRO: DISCORD_BOT_TOKEN não configurado na Vercel." });

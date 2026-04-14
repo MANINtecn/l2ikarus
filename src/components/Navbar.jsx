@@ -20,7 +20,7 @@ export default function Navbar({ onRegisterClick }) {
   useEffect(() => {
     const fetchDiscordStatus = async () => {
       try {
-        const res = await fetch('https://discord.com/api/guilds/1492885957517770772/widget.json')
+        const res = await fetch('/api/discord')
         const data = await res.json()
         setOnlineCount(data.presence_count || 0)
       } catch (e) {
@@ -36,12 +36,11 @@ export default function Navbar({ onRegisterClick }) {
     { label: 'INÍCIO',    href: '#hero' },
     { label: 'TARIFAS',     href: '#rates' },
     { label: 'CARACTERÍSTICAS',  href: '#features' },
-    { label: 'COMUNIDADE', href: '#community' },
     { label: 'DOAR',    href: '#donate' },
     { label: 'DOWNLOAD',  href: '#download' },
   ]
 
-  const discordInvite = "https://discord.gg/uCThsAGmVR" // https://discord.gg/uCThsAGmVR User should provide invite link if different from widget
+  const discordInvite = "https://discord.gg/EnZJPcXZ5e"
 
   return (
     <header style={{
