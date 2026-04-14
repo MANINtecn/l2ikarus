@@ -185,19 +185,6 @@ export default function Navbar({ onRegisterClick }) {
 
         {/* MOBILE TOGGLE */}
         <div className="show-mobile" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <a 
-            href={discordInvite}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              color: 'var(--gold)',
-              padding: '0.5rem',
-              display: 'flex',
-              alignItems: 'center'
-            }}
-          >
-            <DiscordIcon />
-          </a>
           <button 
             onClick={() => setMenuOpen(!menuOpen)}
             style={{
