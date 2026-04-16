@@ -63,6 +63,7 @@ export default function StatusHolo() {
 
         setStats(prev => prev.map(s => {
           if (s.id === 'players') return { ...s, value: data.players?.toLocaleString() || '0' }
+          if (s.id === 'accounts') return { ...s, value: data.accounts?.toLocaleString() || '0' }
           if (s.id === 'discord') return { ...s, value: discordJson.presence_count?.toLocaleString() || '0' }
           if (s.id === 'server') return { 
             ...s, 

@@ -10,6 +10,8 @@ export default function Hero3D({ onRegisterClick }) {
 
   const [scrollProgress, setScrollProgress] = useState(0)
 
+  const [serverStatus, setServerStatus] = useState({ online: false, players: 0 })
+
   useEffect(() => {
     const handleResize = () => {
       const mobile = window.innerWidth <= 1024
@@ -23,11 +25,26 @@ export default function Hero3D({ onRegisterClick }) {
       setScrollProgress(Math.min(1, scrollY / maxScroll))
     }
 
+    const fetchStatus = async () => {
+      try {
+        const res = await fetch('/api/status')
+        const data = await res.json()
+        setServerStatus({ online: data.online, players: data.players || 0 })
+      } catch (e) {
+        setServerStatus({ online: false, players: 0 })
+      }
+    }
+
     window.addEventListener('resize', handleResize)
     window.addEventListener('scroll', handleScroll, { passive: true })
+    
+    fetchStatus()
+    const interval = setInterval(fetchStatus, 60000)
+
     return () => {
       window.removeEventListener('resize', handleResize)
       window.removeEventListener('scroll', handleScroll)
+      clearInterval(interval)
     }
   }, [])
 
@@ -178,13 +195,13 @@ export default function Hero3D({ onRegisterClick }) {
             pointerEvents: 'auto' // 👈 Reativa clique nos cards de status
           }}>
             {/* STATUS CARD */}
-            <div className="glass-panel hero-status-card" style={{ borderLeft: '4px solid #4ade80', padding: '1.5rem' }}>
+            <div className="glass-panel hero-status-card" style={{ borderLeft: `4px solid ${serverStatus.online ? '#4ade80' : '#ef4444'}`, padding: '1.5rem' }}>
               <div className="status-header">
                 <span className="status-label">STATUS</span>
-                <div className="status-dot" style={{ background: '#4ade80', boxShadow: '0 0 10px #4ade80' }} />
+                <div className="status-dot" style={{ background: serverStatus.online ? '#4ade80' : '#ef4444', boxShadow: `0 0 10px ${serverStatus.online ? '#4ade80' : '#ef4444'}` }} />
               </div>
-              <div className="status-value">ON-LINE</div>
-              <p className="status-meta">1.240 Jogadores Ativos</p>
+              <div className="status-value">{serverStatus.online ? 'ON-LINE' : 'OFFLINE'}</div>
+              <p className="status-meta">{serverStatus.players.toLocaleString()} Jogadores Ativos</p>
             </div>
 
             {/* RATES HUD */}
