@@ -710,4 +710,7 @@ h1, h2, h3, h4, .cinzel {
   will-change: transform, opacity;
 }
 
-::selection { background: var(--purple); color: #fff; }
+/* 📱 MOBILE RESPONSIVENESS UPDATES
+   - Improved layout tokens for smaller screens
+   - Refined hero section spacing
+   ============================================================ */
