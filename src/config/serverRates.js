@@ -1,3 +1,4 @@
+// Automated Discord Notification Test
 export const serverRates = [
   { label: 'EXPERIENCE', value: 'x1000', sub: 'FAST PROGRESS', color: 'var(--gold)' },
   { label: 'SKILL POINTS', value: 'x1000', sub: 'DYNAMIC SKILLS', color: 'var(--neon-blue)' },
