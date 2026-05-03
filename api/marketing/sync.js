@@ -1,3 +1,4 @@
+// Ikarus Sync API - Updated 2026-05-03
 import { getConnection } from '../_db';
 
 export default async function handler(req, res) {
