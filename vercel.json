@@ -1,7 +1,8 @@
 {
+  "cleanUrls": true,
+  "trailingSlash": true,
   "rewrites": [
     { "source": "/privacy", "destination": "/privacy.html" },
-    { "source": "/terms", "destination": "/terms.html" },
-    { "source": "/(tiktok.*\\.txt)", "destination": "/$1" }
+    { "source": "/terms", "destination": "/terms.html" }
   ]
 }
