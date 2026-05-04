@@ -55,8 +55,8 @@ export default function Footer({ onAdminClick }) {
           </div>
           
           <div style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
-            <a href="#" style={{ color: 'var(--text-mute)', fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '2px' }}>Termos de Uso</a>
-            <a href="#" style={{ color: 'var(--text-mute)', fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '2px' }}>Privacidade</a>
+            <a href="/terms.html" style={{ color: 'var(--text-mute)', fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '2px' }}>Termos de Uso</a>
+            <a href="/privacy.html" style={{ color: 'var(--text-mute)', fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '2px' }}>Privacidade</a>
             <a 
               href="https://discord.gg/EnZJPcXZ5e" 
               target="_blank" 
