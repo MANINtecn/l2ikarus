@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { serverRates } from '../config/serverRates'
+import { serverRates } from '../../config/serverRates'
 
 export default function RatesGrid() {
   const [activeRates, setActiveRates] = useState(serverRates)

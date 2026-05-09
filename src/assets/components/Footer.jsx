@@ -19,17 +19,19 @@ export default function Footer({ onAdminClick }) {
         <div style={{ textAlign: 'center' }}>
           <h2 className="cinzel" style={{ 
             fontSize: '1.5rem', 
-            color: 'var(--gold)', 
-            letterSpacing: '8px',
+            color: '#fff', 
+            letterSpacing: '12px',
             margin: 0
           }}>IKARUS</h2>
           <p style={{ 
-            fontSize: '0.6rem', 
-            letterSpacing: '4px', 
-            color: 'rgba(255,255,255,0.3)',
+            fontSize: '0.55rem', 
+            letterSpacing: '6px', 
+            color: 'var(--gold)',
             textTransform: 'uppercase',
-            marginTop: '0.5rem'
-          }}>Legendary Dragon Realm</p>
+            fontWeight: '900',
+            marginTop: '0.8rem',
+            opacity: 0.8
+          }}>Elite Gaming Experience</p>
         </div>
 
         {/* HUD DIVIDER */}

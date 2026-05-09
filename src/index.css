@@ -5,29 +5,27 @@
    Tema: High-End 3D Showcase
    ============================================================ */
 :root {
-  --gold:       #c5a059;
-  --gold-light: #f0d080;
-  --purple:     #7b2cbf;
-  --neon-blue:  #00d2ff;
-  --bg-deep:    #050508;
-  --bg-card:    #0a0b12;
-  --text-main:  #e0e6ed;
-  --text-mute:  #7a85a0;
+  --gold:       #d4af37;
+  --gold-light: #f9e79f;
+  --bg-deep:    #020203;
+  --bg-card:    #08080a;
+  --text-main:  #f8fafc;
+  --text-mute:  #94a3b8;
   
-  /* Glassmorphism Elite */
-  --glass-bg:     rgba(10, 12, 30, 0.6);
-  --glass-border: rgba(197, 160, 89, 0.15);
-  --glass-blur:   blur(14px);
+  /* Glassmorphism Elite - Sharper and Darker */
+  --glass-bg:     rgba(2, 2, 3, 0.8);
+  --glass-border: rgba(212, 175, 55, 0.2);
+  --glass-blur:   blur(20px);
   
   --font-main:    'Outfit', sans-serif;
   --font-heading: 'Cinzel', serif;
   
-  --shadow-glow:  0 0 40px rgba(197, 160, 89, 0.25);
-  --shadow-neon:  0 0 30px rgba(123, 44, 191, 0.4);
+  --shadow-glow:  0 0 50px rgba(212, 175, 55, 0.15);
+  --shadow-neon:  0 0 30px rgba(255, 255, 255, 0.1);
 
   /* Layout Tokens */
   --container-max: 1400px;
-  --section-pad: clamp(4rem, 10vw, 8rem);
+  --section-pad: clamp(5rem, 12vw, 10rem);
 }
 
 /* ── RESET UNIVERSAL ── */
@@ -96,19 +94,25 @@ h1, h2, h3, h4, .cinzel {
   border: 1px solid var(--glass-border);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
-  border-radius: 4px;
+  border-radius: 2px; /* Sharper corners */
   position: relative;
   overflow: hidden;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.5s cubic-bezier(0.2, 1, 0.3, 1);
 }
 
 .glass-panel::before {
   content: '';
   position: absolute;
   top: 0; left: 0; right: 0;
-  height: 1px;
+  height: 2px;
   background: linear-gradient(90deg, transparent, var(--gold), transparent);
-  opacity: 0.3;
+  opacity: 0.5;
+  transform: scaleX(0);
+  transition: transform 0.6s ease;
+}
+
+.glass-panel:hover::before {
+  transform: scaleX(1);
 }
 
 /* ── BUTTONS AAA ── */
@@ -132,12 +136,13 @@ h1, h2, h3, h4, .cinzel {
 .btn-primary {
   background: var(--gold);
   color: #000;
-  clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
+  clip-path: polygon(5% 0, 100% 0, 95% 100%, 0 100%);
+  font-weight: 900;
 }
 
 .btn-primary:hover {
   background: var(--gold-light);
-  transform: translateY(-2px);
+  transform: translateY(-3px) scale(1.05);
   box-shadow: var(--shadow-glow);
 }
 
@@ -608,19 +613,32 @@ h1, h2, h3, h4, .cinzel {
 }
 
 /* ── ANIMATIONS ── */
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
-}
-
-@keyframes glowPulse {
-  0%, 100% { opacity: 0.4; filter: blur(20px); }
-  50% { opacity: 0.8; filter: blur(40px); }
+@keyframes logoPulse {
+  0%, 100% { opacity: 0.3; transform: translate(-50%, -50%) scale(1); }
+  50% { opacity: 0.6; transform: translate(-50%, -50%) scale(1.2); }
 }
 
 @keyframes fadeUp {
-  from { opacity: 0; transform: translateY(20px); }
+  from { opacity: 0; transform: translateY(30px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── TRIANGULAR MOTIF ── */
+.tri-border {
+  position: relative;
+}
+
+.tri-border::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 10px;
+  background: var(--gold);
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+  opacity: 0.6;
 }
 
 /* ── SCROLLBAR ── */

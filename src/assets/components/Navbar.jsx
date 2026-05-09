@@ -6,7 +6,7 @@ const DiscordIcon = () => (
   </svg>
 )
 
-export default function Navbar({ onRegisterClick }) {
+export default function Navbar({ onRegisterClick, onLoginClick }) {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const [onlineCount, setOnlineCount] = useState(0)
@@ -65,31 +65,51 @@ export default function Navbar({ onRegisterClick }) {
       }}>
         {/* LOGO AREA */}
         <div style={{ display: 'flex', alignItems: 'center', zIndex: 1100 }}>
-          <img 
-            src="/assets/images/logo.png" 
-            alt="L2 Ikarus Logo" 
-            style={{ 
-              height: scrolled ? '65px' : '75px',
-              transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
-              mixBlendMode: 'screen',
-              filter: 'brightness(1.1) contrast(1.1)',
-              cursor: 'pointer',
-              transform: scrolled ? 'scale(1)' : 'scale(1.1)'
-            }} 
-            onClick={() => window.location.href = '#hero'}
-          />
+          <div style={{ position: 'relative' }}>
+            <img 
+              src="/assets/images/logo.png" 
+              alt="L2 Ikarus Logo" 
+              style={{ 
+                height: scrolled ? '55px' : '75px',
+                transition: 'all 0.5s cubic-bezier(0.2, 1, 0.3, 1)',
+                filter: 'drop-shadow(0 0 10px rgba(212, 175, 55, 0.3))',
+                cursor: 'pointer',
+              }} 
+              onClick={() => window.location.href = '#hero'}
+            />
+            {/* Ambient Glow behind logo */}
+            <div style={{
+              position: 'absolute',
+              top: '50%', left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: '120%', height: '120%',
+              background: 'radial-gradient(circle, rgba(212, 175, 55, 0.1) 0%, transparent 70%)',
+              zIndex: -1,
+              animation: 'logoPulse 4s infinite ease-in-out'
+            }} />
+          </div>
           
-          <h1 className="cinzel hide-mobile" style={{ 
-            fontSize: '1.2rem', 
-            color: 'var(--gold)', 
-            marginLeft: '15px',
-            letterSpacing: '4px',
-            textShadow: '0 0 20px rgba(197,160,89,0.4)',
-            opacity: scrolled ? 0.5 : 1,
-            transition: 'opacity 0.4s'
-          }}>
-            L2 IKARUS
-          </h1>
+          <div style={{ marginLeft: '20px', display: 'flex', flexDirection: 'column' }}>
+            <h1 className="cinzel" style={{ 
+              fontSize: scrolled ? '1rem' : '1.3rem', 
+              color: '#fff', 
+              letterSpacing: '6px',
+              transition: 'all 0.4s'
+            }}>
+              IKARUS
+            </h1>
+            {!scrolled && (
+              <span style={{ 
+                fontSize: '0.5rem', 
+                color: 'var(--gold)', 
+                letterSpacing: '4px',
+                fontWeight: '900',
+                opacity: 0.8
+              }}>
+                ELITE SEASON
+              </span>
+            )}
+          </div>
         </div>
 
         {/* DESKTOP HUD NAVIGATION */}
@@ -160,6 +180,24 @@ export default function Navbar({ onRegisterClick }) {
               </div>
             )}
           </a>
+
+          <button 
+            onClick={onLoginClick}
+            style={{ 
+              background: 'none', 
+              border: 'none', 
+              color: 'rgba(255,255,255,0.6)', 
+              fontSize: '0.7rem', 
+              fontWeight: '700', 
+              letterSpacing: '2px',
+              cursor: 'pointer',
+              transition: '0.3s'
+            }}
+            onMouseEnter={(e) => e.target.style.color = '#fff'}
+            onMouseLeave={(e) => e.target.style.color = 'rgba(255,255,255,0.6)'}
+          >
+            LOGIN
+          </button>
 
           <button 
             onClick={onRegisterClick}
@@ -260,12 +298,31 @@ export default function Navbar({ onRegisterClick }) {
           <button 
             onClick={() => {
               setMenuOpen(false);
+              onLoginClick();
+            }}
+            style={{ 
+              background: 'none', 
+              border: 'none', 
+              color: '#fff', 
+              fontSize: '1.2rem', 
+              fontWeight: '700', 
+              letterSpacing: '4px',
+              cursor: 'pointer',
+              marginTop: '1rem'
+            }}
+          >
+            LOGIN
+          </button>
+
+          <button 
+            onClick={() => {
+              setMenuOpen(false);
               onRegisterClick();
             }}
             className="btn btn-primary"
-            style={{ marginTop: '2rem', width: '200px' }}
+            style={{ marginTop: '1rem', width: '200px' }}
           >
-            INICIAR AGORA
+            CADASTRO
           </button>
         </div>
       </div>

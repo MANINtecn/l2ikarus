@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { betaLaunchDate } from '../config/serverRates'
+import { betaLaunchDate } from '../../config/serverRates'
 
 function CountdownTimer({ targetDate }) {
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 })
@@ -85,7 +85,7 @@ export default function StatusHolo() {
   return (
     <section id="status" className="status-section" style={{ position: 'relative', overflow: 'hidden' }}>
       <div className="container">
-        <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
+        <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
           <div style={{ 
             display: 'inline-block',
             padding: '0.3rem 1.5rem',
@@ -97,11 +97,9 @@ export default function StatusHolo() {
             letterSpacing: '4px',
             marginBottom: '1.5rem',
             fontWeight: '800'
-          }}>BETA PHASE ACTIVE</div>
+          }}>SISTEMA OPERACIONAL ATIVO</div>
           
-          <h2 className="section-title" style={{ marginBottom: '3rem' }}>O DESPERTAR EM <span style={{ color: 'var(--gold)' }}>CONTAGEM</span></h2>
-          
-          <CountdownTimer targetDate={betaLaunchDate} />
+          <h2 className="section-title">MÉTRICAS DO <span style={{ color: 'var(--gold)' }}>REINO</span></h2>
         </div>
 
         <div style={{ 

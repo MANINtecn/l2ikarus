@@ -34,7 +34,7 @@ export default function FeaturesTerminal() {
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.borderLeftColor = 'var(--gold)';
-                e.currentTarget.style.background = 'rgba(197,160,89,0.03)';
+                e.currentTarget.style.background = 'rgba(212, 175, 55, 0.03)';
                 e.currentTarget.style.transform = 'scale(1.02)';
               }}
               onMouseLeave={(e) => {
@@ -79,12 +79,12 @@ export default function FeaturesTerminal() {
       {/* AMBIENT TECH LINES */}
       <div style={{ 
         position: 'absolute', top: 0, left: '10%', width: '1px', height: '100%',
-        background: 'linear-gradient(to bottom, transparent, rgba(197,160,89,0.05), transparent)',
+        background: 'linear-gradient(to bottom, transparent, rgba(212, 175, 55, 0.05), transparent)',
         pointerEvents: 'none'
       }} />
       <div style={{ 
         position: 'absolute', top: 0, right: '10%', width: '1px', height: '100%',
-        background: 'linear-gradient(to bottom, transparent, rgba(123,44,191,0.05), transparent)',
+        background: 'linear-gradient(to bottom, transparent, rgba(212, 175, 55, 0.05), transparent)',
         pointerEvents: 'none'
       }} />
     </section>

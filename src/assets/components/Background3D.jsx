@@ -72,13 +72,13 @@ function Particles({ count = 300 }) {
 
   return (
     <instancedMesh ref={mesh} args={[null, null, count]}>
-      <cylinderGeometry args={[0.04, 0.04, 1, 4]} />
+      <tetrahedronGeometry args={[0.5, 0]} />
       <meshStandardMaterial 
-        color="#7b2cbf" 
-        emissive="#7b2cbf" 
-        emissiveIntensity={8} 
+        color="#d4af37" 
+        emissive="#d4af37" 
+        emissiveIntensity={4} 
         transparent 
-        opacity={0.9} 
+        opacity={0.4} 
         blending={THREE.AdditiveBlending} 
       />
     </instancedMesh>
@@ -93,11 +93,12 @@ export default function Background3D() {
       width: '100%', height: '100%',
       pointerEvents: 'none',
       zIndex: -1,
-      background: '#050508'
+      background: '#020203'
     }}>
       <Canvas camera={{ position: [0, 0, 50], fov: 75 }} gl={{ alpha: true }}>
-        <ambientLight intensity={0.5} />
-        <pointLight position={[10, 10, 10]} intensity={2} color="#c5a059" />
+        <ambientLight intensity={0.2} />
+        <pointLight position={[10, 10, 10]} intensity={5} color="#d4af37" />
+        <Particles count={150} />
       </Canvas>
     </div>
   )
