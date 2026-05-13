@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import logoWhite from '../images/logo_white.png'
 
 const DiscordIcon = () => (
   <svg viewBox="0 0 127.14 96.36" style={{ width: '20px', height: '20px' }} xmlns="http://www.w3.org/2000/svg">
@@ -32,13 +33,18 @@ export default function Navbar({ onRegisterClick, onLoginClick }) {
     return () => clearInterval(interval)
   }, [])
 
-  const links = [
+  const leftLinks = [
     { label: 'INÍCIO',    href: '#hero' },
     { label: 'TARIFAS',     href: '#rates' },
-    { label: 'CARACTERÍSTICAS',  href: '#features' },
+    { label: 'RECURSOS',  href: '#features' },
+  ]
+
+  const rightLinks = [
     { label: 'DOAR',    href: '#donate' },
     { label: 'DOWNLOAD',  href: '#download' },
   ]
+
+  const links = [...leftLinks, ...rightLinks]
 
   const discordInvite = "https://discord.gg/EnZJPcXZ5e"
 
@@ -57,74 +63,21 @@ export default function Navbar({ onRegisterClick, onLoginClick }) {
       alignItems: 'center'
     }}>
       <div className="container" style={{
-        display: 'flex',
+        display: 'grid',
+        gridTemplateColumns: '1fr auto 1fr',
         alignItems: 'center',
-        justifyContent: 'space-between',
         width: '100%',
-        position: 'relative'
+        position: 'relative',
+        gap: '2rem'
       }}>
-        {/* LOGO AREA */}
-        <div style={{ display: 'flex', alignItems: 'center', zIndex: 1100 }}>
-          <div style={{ position: 'relative' }}>
-            <img 
-              src="/assets/images/logo.png" 
-              alt="L2 Ikarus Logo" 
-              style={{ 
-                height: scrolled ? '55px' : '75px',
-                transition: 'all 0.5s cubic-bezier(0.2, 1, 0.3, 1)',
-                filter: 'drop-shadow(0 0 10px rgba(212, 175, 55, 0.3))',
-                cursor: 'pointer',
-              }} 
-              onClick={() => window.location.href = '#hero'}
-            />
-            {/* Ambient Glow behind logo */}
-            <div style={{
-              position: 'absolute',
-              top: '50%', left: '50%',
-              transform: 'translate(-50%, -50%)',
-              width: '120%', height: '120%',
-              background: 'radial-gradient(circle, rgba(212, 175, 55, 0.1) 0%, transparent 70%)',
-              zIndex: -1,
-              animation: 'logoPulse 4s infinite ease-in-out'
-            }} />
-          </div>
-          
-          <div style={{ marginLeft: '20px', display: 'flex', flexDirection: 'column' }}>
-            <h1 className="cinzel" style={{ 
-              fontSize: scrolled ? '1rem' : '1.3rem', 
-              color: '#fff', 
-              letterSpacing: '6px',
-              transition: 'all 0.4s'
-            }}>
-              IKARUS
-            </h1>
-            {!scrolled && (
-              <span style={{ 
-                fontSize: '0.5rem', 
-                color: 'var(--gold)', 
-                letterSpacing: '4px',
-                fontWeight: '900',
-                opacity: 0.8
-              }}>
-                ELITE SEASON
-              </span>
-            )}
-          </div>
-        </div>
-
-        {/* DESKTOP HUD NAVIGATION */}
+        {/* LEFT NAVIGATION */}
         <nav className="hide-mobile" style={{ 
           display: 'flex', 
-          gap: '2rem', 
+          gap: '2.5rem', 
           alignItems: 'center',
-          background: 'rgba(255,255,255,0.03)',
-          padding: '0.6rem 2.5rem',
-          borderRadius: '50px',
-          border: '1px solid rgba(255,255,255,0.05)',
-          backdropFilter: 'blur(10px)',
-          transition: 'all 0.4s'
+          justifyContent: 'flex-start'
         }}>
-          {links.map(l => (
+          {leftLinks.map(l => (
             <a 
               key={l.href} 
               href={l.href} 
@@ -145,80 +98,99 @@ export default function Navbar({ onRegisterClick, onLoginClick }) {
           ))}
         </nav>
 
-        {/* CTA AREA */}
-        <div className="hide-mobile" style={{ display: 'flex', justifyContent: 'flex-end', gap: '1.5rem', alignItems: 'center' }}>
-          <a 
-            href={discordInvite}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              color: 'rgba(255,255,255,0.6)',
-              textDecoration: 'none',
-              transition: '0.3s',
-              padding: '0.5rem 1rem',
-              borderRadius: '8px',
-              background: 'rgba(88, 101, 242, 0.1)',
-              border: '1px solid rgba(88, 101, 242, 0.2)'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.color = '#fff';
-              e.currentTarget.style.background = 'rgba(88, 101, 242, 0.3)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.color = 'rgba(255,255,255,0.6)';
-              e.currentTarget.style.background = 'rgba(88, 101, 242, 0.1)';
-            }}
-          >
-            <DiscordIcon />
-            {onlineCount > 0 && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#3ba55c', boxShadow: '0 0 10px #3ba55c' }} />
-                <span style={{ fontSize: '0.65rem', fontWeight: '800' }}>{onlineCount}</span>
-              </div>
-            )}
-          </a>
+        {/* CENTRAL LOGO AREA */}
+        <div style={{ 
+          display: 'flex', 
+          flexDirection: 'column',
+          alignItems: 'center', 
+          justifyContent: 'center',
+          zIndex: 1100,
+          position: 'relative'
+        }}>
+          <div style={{ 
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            height: scrolled ? '100px' : '130px',
+            transition: 'all 0.5s cubic-bezier(0.2, 1, 0.3, 1)',
+          }}>
+            <img 
+              src={logoWhite} 
+              alt="L2 Ikarus Logo" 
+              style={{ 
+                height: '100%',
+                width: 'auto',
+                filter: 'drop-shadow(0 0 15px rgba(212, 175, 55, 0.4))',
+                cursor: 'pointer',
+              }} 
+              onClick={() => window.location.href = '#hero'}
+            />
+            {/* Ambient Glow behind logo */}
+            <div style={{
+              position: 'absolute',
+              top: '50%', left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: '120%', height: '120%',
+              background: 'radial-gradient(circle, rgba(212, 175, 55, 0.2) 0%, transparent 70%)',
+              zIndex: -1,
+              animation: 'logoPulse 4s infinite ease-in-out'
+            }} />
+          </div>
+        </div>
 
-          <button 
-            onClick={onLoginClick}
-            style={{ 
-              background: 'none', 
-              border: 'none', 
-              color: 'rgba(255,255,255,0.6)', 
-              fontSize: '0.7rem', 
-              fontWeight: '700', 
-              letterSpacing: '2px',
-              cursor: 'pointer',
-              transition: '0.3s'
-            }}
-            onMouseEnter={(e) => e.target.style.color = '#fff'}
-            onMouseLeave={(e) => e.target.style.color = 'rgba(255,255,255,0.6)'}
-          >
-            LOGIN
-          </button>
+        {/* RIGHT NAVIGATION & CTAs */}
+        <div className="hide-mobile" style={{ 
+          display: 'flex', 
+          justifyContent: 'flex-end', 
+          gap: '2.5rem', 
+          alignItems: 'center' 
+        }}>
+          <nav style={{ display: 'flex', gap: '2.5rem', alignItems: 'center' }}>
+            {rightLinks.map(l => (
+              <a 
+                key={l.href} 
+                href={l.href} 
+                style={{
+                  fontSize: '0.65rem',
+                  fontWeight: '800',
+                  letterSpacing: '2px',
+                  textTransform: 'uppercase',
+                  color: 'rgba(255,255,255,0.7)',
+                  transition: '0.3s',
+                  textDecoration: 'none'
+                }}
+                onMouseEnter={(e) => e.target.style.color = 'var(--gold)'}
+                onMouseLeave={(e) => e.target.style.color = 'rgba(255,255,255,0.7)'}
+              >
+                {l.label}
+              </a>
+            ))}
+          </nav>
 
-          <button 
-            onClick={onRegisterClick}
-            style={{ 
-              background: 'none', 
-              border: 'none', 
-              color: 'rgba(255,255,255,0.6)', 
-              fontSize: '0.7rem', 
-              fontWeight: '700', 
-              letterSpacing: '2px',
-              cursor: 'pointer',
-              transition: '0.3s'
-            }}
-            onMouseEnter={(e) => e.target.style.color = '#fff'}
-            onMouseLeave={(e) => e.target.style.color = 'rgba(255,255,255,0.6)'}
-          >
-            CADASTRO
-          </button>
-          <a href="#download" className="btn btn-primary" style={{ padding: '0.7rem 1.8rem' }}>
-            JOGAR AGORA
-          </a>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', borderLeft: '1px solid rgba(255,255,255,0.1)', paddingLeft: '2rem' }}>
+            <button 
+              onClick={onLoginClick}
+              style={{ 
+                background: 'none', 
+                border: 'none', 
+                color: 'rgba(255,255,255,0.6)', 
+                fontSize: '0.7rem', 
+                fontWeight: '700', 
+                letterSpacing: '2px',
+                cursor: 'pointer',
+                transition: '0.3s'
+              }}
+              onMouseEnter={(e) => e.target.style.color = '#fff'}
+              onMouseLeave={(e) => e.target.style.color = 'rgba(255,255,255,0.6)'}
+            >
+              LOGIN
+            </button>
+
+            <a href="#download" className="btn btn-primary" style={{ padding: '0.6rem 1.5rem', fontSize: '0.65rem' }}>
+              JOGAR AGORA
+            </a>
+          </div>
         </div>
 
         {/* MOBILE TOGGLE */}

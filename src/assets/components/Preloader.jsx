@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { gsap } from 'gsap'
+import logoWhite from '../images/logo_white.png'
 
 export default function Preloader() {
   const containerRef = useRef(null)
@@ -7,25 +8,24 @@ export default function Preloader() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Animação dos fragmentos (shards)
-      gsap.from(".shard", {
+      // Animação da logo
+      gsap.from(".preloader-logo", {
         duration: 1.5,
-        x: (i) => (i === 0 ? -100 : i === 1 ? 0 : 100),
-        y: (i) => (i === 1 ? -100 : 50),
+        y: 20,
         opacity: 0,
-        rotation: 45,
-        stagger: 0.2,
+        scale: 0.8,
         ease: "expo.out"
       })
 
-      // Pulsação constante
-      gsap.to(".shard", {
+      // Pulsação constante e brilho
+      gsap.to(".preloader-logo", {
         duration: 2,
-        opacity: 0.6,
+        opacity: 0.8,
+        scale: 1.05,
+        filter: 'drop-shadow(0 0 20px rgba(212, 175, 55, 0.4))',
         repeat: -1,
         yoyo: true,
-        ease: "sine.inOut",
-        stagger: 0.1
+        ease: "sine.inOut"
       })
     }, containerRef)
 
@@ -44,35 +44,17 @@ export default function Preloader() {
       justifyContent: 'center',
       gap: '2rem'
     }}>
-      <div style={{ position: 'relative', width: '100px', height: '100px' }}>
-        {/* Simulação do logo triangular com fragmentos via CSS */}
-        {/* Shard 1 (L2) */}
-        <div className="shard" style={{
-          position: 'absolute',
-          left: '0', bottom: '0',
-          width: '45px', height: '80px',
-          background: 'var(--gold)',
-          clipPath: 'polygon(0% 100%, 100% 100%, 100% 0%)',
-          opacity: 0.9
-        }} />
-        {/* Shard 2 (I) */}
-        <div className="shard" style={{
-          position: 'absolute',
-          left: '50%', transform: 'translateX(-50%)',
-          top: '0',
-          width: '15px', height: '100px',
-          background: '#fff',
-          opacity: 1
-        }} />
-        {/* Shard 3 (K) */}
-        <div className="shard" style={{
-          position: 'absolute',
-          right: '0', bottom: '0',
-          width: '45px', height: '80px',
-          background: 'var(--gold)',
-          clipPath: 'polygon(0% 100%, 0% 0%, 100% 100%)',
-          opacity: 0.9
-        }} />
+      <div style={{ position: 'relative', width: '180px', display: 'flex', justifyContent: 'center' }}>
+        <img 
+          src={logoWhite} 
+          alt="L2 Ikarus Logo" 
+          className="preloader-logo"
+          style={{
+            width: '100%',
+            height: 'auto',
+            filter: 'drop-shadow(0 0 15px rgba(212, 175, 55, 0.2))'
+          }}
+        />
       </div>
 
       <div style={{ textAlign: 'center' }}>

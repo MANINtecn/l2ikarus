@@ -80,7 +80,8 @@ export default function Hero3D({ onRegisterClick }) {
         position: 'relative',
         zIndex: 10,
         display: 'flex',
-        alignItems: 'center',
+        alignItems: 'center', // Mantendo center para alinhamento vertical
+        paddingTop: isMobile ? '60px' : '150px', // Puxando para baixo no desktop
         justifyContent: 'space-between',
         opacity: 1 - scrollProgress,
         transform: `translateY(${scrollProgress * -50}px)`,
@@ -92,17 +93,30 @@ export default function Hero3D({ onRegisterClick }) {
           zIndex: 10,
           position: 'relative'
         }}>
+          {/* LOGO HERO */}
+          <img 
+            src="/assets/images/logo_white.png" 
+            alt="L2 Ikarus" 
+            style={{ 
+              height: isMobile ? '60px' : '120px', 
+              width: 'auto', 
+              marginBottom: '2rem',
+              opacity: 0.9,
+              filter: 'drop-shadow(0 0 20px rgba(0,0,0,0.5))'
+            }} 
+          />
+          
           <p className="section-subtitle" style={{ textAlign: 'left', color: 'var(--gold)' }}>
             RECONECTE-SE COM A LENDA
           </p>
           <h1 className="cinzel hero-title" style={{ 
-            fontSize: isMobile ? '2.8rem' : 'clamp(3rem, 10vw, 6rem)',
+            fontSize: isMobile ? '2.5rem' : 'clamp(3rem, 10vw, 5rem)',
+            lineHeight: 1,
             marginBottom: '1rem',
             position: 'relative',
             textShadow: '0 10px 30px rgba(0,0,0,0.8)'
           }}>
-            L2<br />
-            <span style={{ color: '#fff', position: 'relative', zIndex: 2 }}>IKARUS</span>
+            L2 IKARUS
           </h1>
           <p className="hero-description" style={{ 
             fontSize: isMobile ? '0.9rem' : 'clamp(1rem, 1.5vw, 1.3rem)',
@@ -148,13 +162,61 @@ export default function Hero3D({ onRegisterClick }) {
             <div className="glass-panel hero-status-card" style={{ borderLeft: '4px solid var(--gold)', padding: '1.5rem' }}>
               <span className="status-label" style={{ marginBottom: '1.2rem', display: 'block' }}>RATES TÉCNICOS</span>
               <div className="rates-list">
-                <div className="rate-item"><span>XP</span><span className="rate-value">x1000</span></div>
-                <div className="rate-item"><span>SP</span><span className="rate-value">x1000</span></div>
-                <div className="rate-item"><span>ADENA</span><span className="rate-value">x500</span></div>
+                <div className="rate-item"><span>XP</span><span className="rate-value">x3</span></div>
+                <div className="rate-item"><span>SP</span><span className="rate-value">x3</span></div>
+                <div className="rate-item"><span>ADENA</span><span className="rate-value">x2</span></div>
               </div>
             </div>
           </div>
         )}
+
+        {/* 📊 BARRA DE RATES FIXA - ESTILO ELITE */}
+        <div style={{
+          position: 'absolute',
+          bottom: '40px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: isMobile ? '90%' : 'auto',
+          display: 'flex',
+          gap: isMobile ? '15px' : '3rem',
+          padding: isMobile ? '1rem' : '1rem 3.5rem',
+          background: 'rgba(5, 5, 8, 0.4)',
+          backdropFilter: 'blur(10px)',
+          borderTop: '1px solid rgba(197, 160, 89, 0.1)',
+          borderBottom: '1px solid rgba(197, 160, 89, 0.1)',
+          zIndex: 20,
+          justifyContent: 'center',
+          animation: 'fadeUp 1s ease-out 1s both'
+        }}>
+          {[
+            { label: 'EXP', value: 'x3' },
+            { label: 'SP', value: 'x3' },
+            { label: 'ADENA', value: 'x2' },
+            { label: 'QUEST', value: 'x1' },
+            { label: 'DROP', value: 'x1' }
+          ].map((rate, i) => (
+            <div key={i} style={{ textAlign: 'center' }}>
+              <div style={{ 
+                fontFamily: 'Cinzel', 
+                fontSize: isMobile ? '1rem' : '1.8rem', 
+                color: 'var(--gold)',
+                fontWeight: '700',
+                lineHeight: 1
+              }}>
+                {rate.value}
+              </div>
+              <div style={{ 
+                fontSize: '0.6rem', 
+                letterSpacing: '3px', 
+                color: 'rgba(255,255,255,0.5)',
+                marginTop: '4px',
+                fontWeight: '800'
+              }}>
+                {rate.label}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* SCANLINE OVERLAY - Para textura de "monitor antigo/militar" */}

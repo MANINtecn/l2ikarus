@@ -16,6 +16,8 @@ import AudioController from './assets/components/AudioController'
 import FogOverlay from './assets/components/FogOverlay'
 import Preloader from './assets/components/Preloader'
 import ServerGuide from './assets/components/ServerGuide'
+import LauncherHeader from './assets/components/LauncherHeader'
+import PlayButton from './assets/components/PlayButton'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -63,6 +65,8 @@ function App() {
       
       {!loading && (
         <>
+          <LauncherHeader />
+          <PlayButton />
           {/* 🚀 SEÇÃO HERO - O DESPERTAR (VÍDEO) */}
           <Navbar 
             onRegisterClick={() => setIsRegisterOpen(true)} 
