@@ -1,31 +1,40 @@
-import { getConnection } from './_db';
+const VPS_STATUS_URL = process.env.VPS_STATUS_URL;   // ex: http://192.99.110.164:8080/status
+const VPS_API_KEY   = process.env.VPS_STATUS_TOKEN;  // mesmo valor de STATUS_API_KEY no VPS
 
-export default async function handler(req, res) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
+export default async function handler(_req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Content-Type', 'application/json');
+
+  if (!VPS_STATUS_URL || !VPS_API_KEY) {
+    return res.status(200).json({ online: false, players: 0, accounts: 0,
+      status_login: 'OFFLINE', status_game: 'OFFLINE' });
+  }
+
   try {
-    const pool = await getConnection();
-    
-    // Consulta para contar jogadores online (ajuste os nomes das tabelas se necessário)
-    // No Mobius Essence geralmente é a tabela 'characters' com a coluna 'online'
-    const [playersRow] = await pool.query('SELECT COUNT(*) as count FROM characters WHERE online > 0');
-    
-    // Consulta para contar total de contas criadas
-    const [accountsRow] = await pool.query('SELECT COUNT(*) as count FROM accounts');
-    
-    res.status(200).json({ 
-      online: true, 
-      players: playersRow[0].count,
-      accounts: accountsRow[0].count,
-      status_login: "ONLINE",
-      status_game: "ONLINE"
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000); // 5s timeout
+
+    const response = await fetch(VPS_STATUS_URL, {
+      headers: { 'x-api-key': VPS_API_KEY },
+      signal: controller.signal,
     });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ 
-      online: false, 
-      players: 0,
-      accounts: 0,
-      error: "Erro ao conectar ao banco de dados. Verifique a ponte Ngrok/VPS." 
+    clearTimeout(timeout);
+
+    if (!response.ok) throw new Error('VPS returned non-200');
+
+    const data = await response.json();
+
+    return res.status(200).json({
+      online: data.online ?? false,
+      players: data.players ?? 0,
+      accounts: data.accounts ?? 0,
+      status_login: data.online ? 'ONLINE' : 'OFFLINE',
+      status_game:  data.online ? 'ONLINE' : 'OFFLINE',
+    });
+  } catch {
+    return res.status(200).json({
+      online: false, players: 0, accounts: 0,
+      status_login: 'OFFLINE', status_game: 'OFFLINE',
     });
   }
 }
