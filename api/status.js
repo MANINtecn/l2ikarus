@@ -1,6 +1,7 @@
 import { getConnection } from './_db';
 
 export default async function handler(req, res) {
+  res.setHeader("Access-Control-Allow-Origin", "*");
   try {
     const pool = await getConnection();
     
