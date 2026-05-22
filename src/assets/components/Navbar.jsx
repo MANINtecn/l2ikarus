@@ -7,7 +7,7 @@ const DiscordIcon = () => (
   </svg>
 )
 
-export default function Navbar({ onRegisterClick, onLoginClick }) {
+export default function Navbar({ onRegisterClick, onLoginClick, topOffset = 0 }) {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const [onlineCount, setOnlineCount] = useState(0)
@@ -51,7 +51,7 @@ export default function Navbar({ onRegisterClick, onLoginClick }) {
   return (
     <header style={{
       position: 'fixed',
-      top: 0, left: 0,
+      top: topOffset, left: 0,
       width: '100%',
       height: scrolled ? '70px' : '90px',
       zIndex: 1000,

@@ -10,7 +10,7 @@ const STEPS = [
   {
     num: '02',
     title: 'BAIXE O CLIENTE',
-    desc: 'Escolha MEGA ou Google Drive. Tamanho: ~36 GB.',
+    desc: 'Baixe via Google Drive. Tamanho: ~36 GB.',
     color: 'var(--gold)',
   },
   {
@@ -96,7 +96,7 @@ export default function DownloadTerminal() {
           <div className="glass-panel" style={{
             display: 'inline-flex', flexDirection: 'column',
             alignItems: 'center', gap: '2rem',
-            padding: '3rem 4rem',
+            padding: 'clamp(2rem, 6vw, 3rem) clamp(1.5rem, 8vw, 4rem)',
             background: 'rgba(88,101,242,0.05)',
             border: '1px solid rgba(88,101,242,0.2)',
             maxWidth: '520px', width: '100%',
@@ -123,7 +123,7 @@ export default function DownloadTerminal() {
                 color: 'var(--text-mute)', fontSize: '0.78rem',
                 letterSpacing: '2px', lineHeight: '1.7'
               }}>
-                MEGA · GOOGLE DRIVE · SUPORTE 24/7
+                GOOGLE DRIVE · SUPORTE 24/7
               </p>
             </div>
 

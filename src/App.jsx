@@ -3,7 +3,7 @@ import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import './index.css'
 import Navbar from './assets/components/Navbar'
-import Background3D from './assets/components/Background3D'
+import BetaBanner, { BANNER_HEIGHT } from './assets/components/BetaBanner'
 import Footer from './assets/components/Footer'
 import RegisterModal from './assets/components/RegisterModal'
 import Hero3D from './assets/components/Hero3D'
@@ -13,11 +13,8 @@ import DownloadTerminal from './assets/components/DownloadTerminal'
 import DonateTerminal from './assets/components/DonateTerminal'
 import DiscordCommunity from './assets/components/DiscordCommunity'
 import AudioController from './assets/components/AudioController'
-import FogOverlay from './assets/components/FogOverlay'
 import Preloader from './assets/components/Preloader'
 import ServerGuide from './assets/components/ServerGuide'
-import LauncherHeader from './assets/components/LauncherHeader'
-import PlayButton from './assets/components/PlayButton'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -26,6 +23,7 @@ function App() {
   const [isLoginOpen, setIsLoginOpen] = useState(false)
   const [showLogin, setShowLogin] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [bannerVisible, setBannerVisible] = useState(true)
   const containerRef = useRef(null)
 
   useEffect(() => {
@@ -65,10 +63,10 @@ function App() {
       
       {!loading && (
         <>
-          <LauncherHeader />
-          <PlayButton />
+          {bannerVisible && <BetaBanner onDismiss={() => setBannerVisible(false)} />}
           {/* 🚀 SEÇÃO HERO - O DESPERTAR (VÍDEO) */}
-          <Navbar 
+          <Navbar
+            topOffset={bannerVisible ? BANNER_HEIGHT : 0}
             onRegisterClick={() => setIsRegisterOpen(true)} 
             onLoginClick={() => setIsLoginOpen(true)}
           />
