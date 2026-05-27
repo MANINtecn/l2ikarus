@@ -1,6 +1,6 @@
 export default async function handler(request, response) {
   const token = process.env.DISCORD_BOT_TOKEN;
-  const adminId = process.env.DISCORD_ADMIN_ID; // ID do Discord do admin (IKARUS)
+  const adminUsername = process.env.DISCORD_ADMIN_USERNAME || 'ManinZk'; // parte do username do admin
   const guildId = "1254439382300098630";
 
   if (!token) {
@@ -18,17 +18,17 @@ export default async function handler(request, response) {
     const widgetRes = await fetch(`https://discord.com/api/guilds/${guildId}/widget.json`);
     const widgetData = await widgetRes.json();
 
-    // Verifica se o admin está online via widget (aparece apenas se estiver online)
+    // Widget retorna IDs aleatórios (não reais) — comparamos pelo username
     const members = widgetData.members || [];
     let adminOnline = false;
     let adminStatus = 'offline';
 
-    if (adminId) {
-      const adminMember = members.find(m => m.id === adminId);
-      if (adminMember) {
-        adminOnline = true;
-        adminStatus = adminMember.status || 'online';
-      }
+    const adminMember = members.find(m =>
+      m.username?.toLowerCase().includes(adminUsername.toLowerCase())
+    );
+    if (adminMember) {
+      adminOnline = true;
+      adminStatus = adminMember.status || 'online';
     }
 
     response.setHeader('Cache-Control', 's-maxage=30, stale-while-revalidate');
