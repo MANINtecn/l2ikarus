@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import logoWhite from '../images/logo_white.png'
 
 const DiscordIcon = () => (
   <svg viewBox="0 0 127.14 96.36" style={{ width: '20px', height: '20px' }} xmlns="http://www.w3.org/2000/svg">
@@ -138,7 +137,7 @@ export default function Navbar({ onRegisterClick, onLoginClick, topOffset = 0 })
             transition: 'all 0.5s cubic-bezier(0.2, 1, 0.3, 1)',
           }}>
             <img
-              src={logoWhite}
+              src="/assets/images/logo_white.png"
               alt="L2 Ikarus Logo"
               style={{
                 height: '100%',
