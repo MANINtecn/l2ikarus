@@ -102,19 +102,6 @@ export default function Hero3D({ onRegisterClick }) {
           zIndex: 10,
           position: 'relative'
         }}>
-          {/* LOGO HERO */}
-          <img 
-            src="/assets/images/logo_white.png" 
-            alt="L2 Ikarus" 
-            style={{ 
-              height: isMobile ? '60px' : '120px', 
-              width: 'auto', 
-              marginBottom: '2rem',
-              opacity: 0.9,
-              filter: 'drop-shadow(0 0 20px rgba(0,0,0,0.5))'
-            }} 
-          />
-          
           <p className="section-subtitle" style={{ textAlign: 'left', color: 'var(--gold)' }}>
             RECONECTE-SE COM A LENDA
           </p>
