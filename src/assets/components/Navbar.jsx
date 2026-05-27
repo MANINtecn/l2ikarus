@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import logoWhite from '../images/logo_white.png'
 
 const DiscordIcon = () => (
   <svg viewBox="0 0 127.14 96.36" style={{ width: '20px', height: '20px' }} xmlns="http://www.w3.org/2000/svg">
@@ -11,11 +10,17 @@ export default function Navbar({ onRegisterClick, onLoginClick, topOffset = 0 })
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const [onlineCount, setOnlineCount] = useState(0)
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 1024)
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 40)
+    const handleResize = () => setIsMobile(window.innerWidth <= 1024)
     window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
+    window.addEventListener('resize', handleResize)
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+      window.removeEventListener('resize', handleResize)
+    }
   }, [])
 
   useEffect(() => {
@@ -35,18 +40,27 @@ export default function Navbar({ onRegisterClick, onLoginClick, topOffset = 0 })
 
   const leftLinks = [
     { label: 'INÍCIO',    href: '#hero' },
-    { label: 'TARIFAS',     href: '#rates' },
+    { label: 'TARIFAS',   href: '#rates' },
     { label: 'RECURSOS',  href: '#features' },
   ]
 
   const rightLinks = [
-    { label: 'DOAR',    href: '#donate' },
-    { label: 'DOWNLOAD',  href: '#download' },
+    { label: 'DOAR',     href: '#donate' },
+    { label: 'DOWNLOAD', href: '#download' },
   ]
 
   const links = [...leftLinks, ...rightLinks]
-
   const discordInvite = "https://discord.gg/EnZJPcXZ5e"
+
+  const navLinkStyle = {
+    fontSize: '0.65rem',
+    fontWeight: '800',
+    letterSpacing: '2px',
+    textTransform: 'uppercase',
+    color: 'rgba(255,255,255,0.7)',
+    transition: '0.3s',
+    textDecoration: 'none'
+  }
 
   return (
     <header style={{
@@ -64,50 +78,57 @@ export default function Navbar({ onRegisterClick, onLoginClick, topOffset = 0 })
     }}>
       <div className="container" style={{
         display: 'grid',
-        gridTemplateColumns: '1fr auto 1fr',
+        gridTemplateColumns: isMobile ? '1fr auto 1fr' : '1fr auto 1fr',
         alignItems: 'center',
         width: '100%',
         position: 'relative',
         gap: '2rem'
       }}>
-        {/* LEFT NAVIGATION */}
-        <nav className="hide-mobile" style={{ 
-          display: 'flex', 
-          gap: '2.5rem', 
-          alignItems: 'center',
-          justifyContent: 'flex-start'
-        }}>
-          {leftLinks.map(l => (
-            <a 
-              key={l.href} 
-              href={l.href} 
-              style={{
-                fontSize: '0.65rem',
-                fontWeight: '800',
-                letterSpacing: '2px',
-                textTransform: 'uppercase',
-                color: 'rgba(255,255,255,0.7)',
-                transition: '0.3s',
-                textDecoration: 'none'
-              }}
-              onMouseEnter={(e) => e.target.style.color = 'var(--gold)'}
-              onMouseLeave={(e) => e.target.style.color = 'rgba(255,255,255,0.7)'}
-            >
-              {l.label}
-            </a>
-          ))}
-        </nav>
 
-        {/* CENTRAL LOGO AREA */}
-        <div style={{ 
-          display: 'flex', 
+        {/* LEFT: nav links (desktop) or hamburger (mobile) */}
+        {isMobile ? (
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'var(--gold)',
+                fontSize: '1.5rem',
+                cursor: 'pointer',
+                zIndex: 2000,
+                padding: '1rem'
+              }}
+            >
+              {menuOpen ? '✕' : '☰'}
+            </button>
+          </div>
+        ) : (
+          <nav style={{ display: 'flex', gap: '2.5rem', alignItems: 'center', justifyContent: 'flex-start' }}>
+            {leftLinks.map(l => (
+              <a
+                key={l.href}
+                href={l.href}
+                style={navLinkStyle}
+                onMouseEnter={(e) => e.target.style.color = 'var(--gold)'}
+                onMouseLeave={(e) => e.target.style.color = 'rgba(255,255,255,0.7)'}
+              >
+                {l.label}
+              </a>
+            ))}
+          </nav>
+        )}
+
+        {/* CENTER: Logo */}
+        <div style={{
+          display: 'flex',
           flexDirection: 'column',
-          alignItems: 'center', 
+          alignItems: 'center',
           justifyContent: 'center',
           zIndex: 1100,
           position: 'relative'
         }}>
-          <div style={{ 
+          <div style={{
             position: 'absolute',
             top: '50%',
             left: '50%',
@@ -115,18 +136,17 @@ export default function Navbar({ onRegisterClick, onLoginClick, topOffset = 0 })
             height: scrolled ? '100px' : '130px',
             transition: 'all 0.5s cubic-bezier(0.2, 1, 0.3, 1)',
           }}>
-            <img 
-              src={logoWhite} 
-              alt="L2 Ikarus Logo" 
-              style={{ 
+            <img
+              src="/assets/images/logo_white.png"
+              alt="L2 Ikarus Logo"
+              style={{
                 height: '100%',
                 width: 'auto',
                 filter: 'drop-shadow(0 0 15px rgba(212, 175, 55, 0.4))',
                 cursor: 'pointer',
-              }} 
+              }}
               onClick={() => window.location.href = '#hero'}
             />
-            {/* Ambient Glow behind logo */}
             <div style={{
               position: 'absolute',
               top: '50%', left: '50%',
@@ -139,164 +159,115 @@ export default function Navbar({ onRegisterClick, onLoginClick, topOffset = 0 })
           </div>
         </div>
 
-        {/* RIGHT NAVIGATION & CTAs */}
-        <div className="hide-mobile" style={{ 
-          display: 'flex', 
-          justifyContent: 'flex-end', 
-          gap: '2.5rem', 
-          alignItems: 'center' 
-        }}>
-          <nav style={{ display: 'flex', gap: '2.5rem', alignItems: 'center' }}>
-            {rightLinks.map(l => (
-              <a 
-                key={l.href} 
-                href={l.href} 
+        {/* RIGHT: links + CTA (desktop) or empty (mobile, menu is on left) */}
+        {isMobile ? (
+          <div />
+        ) : (
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '2.5rem', alignItems: 'center' }}>
+            <nav style={{ display: 'flex', gap: '2.5rem', alignItems: 'center' }}>
+              {rightLinks.map(l => (
+                <a
+                  key={l.href}
+                  href={l.href}
+                  style={navLinkStyle}
+                  onMouseEnter={(e) => e.target.style.color = 'var(--gold)'}
+                  onMouseLeave={(e) => e.target.style.color = 'rgba(255,255,255,0.7)'}
+                >
+                  {l.label}
+                </a>
+              ))}
+            </nav>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', borderLeft: '1px solid rgba(255,255,255,0.1)', paddingLeft: '2rem' }}>
+              <button
+                onClick={onLoginClick}
                 style={{
-                  fontSize: '0.65rem',
-                  fontWeight: '800',
+                  background: 'none',
+                  border: 'none',
+                  color: 'rgba(255,255,255,0.6)',
+                  fontSize: '0.7rem',
+                  fontWeight: '700',
                   letterSpacing: '2px',
-                  textTransform: 'uppercase',
-                  color: 'rgba(255,255,255,0.7)',
-                  transition: '0.3s',
-                  textDecoration: 'none'
+                  cursor: 'pointer',
+                  transition: '0.3s'
                 }}
-                onMouseEnter={(e) => e.target.style.color = 'var(--gold)'}
-                onMouseLeave={(e) => e.target.style.color = 'rgba(255,255,255,0.7)'}
+                onMouseEnter={(e) => e.target.style.color = '#fff'}
+                onMouseLeave={(e) => e.target.style.color = 'rgba(255,255,255,0.6)'}
+              >
+                LOGIN
+              </button>
+
+              <a href="#download" className="btn btn-primary" style={{ padding: '0.6rem 1.5rem', fontSize: '0.65rem' }}>
+                JOGAR AGORA
+              </a>
+            </div>
+          </div>
+        )}
+
+        {/* MOBILE MENU OVERLAY */}
+        {isMobile && (
+          <div style={{
+            position: 'fixed',
+            top: 0, left: 0,
+            width: '100%',
+            height: '100vh',
+            background: 'rgba(5, 5, 8, 0.98)',
+            display: menuOpen ? 'flex' : 'none',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '2rem',
+            zIndex: 1500,
+          }}>
+            {links.map(l => (
+              <a
+                key={l.href}
+                href={l.href}
+                onClick={() => setMenuOpen(false)}
+                className="cinzel"
+                style={{ fontSize: '1.5rem', color: '#fff', textDecoration: 'none', letterSpacing: '4px' }}
               >
                 {l.label}
               </a>
             ))}
-          </nav>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', borderLeft: '1px solid rgba(255,255,255,0.1)', paddingLeft: '2rem' }}>
-            <button 
-              onClick={onLoginClick}
-              style={{ 
-                background: 'none', 
-                border: 'none', 
-                color: 'rgba(255,255,255,0.6)', 
-                fontSize: '0.7rem', 
-                fontWeight: '700', 
-                letterSpacing: '2px',
-                cursor: 'pointer',
-                transition: '0.3s'
+            <a
+              href={discordInvite}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: 'flex', alignItems: 'center', gap: '12px',
+                color: '#fff', textDecoration: 'none', fontSize: '1.2rem',
+                marginTop: '1rem',
+                background: 'rgba(88, 101, 242, 0.2)',
+                padding: '1rem 2rem', borderRadius: '12px',
+                border: '1px solid rgba(88, 101, 242, 0.4)'
               }}
-              onMouseEnter={(e) => e.target.style.color = '#fff'}
-              onMouseLeave={(e) => e.target.style.color = 'rgba(255,255,255,0.6)'}
+            >
+              <DiscordIcon />
+              <span>DISCORD {onlineCount > 0 && `(${onlineCount} ONLINE)`}</span>
+            </a>
+
+            <button
+              onClick={() => { setMenuOpen(false); onLoginClick(); }}
+              style={{
+                background: 'none', border: 'none', color: '#fff',
+                fontSize: '1.2rem', fontWeight: '700', letterSpacing: '4px',
+                cursor: 'pointer', marginTop: '1rem'
+              }}
             >
               LOGIN
             </button>
 
-            <a href="#download" className="btn btn-primary" style={{ padding: '0.6rem 1.5rem', fontSize: '0.65rem' }}>
-              JOGAR AGORA
-            </a>
-          </div>
-        </div>
-
-        {/* MOBILE TOGGLE */}
-        <div className="show-mobile" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <button 
-            onClick={() => setMenuOpen(!menuOpen)}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: 'var(--gold)',
-              fontSize: '1.5rem',
-              cursor: 'pointer',
-              zIndex: 2000,
-              padding: '1rem'
-            }}
-          >
-            {menuOpen ? '✕' : '☰'}
-          </button>
-        </div>
-
-        {/* MOBILE MENU OVERLAY */}
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100vh',
-          background: 'rgba(5, 5, 8, 0.98)',
-          display: menuOpen ? 'flex' : 'none',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: '2rem',
-          zIndex: 1500,
-          transition: 'all 0.4s ease',
-          opacity: menuOpen ? 1 : 0
-        }}>
-          {links.map(l => (
-            <a 
-              key={l.href}
-              href={l.href}
-              onClick={() => setMenuOpen(false)}
-              className="cinzel"
-              style={{
-                fontSize: '1.5rem',
-                color: '#fff',
-                textDecoration: 'none',
-                letterSpacing: '4px'
-              }}
+            <button
+              onClick={() => { setMenuOpen(false); onRegisterClick(); }}
+              className="btn btn-primary"
+              style={{ marginTop: '1rem', width: '200px' }}
             >
-              {l.label}
-            </a>
-          ))}
-          
-          <a 
-            href={discordInvite}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '12px',
-              color: '#fff',
-              textDecoration: 'none',
-              fontSize: '1.2rem',
-              marginTop: '1rem',
-              background: 'rgba(88, 101, 242, 0.2)',
-              padding: '1rem 2rem',
-              borderRadius: '12px',
-              border: '1px solid rgba(88, 101, 242, 0.4)'
-            }}
-          >
-            <DiscordIcon />
-            <span>DISCORD {onlineCount > 0 && `(${onlineCount} ONLINE)`}</span>
-          </a>
-
-          <button 
-            onClick={() => {
-              setMenuOpen(false);
-              onLoginClick();
-            }}
-            style={{ 
-              background: 'none', 
-              border: 'none', 
-              color: '#fff', 
-              fontSize: '1.2rem', 
-              fontWeight: '700', 
-              letterSpacing: '4px',
-              cursor: 'pointer',
-              marginTop: '1rem'
-            }}
-          >
-            LOGIN
-          </button>
-
-          <button 
-            onClick={() => {
-              setMenuOpen(false);
-              onRegisterClick();
-            }}
-            className="btn btn-primary"
-            style={{ marginTop: '1rem', width: '200px' }}
-          >
-            CADASTRO
-          </button>
-        </div>
+              CADASTRO
+            </button>
+          </div>
+        )}
       </div>
     </header>
   )

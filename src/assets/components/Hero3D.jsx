@@ -5,6 +5,7 @@ export default function Hero3D({ onRegisterClick }) {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 1024)
   const [scrollProgress, setScrollProgress] = useState(0)
   const [serverStatus, setServerStatus] = useState({ online: false, players: 0 })
+  const [adminOnline, setAdminOnline] = useState(false)
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 1024)
@@ -20,6 +21,14 @@ export default function Hero3D({ onRegisterClick }) {
         setServerStatus({ online: data.online, players: data.players || 0 })
       } catch (e) {
         setServerStatus({ online: false, players: 0 })
+      }
+
+      try {
+        const discordRes = await fetch('/api/discord')
+        const discordData = await discordRes.json()
+        setAdminOnline(discordData.adminOnline || false)
+      } catch (e) {
+        setAdminOnline(false)
       }
     }
 
@@ -157,6 +166,27 @@ export default function Hero3D({ onRegisterClick }) {
               </div>
               <div className="status-value" style={{ fontSize: '1.5rem' }}>{serverStatus.online ? 'ON-LINE' : 'OFFLINE'}</div>
               <p className="status-meta">{serverStatus.players.toLocaleString()} Heróis Ativos</p>
+            </div>
+
+            {/* CARD ADMIN IKARUS - STATUS DISCORD */}
+            <div className="glass-panel hero-status-card" style={{ borderLeft: `4px solid ${adminOnline ? '#4ade80' : '#ef4444'}`, padding: '1.5rem' }}>
+              <div className="status-header">
+                <span className="status-label">ADMIN</span>
+                <div className="status-dot" style={{
+                  background: adminOnline ? '#4ade80' : '#ef4444',
+                  boxShadow: `0 0 15px ${adminOnline ? '#4ade80' : '#ef4444'}`
+                }} />
+              </div>
+              <div className="status-value" style={{
+                fontSize: '1.1rem',
+                color: adminOnline ? '#4ade80' : '#ef4444',
+                letterSpacing: '2px'
+              }}>
+                IKARUS
+              </div>
+              <p className="status-meta" style={{ marginTop: '0.3rem' }}>
+                {adminOnline ? 'Online no Discord' : 'Offline no Discord'}
+              </p>
             </div>
 
             <div className="glass-panel hero-status-card" style={{ borderLeft: '4px solid var(--gold)', padding: '1.5rem' }}>
