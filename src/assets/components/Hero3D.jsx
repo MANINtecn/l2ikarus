@@ -187,53 +187,6 @@ export default function Hero3D({ onRegisterClick }) {
           </div>
         )}
 
-        {/* 📊 BARRA DE RATES FIXA - ESTILO ELITE */}
-        <div style={{
-          position: 'absolute',
-          bottom: '40px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          width: isMobile ? '90%' : 'auto',
-          display: 'flex',
-          gap: isMobile ? '15px' : '3rem',
-          padding: isMobile ? '1rem' : '1rem 3.5rem',
-          background: 'rgba(5, 5, 8, 0.4)',
-          backdropFilter: 'blur(10px)',
-          borderTop: '1px solid rgba(197, 160, 89, 0.1)',
-          borderBottom: '1px solid rgba(197, 160, 89, 0.1)',
-          zIndex: 20,
-          justifyContent: 'center',
-          animation: 'fadeUp 1s ease-out 1s both'
-        }}>
-          {[
-            { label: 'EXP', value: 'x3' },
-            { label: 'SP', value: 'x3' },
-            { label: 'ADENA', value: 'x2' },
-            { label: 'QUEST', value: 'x1' },
-            { label: 'DROP', value: 'x1' }
-          ].map((rate, i) => (
-            <div key={i} style={{ textAlign: 'center' }}>
-              <div style={{ 
-                fontFamily: 'Cinzel', 
-                fontSize: isMobile ? '1rem' : '1.8rem', 
-                color: 'var(--gold)',
-                fontWeight: '700',
-                lineHeight: 1
-              }}>
-                {rate.value}
-              </div>
-              <div style={{ 
-                fontSize: '0.6rem', 
-                letterSpacing: '3px', 
-                color: 'rgba(255,255,255,0.5)',
-                marginTop: '4px',
-                fontWeight: '800'
-              }}>
-                {rate.label}
-              </div>
-            </div>
-          ))}
-        </div>
       </div>
 
       {/* SCANLINE OVERLAY - Para textura de "monitor antigo/militar" */}
