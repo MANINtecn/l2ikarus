@@ -1,4 +1,4 @@
-const DISCORD_INVITE = 'https://discord.gg/EnZJPcXZ5e'
+const DISCORD_INVITE = 'https://discord.gg/KF5AzGT7Y9'
 
 const STEPS = [
   {

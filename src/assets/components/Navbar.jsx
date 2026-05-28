@@ -30,7 +30,7 @@ export default function Navbar({ onRegisterClick, onLoginClick, topOffset = 0 })
     { label: 'DOWNLOAD',  href: '#download' },
   ]
 
-  const discordInvite = "https://discord.gg/EnZJPcXZ5e"
+  const discordInvite = "https://discord.gg/KF5AzGT7Y9"
 
   const navLinkStyle = {
     fontSize: '0.65rem',

@@ -60,7 +60,7 @@ export default function Footer({ onAdminClick }) {
             <a href="/terms.html" style={{ color: 'var(--text-mute)', fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '2px' }}>Termos de Uso</a>
             <a href="/privacy.html" style={{ color: 'var(--text-mute)', fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '2px' }}>Privacidade</a>
             <a 
-              href="https://discord.gg/EnZJPcXZ5e" 
+              href="https://discord.gg/KF5AzGT7Y9" 
               target="_blank" 
               rel="noopener noreferrer" 
               style={{ color: 'var(--gold)', display: 'flex', alignItems: 'center' }}
