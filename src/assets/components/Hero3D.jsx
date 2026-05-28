@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import sectionImg from '../section-1.jpg.jpg'
-import logoWhite from '../images/logo_white.png'
 
 export default function Hero3D({ onRegisterClick }) {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 1024)
@@ -78,7 +77,7 @@ export default function Hero3D({ onRegisterClick }) {
         textAlign: 'center',
       }}>
         <img
-          src={logoWhite}
+          src="/assets/images/logo_white.png"
           alt="L2 Ikarus"
           style={{
             height: isMobile ? '140px' : '280px',
@@ -107,13 +106,6 @@ export default function Hero3D({ onRegisterClick }) {
           alignItems: isMobile ? 'center' : 'flex-start',
           textAlign: isMobile ? 'center' : 'left',
         }}>
-          <p style={{
-            fontSize: '0.7rem', letterSpacing: '4px', fontWeight: '700',
-            color: 'var(--gold)', textTransform: 'uppercase', marginBottom: '0.75rem',
-          }}>
-            RECONECTE-SE COM A LENDA
-          </p>
-
           <h1 className="cinzel" style={{
             fontSize: isMobile ? '2.2rem' : 'clamp(2.5rem, 6vw, 4.2rem)',
             lineHeight: 1.05, marginBottom: '1.2rem',
@@ -131,7 +123,7 @@ export default function Hero3D({ onRegisterClick }) {
             lineHeight: 1.7,
             textShadow: '0 2px 8px rgba(0,0,0,0.6)',
           }}>
-            A essência do Lineage 2 High-Five em sua forma mais pura. Performance otimizada, estabilidade de elite e a glória dos velhos tempos.
+            Lineage 2 Essence reimaginado. Progressão acelerada, sistema de classes moderno e batalhas épicas sem limite de nível para te travar.
           </p>
 
           <div style={{ display: 'flex', gap: isMobile ? '1rem' : '1.5rem', flexWrap: 'wrap', justifyContent: isMobile ? 'center' : 'flex-start' }}>
