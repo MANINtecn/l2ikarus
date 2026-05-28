@@ -68,12 +68,12 @@ function App() {
             onLoginClick={() => setIsLoginOpen(true)}
           />
           <Hero3D onRegisterClick={() => setIsRegisterOpen(true)} />
-          
+
+          {/* Espaçador — empurra o conteúdo para baixo do hero sem bloquear cliques */}
+          <div style={{ height: '100vh', pointerEvents: 'none', position: 'relative', zIndex: 0 }} />
+
           {/* 📜 CONTEÚDO QUE ROLA SOBRE O HERO */}
           <div ref={containerRef} className="scroll-content-container" style={{ position: 'relative', zIndex: 5, background: 'transparent' }}>
-            {/* Espaçador para o Hero */}
-            <div style={{ height: '100vh', pointerEvents: 'none' }} />
-            
             <div className="section-divider" />
 
             {/* 🏰 SEÇÃO FEATURES - MECÂNICAS AAA */}

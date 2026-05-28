@@ -47,7 +47,7 @@ export default function Hero3D({ onRegisterClick }) {
       {/* VIDEO BACKGROUND */}
       <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
         <video autoPlay muted loop playsInline poster={sectionImg}
-          style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(1.15) saturate(1.2)' }}
+          style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 30%', filter: 'brightness(1.15) saturate(1.2)' }}
         >
           <source src="/assets/video-bg.mp4" type="video/mp4" />
         </video>
