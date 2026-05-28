@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import sectionImg from '../section-1.jpg.jpg'
+import logoWhite from '../images/logo_white.png'
 
 export default function Hero3D({ onRegisterClick }) {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 1024)
@@ -67,6 +68,27 @@ export default function Hero3D({ onRegisterClick }) {
         }} />
       </div>
 
+      {/* LOGO - absolutamente centralizada no hero */}
+      <div style={{
+        position: 'absolute',
+        top: '50%', left: '50%',
+        transform: 'translate(-50%, -50%)',
+        zIndex: 5,
+        pointerEvents: 'none',
+        textAlign: 'center',
+      }}>
+        <img
+          src={logoWhite}
+          alt="L2 Ikarus"
+          style={{
+            height: isMobile ? '140px' : '280px',
+            width: 'auto',
+            filter: 'drop-shadow(0 0 50px rgba(212,175,55,0.6)) drop-shadow(0 0 120px rgba(212,175,55,0.25))',
+            animation: 'logoPulse 4s ease-in-out infinite',
+          }}
+        />
+      </div>
+
       {/* CONTENT */}
       <div className="container" style={{
         height: '100%', position: 'relative', zIndex: 10,
@@ -85,19 +107,6 @@ export default function Hero3D({ onRegisterClick }) {
           alignItems: isMobile ? 'center' : 'flex-start',
           textAlign: isMobile ? 'center' : 'left',
         }}>
-          {/* LOGO GRANDE no hero */}
-          <img
-            src="/assets/images/logo_white.png"
-            alt="L2 Ikarus"
-            style={{
-              height: isMobile ? '110px' : '190px',
-              width: 'auto',
-              marginBottom: isMobile ? '1.5rem' : '2rem',
-              filter: 'drop-shadow(0 0 40px rgba(212,175,55,0.55)) drop-shadow(0 0 80px rgba(212,175,55,0.2))',
-              animation: 'logoPulse 4s ease-in-out infinite',
-            }}
-          />
-
           <p style={{
             fontSize: '0.7rem', letterSpacing: '4px', fontWeight: '700',
             color: 'var(--gold)', textTransform: 'uppercase', marginBottom: '0.75rem',

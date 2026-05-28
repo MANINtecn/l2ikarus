@@ -67,44 +67,24 @@ export default function Navbar({ onRegisterClick, onLoginClick, topOffset = 0 })
         gap: '2rem',
       }}>
 
-        {/* LEFT: Logo pequena + nav links */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '2.5rem' }}>
-          {/* Logo pequena */}
-          <a href="#hero" style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
-            <img
-              src="/assets/images/logo_white.png"
-              alt="L2 Ikarus"
-              style={{
-                height: scrolled ? '36px' : '44px',
-                width: 'auto',
-                transition: 'height 0.35s',
-                filter: 'drop-shadow(0 0 8px rgba(212,175,55,0.5))',
-              }}
-            />
-          </a>
-
-          {/* Divisor */}
-          {!isMobile && (
-            <div style={{ width: '1px', height: '22px', background: 'rgba(255,255,255,0.12)', flexShrink: 0 }} />
-          )}
-
-          {/* Nav links desktop */}
-          {!isMobile && (
-            <nav style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
-              {links.map(l => (
-                <a
-                  key={l.href}
-                  href={l.href}
-                  style={navLinkStyle}
-                  onMouseEnter={e => e.target.style.color = 'var(--gold)'}
-                  onMouseLeave={e => e.target.style.color = 'rgba(255,255,255,0.65)'}
-                >
-                  {l.label}
-                </a>
-              ))}
-            </nav>
-          )}
-        </div>
+        {/* LEFT: nav links desktop */}
+        {!isMobile ? (
+          <nav style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
+            {links.map(l => (
+              <a
+                key={l.href}
+                href={l.href}
+                style={navLinkStyle}
+                onMouseEnter={e => e.target.style.color = 'var(--gold)'}
+                onMouseLeave={e => e.target.style.color = 'rgba(255,255,255,0.65)'}
+              >
+                {l.label}
+              </a>
+            ))}
+          </nav>
+        ) : (
+          <div />
+        )}
 
         {/* RIGHT: CTAs desktop */}
         {!isMobile ? (

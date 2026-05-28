@@ -8,13 +8,10 @@ import Footer from './assets/components/Footer'
 import RegisterModal from './assets/components/RegisterModal'
 import Hero3D from './assets/components/Hero3D'
 import FeaturesTerminal from './assets/components/FeaturesTerminal'
-import RoadmapHolo from './assets/components/RoadmapHolo'
 import DownloadTerminal from './assets/components/DownloadTerminal'
 import DonateTerminal from './assets/components/DonateTerminal'
 import DiscordCommunity from './assets/components/DiscordCommunity'
-import AudioController from './assets/components/AudioController'
 import Preloader from './assets/components/Preloader'
-import ServerGuide from './assets/components/ServerGuide'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -70,19 +67,12 @@ function App() {
             onRegisterClick={() => setIsRegisterOpen(true)} 
             onLoginClick={() => setIsLoginOpen(true)}
           />
-          <AudioController />
           <Hero3D onRegisterClick={() => setIsRegisterOpen(true)} />
           
           {/* 📜 CONTEÚDO QUE ROLA SOBRE O HERO */}
           <div ref={containerRef} className="scroll-content-container" style={{ position: 'relative', zIndex: 5, background: 'transparent' }}>
             {/* Espaçador para o Hero */}
             <div style={{ height: '100vh', pointerEvents: 'none' }} />
-            
-            {/* 📅 SEÇÃO ROADMAP - EVOLUÇÃO ESTRATÉGICA */}
-            <RoadmapHolo />
-
-            {/* 📖 SEÇÃO GUIA - CONHECIMENTO PROIBIDO */}
-            <ServerGuide />
             
             <div className="section-divider" />
 
