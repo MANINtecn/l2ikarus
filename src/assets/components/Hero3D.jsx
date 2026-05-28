@@ -52,17 +52,17 @@ export default function Hero3D({ onRegisterClick }) {
           <source src="/assets/video-bg.mp4" type="video/mp4" />
         </video>
 
-        {/* Overlay mais claro para mostrar mais o background */}
+        {/* Overlay leve — apenas escurece bordas para contraste do texto */}
         <div style={{
           position: 'absolute', inset: 0,
-          background: 'radial-gradient(circle at 55% 50%, transparent 25%, rgba(2,2,8,0.55) 100%), linear-gradient(to bottom, rgba(2,2,8,0.2) 0%, rgba(2,2,8,0.65) 100%)',
+          background: 'linear-gradient(to bottom, rgba(2,2,8,0.1) 0%, rgba(2,2,8,0.45) 100%)',
           zIndex: 1,
         }} />
 
-        {/* Vinheta lateral esquerda para contraste do texto */}
+        {/* Vinheta lateral esquerda suave */}
         <div style={{
           position: 'absolute', inset: 0,
-          background: 'linear-gradient(to right, rgba(2,2,8,0.7) 0%, transparent 55%)',
+          background: 'linear-gradient(to right, rgba(2,2,8,0.5) 0%, transparent 45%)',
           zIndex: 2,
         }} />
       </div>
@@ -161,7 +161,6 @@ export default function Hero3D({ onRegisterClick }) {
               <div className="status-value" style={{ fontSize: '1.4rem' }}>
                 {serverStatus.online ? 'ON-LINE' : 'OFFLINE'}
               </div>
-              <p className="status-meta">{serverStatus.players.toLocaleString()} Heróis Ativos</p>
             </div>
 
             {/* ADMIN IKARUS */}

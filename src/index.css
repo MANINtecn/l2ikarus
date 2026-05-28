@@ -614,8 +614,8 @@ h1, h2, h3, h4, .cinzel {
 
 /* ── ANIMATIONS ── */
 @keyframes logoPulse {
-  0%, 100% { opacity: 0.3; transform: translate(-50%, -50%) scale(1); }
-  50% { opacity: 0.6; transform: translate(-50%, -50%) scale(1.2); }
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.88; transform: scale(1.04); }
 }
 
 @keyframes fadeUp {
