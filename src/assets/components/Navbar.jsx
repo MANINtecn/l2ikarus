@@ -153,7 +153,7 @@ export default function Navbar({ onRegisterClick, onLoginClick, topOffset = 0 })
             flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
             gap: '2rem', zIndex: 1500,
           }}>
-            <img src="/assets/images/logo_white.png" alt="L2 Ikarus" style={{ height: '80px', width: 'auto', marginBottom: '1rem', filter: 'drop-shadow(0 0 15px rgba(212,175,55,0.5))' }} />
+            <img src="/logo.png" alt="L2 Ikarus" style={{ height: '80px', width: 'auto', marginBottom: '1rem', filter: 'drop-shadow(0 0 15px rgba(212,175,55,0.5))' }} />
 
             {links.map(l => (
               <a

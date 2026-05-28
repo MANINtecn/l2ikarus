@@ -47,23 +47,16 @@ export default function Hero3D({ onRegisterClick }) {
       {/* VIDEO BACKGROUND */}
       <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
         <video autoPlay muted loop playsInline poster={sectionImg}
-          style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.9 }}
+          style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(1.15) saturate(1.2)' }}
         >
           <source src="/assets/video-bg.mp4" type="video/mp4" />
         </video>
 
-        {/* Overlay leve — apenas escurece bordas para contraste do texto */}
+        {/* Vinheta mínima apenas para legibilidade do texto */}
         <div style={{
           position: 'absolute', inset: 0,
-          background: 'linear-gradient(to bottom, rgba(2,2,8,0.1) 0%, rgba(2,2,8,0.45) 100%)',
+          background: 'linear-gradient(to right, rgba(2,2,8,0.55) 0%, transparent 50%)',
           zIndex: 1,
-        }} />
-
-        {/* Vinheta lateral esquerda suave */}
-        <div style={{
-          position: 'absolute', inset: 0,
-          background: 'linear-gradient(to right, rgba(2,2,8,0.5) 0%, transparent 45%)',
-          zIndex: 2,
         }} />
       </div>
 
@@ -77,7 +70,7 @@ export default function Hero3D({ onRegisterClick }) {
         textAlign: 'center',
       }}>
         <img
-          src="/assets/images/logo_white.png"
+          src="/logo.png"
           alt="L2 Ikarus"
           style={{
             height: isMobile ? '140px' : '280px',
