@@ -2,6 +2,12 @@
   "cleanUrls": true,
   "rewrites": [
     { "source": "/privacy", "destination": "/privacy.html" },
-    { "source": "/terms", "destination": "/terms.html" }
+    { "source": "/terms", "destination": "/terms.html" },
+    { "source": "/api/auth/google", "destination": "/api/auth?action=google" },
+    { "source": "/api/auth/callback", "destination": "/api/auth?action=callback" },
+    { "source": "/api/auth/me", "destination": "/api/auth?action=me" },
+    { "source": "/api/auth/logout", "destination": "/api/auth?action=logout" },
+    { "source": "/api/register/google", "destination": "/api/register?action=google" },
+    { "source": "/api/register/callback", "destination": "/api/register?action=callback" }
   ]
 }
