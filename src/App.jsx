@@ -24,7 +24,7 @@ function App() {
   const [bannerVisible, setBannerVisible] = useState(true)
   const [adminUser, setAdminUser] = useState(null)
   const [authError, setAuthError] = useState('')
-  const [regResult, setRegResult] = useState(null)
+  const [googleData, setGoogleData] = useState(null)
   const containerRef = useRef(null)
 
   useEffect(() => {
@@ -41,11 +41,11 @@ function App() {
     // Checa parâmetros de URL após OAuth
     const params = new URLSearchParams(window.location.search)
 
-    // Resultado de cadastro via Google
-    if (params.get('reg_result')) {
+    // Volta do Google com e-mail verificado — abre modal com form
+    if (params.get('google_data')) {
       try {
-        const data = JSON.parse(atob(params.get('reg_result').replace(/-/g, '+').replace(/_/g, '/')))
-        setRegResult(data)
+        const data = JSON.parse(atob(params.get('google_data').replace(/-/g, '+').replace(/_/g, '/')))
+        setGoogleData(data)
         setIsRegisterOpen(true)
       } catch {}
       window.history.replaceState({}, '', '/')
@@ -143,8 +143,8 @@ function App() {
           {/* 🆔 MODAL DE CADASTRO - NOVO RECRUTA */}
           <RegisterModal
             isOpen={isRegisterOpen}
-            onClose={() => { setIsRegisterOpen(false); setRegResult(null) }}
-            regResult={regResult}
+            onClose={() => { setIsRegisterOpen(false); setGoogleData(null) }}
+            googleData={googleData}
           />
 
           {/* 🗝️ MODAL DE LOGIN DO JOGADOR */}
@@ -204,8 +204,29 @@ function App() {
               </div>
             </div>
           )}
-        </>
-      )}
+        {/* VOTAÇÃO L2JBrasil */}
+        <a
+          id="top-l2jbrasil"
+          href="https://top.l2jbrasil.com/index.php?a=in&u=ikaruslineagell"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{
+            position: 'fixed', bottom: '1.2rem', right: '1.2rem',
+            zIndex: 9999, width: '118px', display: 'block',
+            opacity: 0.85, transition: 'opacity 0.2s',
+          }}
+          onMouseEnter={e => e.currentTarget.style.opacity = '1'}
+          onMouseLeave={e => e.currentTarget.style.opacity = '0.85'}
+        >
+          <img
+            src="https://top.l2jbrasil.com/button_l.php?u=ikaruslineagell&m=left"
+            alt="Top L2JBrasil Servidores Lineage2"
+            border="0"
+            style={{ width: '100%', display: 'block' }}
+          />
+        </a>
+      </>
+    )}
     </main>
   )
 }

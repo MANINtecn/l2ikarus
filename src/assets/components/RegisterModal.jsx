@@ -9,122 +9,51 @@ const GoogleIcon = () => (
   </svg>
 )
 
-export default function RegisterModal({ isOpen, onClose, regResult, regError }) {
-  const [formData, setFormData] = useState({ login: '', email: '', password: '', confirmPassword: '' })
+const inputStyle = {
+  background: 'rgba(255,255,255,0.03)',
+  border: '1px solid rgba(255,255,255,0.08)',
+  color: '#fff', padding: '0.9rem 1rem',
+  borderRadius: '4px', outline: 'none',
+  fontSize: '0.9rem', width: '100%',
+  boxSizing: 'border-box',
+}
+
+export default function RegisterModal({ isOpen, onClose, googleData }) {
+  const [step, setStep] = useState(googleData ? 'form' : 'start')
+  const [formData, setFormData] = useState({
+    login: '',
+    email: googleData?.email || '',
+    password: '',
+    confirmPassword: '',
+  })
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState({ type: '', text: '' })
-  const [manualMode, setManualMode] = useState(false)
+  const [success, setSuccess] = useState(false)
 
   if (!isOpen) return null
-
-  // Tela de sucesso com credenciais (após OAuth Google)
-  if (regResult) {
-    const isExisting = regResult.existing
-    return (
-      <div style={{
-        position: 'fixed', inset: 0, zIndex: 12000,
-        background: 'rgba(5,5,8,0.97)', display: 'flex', alignItems: 'center', justifyContent: 'center',
-        backdropFilter: 'blur(20px)', padding: '1rem',
-      }}>
-        <div className="glass-panel" style={{
-          padding: '3rem', width: '100%', maxWidth: '440px', textAlign: 'center',
-          border: '1px solid rgba(74,222,128,0.3)',
-          animation: 'fadeUp 0.5s ease-out forwards',
-        }}>
-          <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>
-            {isExisting ? '👋' : '✅'}
-          </div>
-
-          {isExisting ? (
-            <>
-              <h2 className="cinzel" style={{ color: 'var(--gold)', fontSize: '1.5rem', marginBottom: '0.75rem' }}>
-                JÁ CADASTRADO
-              </h2>
-              <p style={{ color: 'var(--text-mute)', fontSize: '0.8rem', marginBottom: '2rem' }}>
-                Este e-mail já possui uma conta.<br />Seu login é:
-              </p>
-              <div style={{
-                background: 'rgba(0,0,0,0.5)', border: '1px solid rgba(197,160,89,0.3)',
-                borderRadius: '8px', padding: '1.2rem', marginBottom: '2rem',
-              }}>
-                <p style={{ fontSize: '0.6rem', color: 'var(--text-mute)', letterSpacing: '3px', marginBottom: '0.5rem' }}>SEU LOGIN</p>
-                <p style={{ color: 'var(--gold)', fontSize: '1.3rem', fontWeight: '900', letterSpacing: '3px' }}>
-                  {regResult.login}
-                </p>
-              </div>
-            </>
-          ) : (
-            <>
-              <h2 className="cinzel" style={{ color: '#4ade80', fontSize: '1.5rem', marginBottom: '0.75rem' }}>
-                CONTA CRIADA!
-              </h2>
-              <p style={{ color: 'var(--text-mute)', fontSize: '0.8rem', marginBottom: '2rem' }}>
-                Bem-vindo, <strong style={{ color: '#fff' }}>{regResult.name}</strong>! Use estas credenciais para entrar no jogo.
-              </p>
-
-              <div style={{
-                background: 'rgba(0,0,0,0.5)', border: '1px solid rgba(197,160,89,0.3)',
-                borderRadius: '8px', padding: '1.5rem', marginBottom: '1rem', textAlign: 'left',
-              }}>
-                <div style={{ marginBottom: '1rem' }}>
-                  <p style={{ fontSize: '0.55rem', color: 'var(--text-mute)', letterSpacing: '3px', marginBottom: '0.3rem' }}>LOGIN DO JOGO</p>
-                  <p style={{ color: 'var(--gold)', fontSize: '1.4rem', fontWeight: '900', letterSpacing: '4px', fontFamily: 'monospace' }}>
-                    {regResult.login}
-                  </p>
-                </div>
-                <div>
-                  <p style={{ fontSize: '0.55rem', color: 'var(--text-mute)', letterSpacing: '3px', marginBottom: '0.3rem' }}>SENHA DO JOGO</p>
-                  <p style={{ color: '#4ade80', fontSize: '1.4rem', fontWeight: '900', letterSpacing: '4px', fontFamily: 'monospace' }}>
-                    {regResult.password}
-                  </p>
-                </div>
-              </div>
-
-              <div style={{
-                background: 'rgba(255,68,68,0.08)', border: '1px solid rgba(255,68,68,0.2)',
-                borderRadius: '6px', padding: '0.9rem', marginBottom: '1.5rem',
-              }}>
-                <p style={{ color: '#ff9999', fontSize: '0.68rem', letterSpacing: '1px' }}>
-                  ⚠ ANOTE AGORA — esta senha não será exibida novamente.
-                </p>
-              </div>
-            </>
-          )}
-
-          <button onClick={onClose} className="btn btn-primary" style={{ width: '100%' }}>
-            ENTENDIDO
-          </button>
-        </div>
-      </div>
-    )
-  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setMessage({ type: '', text: '' })
+
     if (formData.password !== formData.confirmPassword)
       return setMessage({ type: 'error', text: 'As senhas não coincidem.' })
 
     setLoading(true)
     try {
-      const response = await fetch('/api/register', {
+      const res = await fetch('/api/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ login: formData.login, email: formData.email, password: formData.password }),
       })
-      const data = await response.json()
-      if (response.ok) {
-        setMessage({ type: 'success', text: 'CONTA CRIADA! SEJA BEM-VINDO AO REINO.' })
-        setTimeout(() => {
-          onClose()
-          setFormData({ login: '', email: '', password: '', confirmPassword: '' })
-          setMessage({ type: '', text: '' })
-        }, 3000)
+      const data = await res.json()
+      if (res.ok) {
+        setSuccess(true)
       } else {
-        setMessage({ type: 'error', text: data.message || 'FALHA NA CONEXÃO.' })
+        setMessage({ type: 'error', text: data.message || 'Erro ao criar conta.' })
       }
     } catch {
-      setMessage({ type: 'error', text: 'ERRO DE TERMINAL.' })
+      setMessage({ type: 'error', text: 'Erro de conexão. Tente novamente.' })
     } finally {
       setLoading(false)
     }
@@ -146,105 +75,157 @@ export default function RegisterModal({ isOpen, onClose, regResult, regError }) 
           background: 'none', border: 'none', color: '#666', fontSize: '1.5rem', cursor: 'pointer',
         }}>&times;</button>
 
-        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          <h2 className="cinzel" style={{ color: 'var(--gold)', fontSize: '1.8rem', letterSpacing: '4px' }}>NOVO RECRUTA</h2>
-          <p style={{ fontSize: '0.7rem', color: 'var(--text-mute)', letterSpacing: '2px', marginTop: '0.5rem' }}>
-            Inicie sua ascensão no Ikarus
-          </p>
-        </div>
-
-        {/* BOTÃO GOOGLE — OPÇÃO RÁPIDA */}
-        {!manualMode && (
-          <>
-            <a href="/api/register/google" style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.9rem',
-              background: '#fff', color: '#1a1a1a', borderRadius: '8px',
-              padding: '1rem 1.5rem', textDecoration: 'none',
-              fontWeight: '700', fontSize: '0.9rem',
-              boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
-              marginBottom: '1.5rem',
-              transition: 'transform 0.2s, box-shadow 0.2s',
-            }}
-              onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 30px rgba(0,0,0,0.5)' }}
-              onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.4)' }}
-            >
-              <GoogleIcon />
-              Criar conta com Google
-            </a>
-
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-              <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.08)' }} />
-              <span style={{ color: 'var(--text-mute)', fontSize: '0.65rem', letterSpacing: '2px' }}>OU</span>
-              <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.08)' }} />
-            </div>
-
-            <button onClick={() => setManualMode(true)} style={{
-              width: '100%', background: 'none', border: '1px solid rgba(255,255,255,0.1)',
-              color: 'rgba(255,255,255,0.6)', padding: '0.85rem', borderRadius: '6px',
-              fontSize: '0.75rem', letterSpacing: '2px', cursor: 'pointer', transition: 'all 0.2s',
-            }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(197,160,89,0.4)'; e.currentTarget.style.color = '#fff' }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = 'rgba(255,255,255,0.6)' }}
-            >
-              CADASTRO MANUAL
+        {/* SUCESSO */}
+        {success ? (
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>✅</div>
+            <h2 className="cinzel" style={{ color: '#4ade80', fontSize: '1.5rem', marginBottom: '0.75rem' }}>CONTA CRIADA!</h2>
+            <p style={{ color: 'var(--text-mute)', fontSize: '0.85rem', marginBottom: '2rem', lineHeight: 1.6 }}>
+              Bem-vindo ao L2 Ikarus!<br />
+              Entre no jogo com o login <strong style={{ color: 'var(--gold)' }}>{formData.login}</strong> e a senha que você escolheu.
+            </p>
+            <button onClick={onClose} className="btn btn-primary" style={{ width: '100%' }}>
+              ENTENDIDO
             </button>
-          </>
-        )}
-
-        {/* FORMULÁRIO MANUAL */}
-        {manualMode && (
+          </div>
+        ) : (
           <>
-            <button onClick={() => setManualMode(false)} style={{
-              background: 'none', border: 'none', color: 'var(--text-mute)',
-              fontSize: '0.65rem', letterSpacing: '2px', cursor: 'pointer', marginBottom: '1.5rem', padding: 0,
-            }}>← VOLTAR</button>
-
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
-              {[
-                { label: 'Login de Acesso', key: 'login', type: 'text' },
-                { label: 'E-mail', key: 'email', type: 'email' },
-              ].map(f => (
-                <div key={f.key} style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                  <label style={{ fontSize: '0.6rem', letterSpacing: '2px', color: 'var(--text-mute)', textTransform: 'uppercase' }}>{f.label}</label>
-                  <input type={f.type} required value={formData[f.key]}
-                    onChange={e => setFormData({ ...formData, [f.key]: e.target.value })}
-                    style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', color: '#fff', padding: '0.9rem', borderRadius: '4px', outline: 'none', fontSize: '0.9rem' }}
-                  />
-                </div>
-              ))}
-
-              <div style={{ display: 'flex', gap: '1rem' }}>
-                {[
-                  { label: 'Senha', key: 'password' },
-                  { label: 'Confirmar', key: 'confirmPassword' },
-                ].map(f => (
-                  <div key={f.key} style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                    <label style={{ fontSize: '0.6rem', letterSpacing: '2px', color: 'var(--text-mute)', textTransform: 'uppercase' }}>{f.label}</label>
-                    <input type="password" required value={formData[f.key]}
-                      onChange={e => setFormData({ ...formData, [f.key]: e.target.value })}
-                      style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', color: '#fff', padding: '0.9rem', borderRadius: '4px', outline: 'none', fontSize: '0.9rem', width: '100%' }}
-                    />
-                  </div>
-                ))}
-              </div>
-
-              {message.text && (
-                <div style={{
-                  padding: '0.9rem', fontSize: '0.7rem', textAlign: 'center', letterSpacing: '1px',
-                  background: message.type === 'error' ? 'rgba(255,68,68,0.1)' : 'rgba(74,222,128,0.1)',
-                  color: message.type === 'error' ? '#ff4444' : '#4ade80',
-                  border: `1px solid ${message.type === 'error' ? 'rgba(255,68,68,0.2)' : 'rgba(74,222,128,0.2)'}`,
-                }}>
-                  {message.text}
+            <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+              <h2 className="cinzel" style={{ color: 'var(--gold)', fontSize: '1.8rem', letterSpacing: '4px' }}>CRIAR CONTA</h2>
+              {googleData && (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', marginTop: '0.75rem' }}>
+                  <GoogleIcon />
+                  <span style={{ color: '#4ade80', fontSize: '0.72rem', letterSpacing: '1px' }}>
+                    E-mail verificado: {googleData.email}
+                  </span>
                 </div>
               )}
+              {!googleData && step === 'start' && (
+                <p style={{ fontSize: '0.7rem', color: 'var(--text-mute)', letterSpacing: '2px', marginTop: '0.5rem' }}>
+                  Escolha como quer se cadastrar
+                </p>
+              )}
+            </div>
 
-              <button type="submit" className="btn btn-primary" disabled={loading}
-                style={{ width: '100%', marginTop: '0.5rem', padding: '1.1rem' }}
-              >
-                {loading ? 'AUTENTICANDO...' : 'CADASTRAR CONTA'}
-              </button>
-            </form>
+            {/* TELA INICIAL — escolha o método */}
+            {step === 'start' && (
+              <>
+                <a href="/api/register/google" style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.9rem',
+                  background: '#fff', color: '#1a1a1a', borderRadius: '8px',
+                  padding: '1rem 1.5rem', textDecoration: 'none',
+                  fontWeight: '700', fontSize: '0.9rem',
+                  boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
+                  marginBottom: '1.5rem',
+                  transition: 'transform 0.2s',
+                }}
+                  onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
+                  onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
+                >
+                  <GoogleIcon />
+                  Continuar com Google
+                </a>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
+                  <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.08)' }} />
+                  <span style={{ color: 'var(--text-mute)', fontSize: '0.65rem', letterSpacing: '2px' }}>OU</span>
+                  <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.08)' }} />
+                </div>
+
+                <button onClick={() => setStep('form')} style={{
+                  width: '100%', background: 'none', border: '1px solid rgba(255,255,255,0.1)',
+                  color: 'rgba(255,255,255,0.6)', padding: '0.9rem', borderRadius: '6px',
+                  fontSize: '0.75rem', letterSpacing: '2px', cursor: 'pointer', transition: 'all 0.2s',
+                }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(197,160,89,0.5)'; e.currentTarget.style.color = '#fff' }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = 'rgba(255,255,255,0.6)' }}
+                >
+                  CADASTRO MANUAL
+                </button>
+              </>
+            )}
+
+            {/* FORMULÁRIO — aparece após Google ou manual */}
+            {(step === 'form' || googleData) && (
+              <>
+                {step === 'form' && !googleData && (
+                  <button onClick={() => setStep('start')} style={{
+                    background: 'none', border: 'none', color: 'var(--text-mute)',
+                    fontSize: '0.65rem', letterSpacing: '2px', cursor: 'pointer', marginBottom: '1.5rem', padding: 0,
+                  }}>← VOLTAR</button>
+                )}
+
+                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                    <label style={{ fontSize: '0.6rem', letterSpacing: '2px', color: 'var(--text-mute)', textTransform: 'uppercase' }}>
+                      Login do Jogo <span style={{ color: 'rgba(255,255,255,0.3)' }}>(4-16 caracteres)</span>
+                    </label>
+                    <input
+                      type="text" required autoFocus
+                      value={formData.login}
+                      onChange={e => setFormData({ ...formData, login: e.target.value })}
+                      placeholder="Escolha seu login"
+                      style={inputStyle}
+                    />
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                    <label style={{ fontSize: '0.6rem', letterSpacing: '2px', color: 'var(--text-mute)', textTransform: 'uppercase' }}>
+                      E-mail
+                    </label>
+                    <input
+                      type="email" required
+                      value={formData.email}
+                      onChange={e => setFormData({ ...formData, email: e.target.value })}
+                      placeholder="seu@email.com"
+                      readOnly={!!googleData}
+                      style={{ ...inputStyle, opacity: googleData ? 0.6 : 1, cursor: googleData ? 'default' : 'text' }}
+                    />
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '1rem' }}>
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                      <label style={{ fontSize: '0.6rem', letterSpacing: '2px', color: 'var(--text-mute)', textTransform: 'uppercase' }}>Senha</label>
+                      <input
+                        type="password" required
+                        value={formData.password}
+                        onChange={e => setFormData({ ...formData, password: e.target.value })}
+                        placeholder="Mínimo 6 chars"
+                        style={inputStyle}
+                      />
+                    </div>
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                      <label style={{ fontSize: '0.6rem', letterSpacing: '2px', color: 'var(--text-mute)', textTransform: 'uppercase' }}>Confirmar</label>
+                      <input
+                        type="password" required
+                        value={formData.confirmPassword}
+                        onChange={e => setFormData({ ...formData, confirmPassword: e.target.value })}
+                        placeholder="Repita a senha"
+                        style={inputStyle}
+                      />
+                    </div>
+                  </div>
+
+                  {message.text && (
+                    <div style={{
+                      padding: '0.9rem', fontSize: '0.72rem', textAlign: 'center',
+                      background: message.type === 'error' ? 'rgba(255,68,68,0.1)' : 'rgba(74,222,128,0.1)',
+                      color: message.type === 'error' ? '#ff4444' : '#4ade80',
+                      border: `1px solid ${message.type === 'error' ? 'rgba(255,68,68,0.2)' : 'rgba(74,222,128,0.2)'}`,
+                    }}>
+                      {message.text}
+                    </div>
+                  )}
+
+                  <button type="submit" className="btn btn-primary" disabled={loading}
+                    style={{ width: '100%', marginTop: '0.5rem', padding: '1.1rem' }}
+                  >
+                    {loading ? 'CRIANDO CONTA...' : 'CRIAR CONTA'}
+                  </button>
+                </form>
+              </>
+            )}
           </>
         )}
       </div>
