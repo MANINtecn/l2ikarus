@@ -1,5 +1,5 @@
 import crypto from 'crypto'
-import pool from '../_db.js'
+import { getConnection } from '../_db.js'
 
 function verifyJWT(token, secret) {
   try {
@@ -23,7 +23,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const db = await pool.getConnection()
+    const db = await getConnection()
 
     const [online] = await db.query(
       `SELECT char_name, level, classid, account_name
@@ -40,8 +40,6 @@ export default async function handler(req, res) {
        FROM accounts
        ORDER BY lastactive DESC LIMIT 10`
     )
-
-    db.release()
 
     res.status(200).json({
       onlinePlayers: online,
