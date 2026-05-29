@@ -34,6 +34,24 @@ export default function Footer({ onAdminClick }) {
           }}>Elite Gaming Experience</p>
         </div>
 
+        {/* VOTAÇÃO L2JBRASIL */}
+        <a
+          id="top-l2jbrasil-legacy"
+          href="https://top.l2jbrasil.com/index.php?a=in&u=ikaruslineagell"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ opacity: 0.75, transition: 'opacity 0.2s' }}
+          onMouseEnter={e => e.currentTarget.style.opacity = '1'}
+          onMouseLeave={e => e.currentTarget.style.opacity = '0.75'}
+        >
+          <img
+            src="https://top.l2jbrasil.com/button.php?u=ikaruslineagell"
+            alt="Top L2JBrasil Servidores Lineage2"
+            border="0"
+            style={{ display: 'block' }}
+          />
+        </a>
+
         {/* HUD DIVIDER */}
         <div style={{ 
           width: '100%', 
