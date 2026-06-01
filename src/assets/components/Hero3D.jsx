@@ -60,80 +60,82 @@ export default function Hero3D({ onRegisterClick }) {
         }} />
       </div>
 
-      {/* LOGO + BOTÕES — centro do hero */}
-      <div style={{
-        position: 'absolute',
-        top: '42%', left: '50%',
-        transform: 'translate(-50%, -50%)',
-        zIndex: 5,
-        textAlign: 'center',
-        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2rem',
-      }}>
-        <img
-          src="/logo.png"
-          alt="L2 Ikarus"
-          style={{
-            height: isMobile ? '130px' : '260px',
-            width: 'auto',
-            filter: 'drop-shadow(0 0 50px rgba(212,175,55,0.6)) drop-shadow(0 0 120px rgba(212,175,55,0.25))',
-            animation: 'logoPulse 4s ease-in-out infinite',
-          }}
-        />
-
-        {/* BOTÕES abaixo da logo */}
-        <div style={{ display: 'flex', gap: '1.2rem', flexWrap: 'wrap', justifyContent: 'center' }}>
-          <button onClick={onRegisterClick} className="btn btn-primary"
-            style={{ padding: isMobile ? '0.85rem 1.8rem' : '1rem 2.5rem', fontSize: '0.75rem', letterSpacing: '2px' }}
-          >
-            CRIAR CONTA
-          </button>
-          <a href="#download" className="btn btn-ghost"
-            style={{ padding: isMobile ? '0.85rem 1.8rem' : '1rem 2.5rem', fontSize: '0.75rem', letterSpacing: '2px' }}
-          >
-            BAIXAR JOGO
-          </a>
-        </div>
-      </div>
-
-      {/* CONTENT */}
+      {/* CONTENT — 3 colunas: texto | logo+botões | cards */}
       <div className="container" style={{
         height: '100%', position: 'relative', zIndex: 10,
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        gap: '2rem',
         paddingTop: isMobile ? '80px' : '100px',
         opacity: 1 - scrollProgress,
         transform: `translateY(${scrollProgress * -40}px)`,
         transition: 'opacity 0.1s linear',
       }}>
 
-        {/* LEFT CONTENT */}
+        {/* COLUNA ESQUERDA — título e descrição */}
         <div style={{
-          maxWidth: isMobile ? '100%' : '580px',
-          zIndex: 10, position: 'relative',
+          flex: '0 0 auto', maxWidth: isMobile ? '100%' : '360px',
           display: 'flex', flexDirection: 'column',
           alignItems: isMobile ? 'center' : 'flex-start',
           textAlign: isMobile ? 'center' : 'left',
         }}>
           <h1 className="cinzel" style={{
-            fontSize: isMobile ? '2.2rem' : 'clamp(2.5rem, 6vw, 4.2rem)',
+            fontSize: isMobile ? '2.2rem' : 'clamp(2rem, 4.5vw, 3.5rem)',
             lineHeight: 1.05, marginBottom: '1.2rem',
-            textShadow: '0 8px 30px rgba(0,0,0,0.7)',
-            color: '#fff',
+            textShadow: '0 8px 30px rgba(0,0,0,0.7)', color: '#fff',
           }}>
             L2 IKARUS
           </h1>
-
           <p style={{
-            fontSize: isMobile ? '0.9rem' : '1.05rem',
-            marginBottom: isMobile ? '2rem' : '3rem',
-            maxWidth: isMobile ? '280px' : '480px',
-            color: 'rgba(255,255,255,0.7)',
-            lineHeight: 1.7,
+            fontSize: isMobile ? '0.9rem' : '0.95rem',
+            marginBottom: 0,
+            color: 'rgba(255,255,255,0.7)', lineHeight: 1.7,
             textShadow: '0 2px 8px rgba(0,0,0,0.6)',
           }}>
             Lineage 2 Essence reimaginado. Progressão acelerada, sistema de classes moderno e batalhas épicas sem limite de nível para te travar.
           </p>
-
         </div>
+
+        {/* COLUNA CENTRAL — logo + botões (só desktop) */}
+        {!isMobile && (
+          <div style={{
+            flex: '1 1 auto',
+            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2rem',
+          }}>
+            <img
+              src="/logo.png"
+              alt="L2 Ikarus"
+              style={{
+                height: '240px', width: 'auto',
+                filter: 'drop-shadow(0 0 50px rgba(212,175,55,0.6)) drop-shadow(0 0 120px rgba(212,175,55,0.25))',
+                animation: 'logoPulse 4s ease-in-out infinite',
+              }}
+            />
+            <div style={{ display: 'flex', gap: '1.2rem' }}>
+              <button onClick={onRegisterClick} className="btn btn-primary"
+                style={{ padding: '1rem 2rem', fontSize: '0.75rem', letterSpacing: '2px' }}
+              >
+                CRIAR CONTA
+              </button>
+              <a href="#download" className="btn btn-ghost"
+                style={{ padding: '1rem 2rem', fontSize: '0.75rem', letterSpacing: '2px' }}
+              >
+                BAIXAR JOGO
+              </a>
+            </div>
+          </div>
+        )}
+
+        {/* MOBILE — logo + botões abaixo do texto */}
+        {isMobile && (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem', marginTop: '1.5rem' }}>
+            <img src="/logo.png" alt="L2 Ikarus" style={{ height: '130px', width: 'auto', filter: 'drop-shadow(0 0 30px rgba(212,175,55,0.5))', animation: 'logoPulse 4s ease-in-out infinite' }} />
+            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+              <button onClick={onRegisterClick} className="btn btn-primary" style={{ padding: '0.85rem 1.8rem', fontSize: '0.75rem' }}>CRIAR CONTA</button>
+              <a href="#download" className="btn btn-ghost" style={{ padding: '0.85rem 1.8rem', fontSize: '0.75rem' }}>BAIXAR JOGO</a>
+            </div>
+          </div>
+        )}
+
 
         {/* RIGHT: Status cards — apenas desktop */}
         {!isMobile && (
