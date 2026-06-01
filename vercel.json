@@ -8,6 +8,9 @@
     { "source": "/api/auth/me", "destination": "/api/auth?action=me" },
     { "source": "/api/auth/logout", "destination": "/api/auth?action=logout" },
     { "source": "/api/register/google", "destination": "/api/register?action=google" },
-    { "source": "/api/register/callback", "destination": "/api/register?action=callback" }
+    { "source": "/api/register/callback", "destination": "/api/register?action=callback" },
+    { "source": "/api/player/login", "destination": "/api/player?action=login" },
+    { "source": "/api/player/me", "destination": "/api/player?action=me" },
+    { "source": "/api/player/logout", "destination": "/api/player?action=logout" }
   ]
 }
