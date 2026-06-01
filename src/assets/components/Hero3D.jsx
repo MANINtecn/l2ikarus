@@ -60,25 +60,39 @@ export default function Hero3D({ onRegisterClick }) {
         }} />
       </div>
 
-      {/* LOGO - absolutamente centralizada no hero */}
+      {/* LOGO + BOTÕES — centro do hero */}
       <div style={{
         position: 'absolute',
-        top: '50%', left: '50%',
+        top: '42%', left: '50%',
         transform: 'translate(-50%, -50%)',
         zIndex: 5,
-        pointerEvents: 'none',
         textAlign: 'center',
+        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2rem',
       }}>
         <img
           src="/logo.png"
           alt="L2 Ikarus"
           style={{
-            height: isMobile ? '140px' : '280px',
+            height: isMobile ? '130px' : '260px',
             width: 'auto',
             filter: 'drop-shadow(0 0 50px rgba(212,175,55,0.6)) drop-shadow(0 0 120px rgba(212,175,55,0.25))',
             animation: 'logoPulse 4s ease-in-out infinite',
           }}
         />
+
+        {/* BOTÕES abaixo da logo */}
+        <div style={{ display: 'flex', gap: '1.2rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+          <button onClick={onRegisterClick} className="btn btn-primary"
+            style={{ padding: isMobile ? '0.85rem 1.8rem' : '1rem 2.5rem', fontSize: '0.75rem', letterSpacing: '2px' }}
+          >
+            CRIAR CONTA
+          </button>
+          <a href="#download" className="btn btn-ghost"
+            style={{ padding: isMobile ? '0.85rem 1.8rem' : '1rem 2.5rem', fontSize: '0.75rem', letterSpacing: '2px' }}
+          >
+            BAIXAR JOGO
+          </a>
+        </div>
       </div>
 
       {/* CONTENT */}
@@ -119,18 +133,6 @@ export default function Hero3D({ onRegisterClick }) {
             Lineage 2 Essence reimaginado. Progressão acelerada, sistema de classes moderno e batalhas épicas sem limite de nível para te travar.
           </p>
 
-          <div style={{ display: 'flex', gap: isMobile ? '1rem' : '1.5rem', flexWrap: 'wrap', justifyContent: isMobile ? 'center' : 'flex-start' }}>
-            <button onClick={onRegisterClick} className="btn btn-primary"
-              style={{ padding: isMobile ? '0.85rem 1.8rem' : '1rem 2.5rem', fontSize: '0.75rem', letterSpacing: '2px' }}
-            >
-              CRIAR CONTA
-            </button>
-            <a href="#download" className="btn btn-ghost"
-              style={{ padding: isMobile ? '0.85rem 1.8rem' : '1rem 2.5rem', fontSize: '0.75rem', letterSpacing: '2px' }}
-            >
-              BAIXAR JOGO
-            </a>
-          </div>
         </div>
 
         {/* RIGHT: Status cards — apenas desktop */}
