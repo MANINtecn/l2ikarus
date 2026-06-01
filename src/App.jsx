@@ -206,7 +206,7 @@ function App() {
           )}
         {/* VOTAÇÃO L2JBrasil */}
         <div style={{
-          position: 'fixed', bottom: '1.5rem', right: '1.5rem',
+          position: 'fixed', bottom: '1.5rem', left: '1.5rem',
           zIndex: 9999, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px',
         }}>
           <span style={{
