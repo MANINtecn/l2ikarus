@@ -221,7 +221,7 @@ function App() {
           <img
             src="https://top.l2jbrasil.com/button_l.php?u=ikaruslineagell&m=left"
             alt="Top L2JBrasil Servidores Lineage2"
-            border="0"
+            referrerPolicy="no-referrer"
             style={{ width: '100%', display: 'block' }}
           />
         </a>

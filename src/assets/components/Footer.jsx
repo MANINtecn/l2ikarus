@@ -47,7 +47,7 @@ export default function Footer({ onAdminClick }) {
           <img
             src="https://top.l2jbrasil.com/button.php?u=ikaruslineagell"
             alt="Top L2JBrasil Servidores Lineage2"
-            border="0"
+            referrerPolicy="no-referrer"
             style={{ display: 'block' }}
           />
         </a>
