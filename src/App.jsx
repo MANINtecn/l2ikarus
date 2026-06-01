@@ -205,26 +205,39 @@ function App() {
             </div>
           )}
         {/* VOTAÇÃO L2JBrasil */}
-        <a
-          id="top-l2jbrasil"
-          href="https://top.l2jbrasil.com/index.php?a=in&u=ikaruslineagell"
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{
-            position: 'fixed', bottom: '1.2rem', right: '1.2rem',
-            zIndex: 9999, width: '118px', display: 'block',
-            opacity: 0.85, transition: 'opacity 0.2s',
-          }}
-          onMouseEnter={e => e.currentTarget.style.opacity = '1'}
-          onMouseLeave={e => e.currentTarget.style.opacity = '0.85'}
-        >
-          <img
-            src="https://top.l2jbrasil.com/button_l.php?u=ikaruslineagell&m=left"
-            alt="Top L2JBrasil Servidores Lineage2"
-            referrerPolicy="no-referrer"
-            style={{ width: '100%', display: 'block' }}
-          />
-        </a>
+        <div style={{
+          position: 'fixed', bottom: '1.5rem', right: '1.5rem',
+          zIndex: 9999, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px',
+        }}>
+          <span style={{
+            background: 'rgba(197,160,89,0.15)', border: '1px solid rgba(197,160,89,0.4)',
+            color: 'var(--gold)', fontSize: '0.55rem', fontWeight: '700',
+            letterSpacing: '2px', padding: '3px 10px', borderRadius: '20px',
+            textTransform: 'uppercase', whiteSpace: 'nowrap',
+          }}>
+            🏆 Vote e Ganhe Recompensas
+          </span>
+          <a
+            id="top-l2jbrasil"
+            href="https://top.l2jbrasil.com/index.php?a=in&u=ikaruslineagell"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              width: '200px', display: 'block',
+              opacity: 0.9, transition: 'opacity 0.2s, transform 0.2s',
+              filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.5))',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.opacity = '1'; e.currentTarget.style.transform = 'translateY(-2px)' }}
+            onMouseLeave={e => { e.currentTarget.style.opacity = '0.9'; e.currentTarget.style.transform = 'translateY(0)' }}
+          >
+            <img
+              src="https://top.l2jbrasil.com/button_l.php?u=ikaruslineagell&m=left"
+              alt="Top L2JBrasil Servidores Lineage2"
+              referrerPolicy="no-referrer"
+              style={{ width: '100%', display: 'block', borderRadius: '6px' }}
+            />
+          </a>
+        </div>
       </>
     )}
     </main>
