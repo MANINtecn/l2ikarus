@@ -91,7 +91,7 @@ export default function Hero3D({ onRegisterClick }) {
             color: 'rgba(255,255,255,0.7)', lineHeight: 1.7,
             textShadow: '0 2px 8px rgba(0,0,0,0.6)',
           }}>
-            Lineage 2 Essence reimaginado. Progressão acelerada, sistema de classes moderno e batalhas épicas sem limite de nível para te travar.
+            Você lembra do primeiro siege. Da aliança que traiu. Do PvP que fez o coração acelerar. O reino não esqueceu de você.
           </p>
         </div>
 
