@@ -61,7 +61,7 @@ export default async function handler(req, res) {
       const db = await getConnection()
       const hashedPass = crypto.createHash('sha1').update(password).digest('base64')
       const [rows] = await db.query(
-        'SELECT login, email, access_level FROM accounts WHERE login = ? AND password = ?',
+        'SELECT login, email FROM accounts WHERE login = ? AND password = ?',
         [login, hashedPass]
       )
       if (rows.length === 0) return res.status(401).json({ error: 'Login ou senha incorretos' })

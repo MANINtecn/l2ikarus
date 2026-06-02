@@ -49,6 +49,12 @@ export default function RegisterModal({ isOpen, onClose, googleData }) {
       const data = await res.json()
       if (res.ok) {
         setSuccess(true)
+        // Loga automaticamente após cadastro
+        await fetch('/api/player/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ login: formData.login, password: formData.password }),
+        })
       } else {
         setMessage({ type: 'error', text: data.message || 'Erro ao criar conta.' })
       }
@@ -84,8 +90,11 @@ export default function RegisterModal({ isOpen, onClose, googleData }) {
               Bem-vindo ao L2 Ikarus!<br />
               Entre no jogo com o login <strong style={{ color: 'var(--gold)' }}>{formData.login}</strong> e a senha que você escolheu.
             </p>
-            <button onClick={onClose} className="btn btn-primary" style={{ width: '100%' }}>
-              ENTENDIDO
+            <button onClick={() => { onClose(); window.location.reload() }} className="btn btn-primary" style={{ width: '100%', marginBottom: '0.75rem' }}>
+              ACESSAR MEU PAINEL
+            </button>
+            <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'var(--text-mute)', fontSize: '0.7rem', cursor: 'pointer', letterSpacing: '2px' }}>
+              FECHAR
             </button>
           </div>
         ) : (
