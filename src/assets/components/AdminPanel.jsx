@@ -5,7 +5,13 @@ const TABS = [
   { id: 'players', label: 'ONLINE' },
   { id: 'accounts', label: 'CONTAS' },
   { id: 'ranking', label: 'RANKING' },
+  { id: 'codes', label: 'CÓDIGOS' },
 ]
+
+const inputStyleAdmin = {
+  background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)',
+  padding: '0.7rem 0.9rem', color: '#fff', fontSize: '0.8rem', borderRadius: '5px', outline: 'none',
+}
 
 const StatCard = ({ label, value, color = 'var(--gold)' }) => (
   <div className="glass-panel" style={{ padding: '1.4rem', borderLeft: `3px solid ${color}` }}>
@@ -56,6 +62,9 @@ export default function AdminPanel({ user, onLogout }) {
   const [charLoading, setCharLoading] = useState(false)
   const [playersDebug, setPlayersDebug] = useState(null)
   const [charTab, setCharTab] = useState('dados')
+  const [codes, setCodes] = useState([])
+  const [newCode, setNewCode] = useState({ code: '', items: '', description: '', maxUses: '' })
+  const [codeMsg, setCodeMsg] = useState('')
   const [deleteConfirm, setDeleteConfirm] = useState(null) // { objectId, name }
   const [deletePass, setDeletePass] = useState('')
   const [deleteMsg, setDeleteMsg] = useState('')
@@ -82,6 +91,9 @@ export default function AdminPanel({ user, onLogout }) {
       } else if (t === 'ranking') {
         const r = await fetch('/api/admin/ranking').then(x => x.json())
         setRanking(r)
+      } else if (t === 'codes') {
+        const r = await fetch('/api/admin/codes').then(x => x.json())
+        setCodes(r.codes || [])
       }
     } catch {}
     setLoading(false)
@@ -157,6 +169,41 @@ export default function AdminPanel({ user, onLogout }) {
     } else {
       setDeleteMsg('✗ ' + r.error)
     }
+  }
+
+  const createCode = async () => {
+    setCodeMsg('')
+    const r = await fetch('/api/admin/code-create', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newCode),
+    }).then(x => x.json())
+    if (r.success) {
+      setCodeMsg('✓ ' + r.message)
+      setNewCode({ code: '', items: '', description: '', maxUses: '' })
+      fetchTab('codes')
+    } else {
+      setCodeMsg('✗ ' + r.error)
+    }
+    setTimeout(() => setCodeMsg(''), 4000)
+  }
+
+  const toggleCode = async (code, active) => {
+    await fetch('/api/admin/code-toggle', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code, active }),
+    })
+    fetchTab('codes')
+  }
+
+  const deleteCode = async (code) => {
+    const password = prompt('Senha de confirmação para deletar o código:')
+    if (!password) return
+    const r = await fetch('/api/admin/code-delete', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code, password }),
+    }).then(x => x.json())
+    if (r.success) fetchTab('codes')
+    else alert(r.error)
   }
 
   const fmtTime = (secs) => {
@@ -379,6 +426,60 @@ export default function AdminPanel({ user, onLogout }) {
                 rows={ranking[rankTab]}
                 emptyMsg="Nenhum dado de ranking"
               />
+            </div>
+          </div>
+        )}
+
+        {/* CÓDIGOS PROMOCIONAIS */}
+        {!loading && tab === 'codes' && (
+          <div>
+            {/* Criar novo código */}
+            <div className="glass-panel" style={{ padding: '1.5rem', marginBottom: '1.5rem' }}>
+              <p style={{ fontSize: '0.58rem', color: 'var(--gold)', letterSpacing: '3px', marginBottom: '1rem' }}>CRIAR NOVO CÓDIGO</p>
+              {codeMsg && <div style={{ background: codeMsg.startsWith('✓') ? 'rgba(74,222,128,0.1)' : 'rgba(255,68,68,0.1)', border: `1px solid ${codeMsg.startsWith('✓') ? 'rgba(74,222,128,0.3)' : 'rgba(255,68,68,0.3)'}`, padding: '0.7rem 1rem', marginBottom: '1rem', color: codeMsg.startsWith('✓') ? '#4ade80' : '#ef4444', fontSize: '0.75rem' }}>{codeMsg}</div>}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem', marginBottom: '0.8rem' }}>
+                <input value={newCode.code} onChange={e => setNewCode({ ...newCode, code: e.target.value.toUpperCase() })} placeholder="CÓDIGO (ex: STREAMER10)" style={inputStyleAdmin} />
+                <input value={newCode.maxUses} onChange={e => setNewCode({ ...newCode, maxUses: e.target.value })} placeholder="Máx. usos (0 = ilimitado)" type="number" style={inputStyleAdmin} />
+              </div>
+              <input value={newCode.items} onChange={e => setNewCode({ ...newCode, items: e.target.value })} placeholder="Itens: itemId:quantidade;itemId:quantidade  (ex: 57:1000000;3470:5)" style={{ ...inputStyleAdmin, width: '100%', marginBottom: '0.8rem', boxSizing: 'border-box' }} />
+              <input value={newCode.description} onChange={e => setNewCode({ ...newCode, description: e.target.value })} placeholder="Descrição (opcional)" style={{ ...inputStyleAdmin, width: '100%', marginBottom: '1rem', boxSizing: 'border-box' }} />
+              <button onClick={createCode} className="btn btn-primary" style={{ padding: '0.7rem 2rem', fontSize: '0.7rem' }}>CRIAR CÓDIGO</button>
+              <p style={{ fontSize: '0.62rem', color: 'var(--text-mute)', marginTop: '0.8rem', lineHeight: 1.5 }}>
+                💡 Jogador resgata no jogo digitando <span style={{ color: 'var(--gold)' }}>.code SEUCODIGO</span> — recebe os itens uma única vez por conta.
+              </p>
+            </div>
+
+            {/* Lista de códigos */}
+            <div className="glass-panel" style={{ padding: '1.5rem' }}>
+              <p style={{ fontSize: '0.58rem', color: 'var(--text-mute)', letterSpacing: '3px', marginBottom: '1rem' }}>CÓDIGOS CRIADOS — {codes.length}</p>
+              {codes.length === 0
+                ? <p style={{ color: 'var(--text-mute)', fontSize: '0.8rem' }}>Nenhum código criado ainda.</p>
+                : <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.76rem' }}>
+                    <thead>
+                      <tr>
+                        {['CÓDIGO', 'ITENS', 'USOS', 'STATUS', 'AÇÕES'].map(h => (
+                          <th key={h} style={{ textAlign: 'left', padding: '0.5rem', borderBottom: '1px solid rgba(255,255,255,0.06)', color: 'var(--text-mute)', fontSize: '0.55rem', letterSpacing: '2px' }}>{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {codes.map((c, i) => (
+                        <tr key={i} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
+                          <td style={{ padding: '0.6rem 0.5rem', color: 'var(--gold)', fontWeight: '700', fontFamily: 'monospace' }}>{c.code}</td>
+                          <td style={{ padding: '0.6rem 0.5rem', color: 'rgba(255,255,255,0.6)', fontFamily: 'monospace', fontSize: '0.68rem' }}>{c.items}</td>
+                          <td style={{ padding: '0.6rem 0.5rem', color: 'rgba(255,255,255,0.7)' }}>{c.uses}{c.max_uses > 0 ? `/${c.max_uses}` : ''}</td>
+                          <td style={{ padding: '0.6rem 0.5rem' }}>
+                            <span style={{ color: c.active ? '#4ade80' : 'var(--text-mute)', fontSize: '0.6rem' }}>{c.active ? '● ATIVO' : '○ INATIVO'}</span>
+                          </td>
+                          <td style={{ padding: '0.6rem 0.5rem', display: 'flex', gap: '0.4rem' }}>
+                            <button onClick={() => toggleCode(c.code, !c.active)} style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', padding: '0.3rem 0.7rem', borderRadius: '4px', fontSize: '0.58rem', cursor: 'pointer' }}>{c.active ? 'DESATIVAR' : 'ATIVAR'}</button>
+                            <button onClick={() => deleteCode(c.code)} style={{ background: 'rgba(255,68,68,0.1)', border: '1px solid rgba(255,68,68,0.2)', color: '#ef4444', padding: '0.3rem 0.7rem', borderRadius: '4px', fontSize: '0.58rem', cursor: 'pointer' }}>DEL</button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+              }
             </div>
           </div>
         )}

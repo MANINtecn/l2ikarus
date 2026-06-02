@@ -59,7 +59,8 @@ function getAction(req) {
 }
 
 export default async function handler(req, res) {
-  if (!requireAdmin(req, res)) return
+  const admin = requireAdmin(req, res)
+  if (!admin) return
   const action = getAction(req)
   const db = await getConnection()
 
@@ -241,6 +242,49 @@ export default async function handler(req, res) {
       if (!objectId) return res.status(400).json({ error: 'objectId obrigatório' })
       await db.query('DELETE FROM items WHERE object_id = ?', [objectId])
       return res.status(200).json({ success: true, message: 'Item deletado.' })
+    }
+
+    // GET /api/admin/codes — lista códigos promocionais
+    if (action === 'codes') {
+      const [rows] = await db.query('SELECT * FROM promo_codes ORDER BY created_at DESC LIMIT 100')
+      return res.status(200).json({ codes: rows })
+    }
+
+    // POST /api/admin/code-create — cria código
+    if (action === 'code-create' && req.method === 'POST') {
+      const { code, items, description, maxUses } = req.body || {}
+      if (!code || !items) return res.status(400).json({ error: 'Código e itens obrigatórios' })
+      // valida formato items "id:count;id:count"
+      if (!/^(\d+:\d+;?)+$/.test(items.replace(/\s/g, ''))) {
+        return res.status(400).json({ error: 'Formato de itens inválido. Use: itemId:quantidade;itemId:quantidade' })
+      }
+      try {
+        await db.query(
+          'INSERT INTO promo_codes (code, items, description, active, max_uses, uses, created_by, created_at) VALUES (?, ?, ?, 1, ?, 0, ?, ?)',
+          [code.trim(), items.replace(/\s/g, ''), description || null, parseInt(maxUses) || 0, admin.email || 'admin', Math.floor(Date.now() / 1000)]
+        )
+        return res.status(200).json({ success: true, message: `Código ${code} criado.` })
+      } catch (e) {
+        if (e.code === 'ER_DUP_ENTRY') return res.status(409).json({ error: 'Este código já existe.' })
+        throw e
+      }
+    }
+
+    // POST /api/admin/code-toggle — ativa/desativa código
+    if (action === 'code-toggle' && req.method === 'POST') {
+      const { code, active } = req.body || {}
+      await db.query('UPDATE promo_codes SET active = ? WHERE code = ?', [active ? 1 : 0, code])
+      return res.status(200).json({ success: true, message: active ? 'Código ativado.' : 'Código desativado.' })
+    }
+
+    // POST /api/admin/code-delete — deleta código
+    if (action === 'code-delete' && req.method === 'POST') {
+      const { code, password } = req.body || {}
+      const adminPass = process.env.ADMIN_ACTION_PASSWORD
+      if (!adminPass || password !== adminPass) return res.status(403).json({ error: 'Senha incorreta' })
+      await db.query('DELETE FROM promo_codes WHERE code = ?', [code])
+      await db.query('DELETE FROM promo_redeemed WHERE code = ?', [code])
+      return res.status(200).json({ success: true, message: 'Código removido.' })
     }
 
     // POST /api/admin/ban — banir conta
