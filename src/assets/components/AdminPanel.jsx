@@ -54,6 +54,7 @@ export default function AdminPanel({ user, onLogout }) {
   const [banMsg, setBanMsg] = useState('')
   const [charModal, setCharModal] = useState(null)
   const [charLoading, setCharLoading] = useState(false)
+  const [playersDebug, setPlayersDebug] = useState(null)
   const [deleteConfirm, setDeleteConfirm] = useState(null) // { objectId, name }
   const [deletePass, setDeletePass] = useState('')
   const [deleteMsg, setDeleteMsg] = useState('')
@@ -72,9 +73,11 @@ export default function AdminPanel({ user, onLogout }) {
         ])
         setStats(s)
         setPlayers(p.players || [])
+        setPlayersDebug(p.debug || p.error || null)
       } else if (t === 'players') {
         const r = await fetch('/api/admin/players').then(x => x.json())
         setPlayers(r.players || [])
+        setPlayersDebug(r.debug || r.error || null)
       } else if (t === 'ranking') {
         const r = await fetch('/api/admin/ranking').then(x => x.json())
         setRanking(r)
@@ -238,7 +241,14 @@ export default function AdminPanel({ user, onLogout }) {
               JOGADORES ONLINE — {players.length} ATIVOS · <span style={{ color: 'rgba(255,255,255,0.3)' }}>clique no jogador para ver detalhes</span>
             </p>
             {players.length === 0
-              ? <p style={{ color: 'var(--text-mute)', fontSize: '0.8rem' }}>Nenhum jogador online</p>
+              ? <div>
+                  <p style={{ color: 'var(--text-mute)', fontSize: '0.8rem' }}>Nenhum jogador online</p>
+                  {playersDebug && (
+                    <pre style={{ marginTop: '1rem', background: 'rgba(0,0,0,0.4)', padding: '1rem', borderRadius: '6px', color: '#60a5fa', fontSize: '0.7rem', overflow: 'auto' }}>
+                      DEBUG: {JSON.stringify(playersDebug, null, 2)}
+                    </pre>
+                  )}
+                </div>
               : <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.78rem' }}>
                   <thead>
                     <tr>
