@@ -1,5 +1,9 @@
 import crypto from 'crypto'
 import { getConnection } from './_db.js'
+import { createRequire } from 'module'
+const require = createRequire(import.meta.url)
+const ITEMS_DB = require('./items-db.json')
+const itemName = (id) => ITEMS_DB[String(id)] || `Item #${id}`
 
 const L2_CLASSES = {
   0:'Fighter',1:'Warrior',2:'Gladiator',3:'Warlord',4:'Knight',5:'Paladin',6:'Dark Avenger',
@@ -128,11 +132,13 @@ export default async function handler(req, res) {
       }
 
       const equipped = items.filter(i => i.loc === 'PAPERDOLL').map(i => ({
-        itemId: i.item_id, count: i.count, enchant: i.enchant_level,
+        objectId: i.object_id, itemId: i.item_id, name: itemName(i.item_id),
+        count: i.count, enchant: i.enchant_level,
         slot: SLOTS[i.loc_data] || `Slot ${i.loc_data}`,
       }))
       const inventory = items.filter(i => i.loc === 'INVENTORY').map(i => ({
-        itemId: i.item_id, count: i.count, enchant: i.enchant_level,
+        objectId: i.object_id, itemId: i.item_id, name: itemName(i.item_id),
+        count: i.count, enchant: i.enchant_level,
       }))
 
       return res.status(200).json({
@@ -193,6 +199,25 @@ export default async function handler(req, res) {
         pvp: pvp.map(r => ({ name: r.char_name, level: r.level, class: L2_CLASSES[r.classid] || `Class ${r.classid}`, pvp: r.pvpkills, pk: r.pkkills })),
         pk: pk.map(r => ({ name: r.char_name, level: r.level, class: L2_CLASSES[r.classid] || `Class ${r.classid}`, pvp: r.pvpkills, pk: r.pkkills })),
       })
+    }
+
+    // POST /api/admin/set-gm — dar/remover GM do personagem
+    if (action === 'set-gm' && req.method === 'POST') {
+      const { objId, gm } = req.body || {}
+      if (!objId) return res.status(400).json({ error: 'objId obrigatório' })
+      const level = gm ? 100 : 0
+      await db.query('UPDATE characters SET accesslevel = ? WHERE obj_Id = ?', [level, objId])
+      return res.status(200).json({ success: true, message: gm ? 'GM concedido.' : 'GM removido.' })
+    }
+
+    // POST /api/admin/delete-item — deletar item com senha
+    if (action === 'delete-item' && req.method === 'POST') {
+      const { objectId, password } = req.body || {}
+      const adminPass = process.env.ADMIN_ACTION_PASSWORD
+      if (!adminPass || password !== adminPass) return res.status(403).json({ error: 'Senha incorreta' })
+      if (!objectId) return res.status(400).json({ error: 'objectId obrigatório' })
+      await db.query('DELETE FROM items WHERE object_id = ?', [objectId])
+      return res.status(200).json({ success: true, message: 'Item deletado.' })
     }
 
     // POST /api/admin/ban — banir conta

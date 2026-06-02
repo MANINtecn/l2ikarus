@@ -19,6 +19,8 @@
     { "source": "/api/admin/ranking", "destination": "/api/admin?action=ranking" },
     { "source": "/api/admin/ban", "destination": "/api/admin?action=ban" },
     { "source": "/api/admin/unban", "destination": "/api/admin?action=unban" },
-    { "source": "/api/admin/char-detail", "destination": "/api/admin?action=char-detail" }
+    { "source": "/api/admin/char-detail", "destination": "/api/admin?action=char-detail" },
+    { "source": "/api/admin/set-gm", "destination": "/api/admin?action=set-gm" },
+    { "source": "/api/admin/delete-item", "destination": "/api/admin?action=delete-item" }
   ]
 }

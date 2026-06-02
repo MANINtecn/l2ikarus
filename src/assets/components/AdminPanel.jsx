@@ -54,6 +54,10 @@ export default function AdminPanel({ user, onLogout }) {
   const [banMsg, setBanMsg] = useState('')
   const [charModal, setCharModal] = useState(null)
   const [charLoading, setCharLoading] = useState(false)
+  const [deleteConfirm, setDeleteConfirm] = useState(null) // { objectId, name }
+  const [deletePass, setDeletePass] = useState('')
+  const [deleteMsg, setDeleteMsg] = useState('')
+  const [actionMsg, setActionMsg] = useState('')
 
   useEffect(() => { fetchTab(tab) }, [tab])
 
@@ -103,11 +107,46 @@ export default function AdminPanel({ user, onLogout }) {
   const openCharDetail = async (objId) => {
     setCharLoading(true)
     setCharModal({ loading: true })
+    setActionMsg('')
     try {
       const r = await fetch(`/api/admin/char-detail?objId=${objId}`).then(x => x.json())
       setCharModal(r)
     } catch { setCharModal(null) }
     setCharLoading(false)
+  }
+
+  const setGM = async (objId, gm) => {
+    const r = await fetch('/api/admin/set-gm', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ objId, gm }),
+    }).then(x => x.json())
+    setActionMsg(r.message || r.error)
+    setTimeout(() => setActionMsg(''), 3000)
+  }
+
+  const confirmDelete = (item) => {
+    setDeleteConfirm(item)
+    setDeletePass('')
+    setDeleteMsg('')
+  }
+
+  const deleteItem = async () => {
+    const r = await fetch('/api/admin/delete-item', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ objectId: deleteConfirm.objectId, password: deletePass }),
+    }).then(x => x.json())
+    if (r.success) {
+      setDeleteMsg('✓ ' + r.message)
+      // Atualiza inventário removendo o item
+      setCharModal(prev => ({
+        ...prev,
+        inventory: prev.inventory.filter(i => i.objectId !== deleteConfirm.objectId),
+        equipped: prev.equipped.filter(i => i.objectId !== deleteConfirm.objectId),
+      }))
+      setTimeout(() => { setDeleteConfirm(null); setDeleteMsg('') }, 1500)
+    } else {
+      setDeleteMsg('✗ ' + r.error)
+    }
   }
 
   const fmtTime = (secs) => {
@@ -329,6 +368,30 @@ export default function AdminPanel({ user, onLogout }) {
       </div>
       </div>
 
+      {/* MODAL CONFIRMAÇÃO DELETE */}
+      {deleteConfirm && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 40000, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setDeleteConfirm(null)}>
+          <div className="glass-panel" style={{ padding: '2rem', width: '100%', maxWidth: '380px', border: '1px solid rgba(255,68,68,0.4)' }} onClick={e => e.stopPropagation()}>
+            <h4 className="cinzel" style={{ color: '#ef4444', marginBottom: '0.5rem' }}>DELETAR ITEM</h4>
+            <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.8rem', marginBottom: '1.5rem' }}>
+              <strong style={{ color: '#fff' }}>{deleteConfirm.name}</strong>{deleteConfirm.enchant > 0 ? ` +${deleteConfirm.enchant}` : ''} · Qty: {deleteConfirm.count?.toLocaleString()}
+            </p>
+            <input
+              type="password" placeholder="Senha de confirmação"
+              value={deletePass}
+              onChange={e => setDeletePass(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && deleteItem()}
+              style={{ width: '100%', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,68,68,0.3)', padding: '0.8rem', color: '#fff', fontSize: '0.85rem', borderRadius: '4px', outline: 'none', marginBottom: '1rem', boxSizing: 'border-box' }}
+            />
+            {deleteMsg && <p style={{ color: deleteMsg.startsWith('✓') ? '#4ade80' : '#ef4444', fontSize: '0.75rem', marginBottom: '0.75rem' }}>{deleteMsg}</p>}
+            <div style={{ display: 'flex', gap: '0.75rem' }}>
+              <button onClick={deleteItem} style={{ flex: 1, background: 'rgba(255,68,68,0.15)', border: '1px solid rgba(255,68,68,0.4)', color: '#ef4444', padding: '0.7rem', borderRadius: '5px', fontSize: '0.7rem', letterSpacing: '2px', cursor: 'pointer' }}>CONFIRMAR</button>
+              <button onClick={() => setDeleteConfirm(null)} style={{ flex: 1, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.5)', padding: '0.7rem', borderRadius: '5px', fontSize: '0.7rem', letterSpacing: '2px', cursor: 'pointer' }}>CANCELAR</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* MODAL DETALHES DO PERSONAGEM */}
       {charModal && (
         <div style={{
@@ -346,7 +409,7 @@ export default function AdminPanel({ user, onLogout }) {
               <p style={{ color: 'var(--text-mute)', letterSpacing: '3px' }}>CARREGANDO...</p>
             ) : charModal.char ? (
               <>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
                   <div>
                     <h3 className="cinzel" style={{ color: 'var(--gold)', fontSize: '1.3rem', margin: 0 }}>{charModal.char.name}</h3>
                     <p style={{ color: 'var(--text-mute)', fontSize: '0.68rem', margin: '4px 0 0', letterSpacing: '2px' }}>
@@ -354,6 +417,20 @@ export default function AdminPanel({ user, onLogout }) {
                     </p>
                   </div>
                   <button onClick={() => setCharModal(null)} style={{ background: 'none', border: 'none', color: '#666', fontSize: '1.4rem', cursor: 'pointer' }}>✕</button>
+                </div>
+
+                {/* AÇÕES */}
+                {actionMsg && <div style={{ background: 'rgba(74,222,128,0.1)', border: '1px solid rgba(74,222,128,0.3)', padding: '0.6rem 1rem', marginBottom: '1rem', color: '#4ade80', fontSize: '0.75rem' }}>{actionMsg}</div>}
+                <div style={{ display: 'flex', gap: '0.6rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+                  <button onClick={() => setGM(charModal.char.objId, true)} style={{ background: 'rgba(197,160,89,0.1)', border: '1px solid rgba(197,160,89,0.3)', color: 'var(--gold)', padding: '0.5rem 1rem', borderRadius: '5px', fontSize: '0.65rem', letterSpacing: '2px', cursor: 'pointer' }}>
+                    ⭐ DAR GM
+                  </button>
+                  <button onClick={() => setGM(charModal.char.objId, false)} style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.5)', padding: '0.5rem 1rem', borderRadius: '5px', fontSize: '0.65rem', letterSpacing: '2px', cursor: 'pointer' }}>
+                    REMOVER GM
+                  </button>
+                  <button onClick={() => banAccount(charModal.char.account, true)} style={{ background: 'rgba(255,68,68,0.1)', border: '1px solid rgba(255,68,68,0.3)', color: '#ef4444', padding: '0.5rem 1rem', borderRadius: '5px', fontSize: '0.65rem', letterSpacing: '2px', cursor: 'pointer' }}>
+                    🔨 BANIR CONTA
+                  </button>
                 </div>
 
                 {/* STATS */}
@@ -379,16 +456,17 @@ export default function AdminPanel({ user, onLogout }) {
                 {charModal.equipped?.length > 0 && (
                   <div style={{ marginBottom: '1.5rem' }}>
                     <p style={{ fontSize: '0.58rem', color: 'var(--text-mute)', letterSpacing: '3px', marginBottom: '0.75rem' }}>EQUIPAMENTO</p>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '0.5rem' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '0.5rem' }}>
                       {charModal.equipped.map((item, i) => (
                         <div key={i} style={{ background: 'rgba(197,160,89,0.06)', border: '1px solid rgba(197,160,89,0.15)', padding: '0.6rem 0.8rem', borderRadius: '6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <div>
-                            <p style={{ fontSize: '0.6rem', color: 'var(--text-mute)', margin: 0 }}>{item.slot}</p>
-                            <p style={{ fontSize: '0.78rem', color: '#fff', margin: '2px 0 0', fontFamily: 'monospace' }}>ID: {item.itemId}</p>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <p style={{ fontSize: '0.55rem', color: 'var(--text-mute)', margin: 0 }}>{item.slot}</p>
+                            <p style={{ fontSize: '0.78rem', color: '#fff', margin: '2px 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.name}</p>
                           </div>
-                          {item.enchant > 0 && (
-                            <span style={{ color: 'var(--gold)', fontWeight: '900', fontSize: '0.85rem' }}>+{item.enchant}</span>
-                          )}
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0 }}>
+                            {item.enchant > 0 && <span style={{ color: 'var(--gold)', fontWeight: '900' }}>+{item.enchant}</span>}
+                            <button onClick={() => confirmDelete(item)} style={{ background: 'rgba(255,68,68,0.1)', border: '1px solid rgba(255,68,68,0.2)', color: '#ef4444', width: '22px', height: '22px', borderRadius: '4px', fontSize: '0.7rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -401,11 +479,11 @@ export default function AdminPanel({ user, onLogout }) {
                     <p style={{ fontSize: '0.58rem', color: 'var(--text-mute)', letterSpacing: '3px', marginBottom: '0.75rem' }}>
                       INVENTÁRIO ({charModal.inventory.length} itens)
                     </p>
-                    <div style={{ maxHeight: '200px', overflow: 'auto' }}>
+                    <div style={{ maxHeight: '220px', overflow: 'auto' }}>
                       <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.75rem' }}>
                         <thead>
                           <tr>
-                            {['ITEM ID', 'QUANTIDADE', 'ENCANT'].map(h => (
+                            {['NOME', 'QUANTIDADE', 'ENCANT', ''].map(h => (
                               <th key={h} style={{ textAlign: 'left', padding: '0.4rem 0.5rem', borderBottom: '1px solid rgba(255,255,255,0.06)', color: 'var(--text-mute)', fontSize: '0.55rem', letterSpacing: '2px' }}>{h}</th>
                             ))}
                           </tr>
@@ -413,10 +491,13 @@ export default function AdminPanel({ user, onLogout }) {
                         <tbody>
                           {charModal.inventory.map((item, i) => (
                             <tr key={i} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
-                              <td style={{ padding: '0.4rem 0.5rem', color: '#fff', fontFamily: 'monospace' }}>{item.itemId}</td>
+                              <td style={{ padding: '0.4rem 0.5rem', color: '#fff' }}>{item.name}</td>
                               <td style={{ padding: '0.4rem 0.5rem', color: 'rgba(255,255,255,0.7)' }}>{item.count?.toLocaleString()}</td>
                               <td style={{ padding: '0.4rem 0.5rem', color: item.enchant > 0 ? 'var(--gold)' : 'var(--text-mute)' }}>
                                 {item.enchant > 0 ? `+${item.enchant}` : '—'}
+                              </td>
+                              <td style={{ padding: '0.4rem 0.5rem' }}>
+                                <button onClick={() => confirmDelete(item)} style={{ background: 'rgba(255,68,68,0.1)', border: '1px solid rgba(255,68,68,0.2)', color: '#ef4444', padding: '2px 8px', borderRadius: '4px', fontSize: '0.6rem', cursor: 'pointer' }}>DEL</button>
                               </td>
                             </tr>
                           ))}
