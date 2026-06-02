@@ -11,6 +11,13 @@
     { "source": "/api/register/callback", "destination": "/api/register?action=callback" },
     { "source": "/api/player/login", "destination": "/api/player?action=login" },
     { "source": "/api/player/me", "destination": "/api/player?action=me" },
-    { "source": "/api/player/logout", "destination": "/api/player?action=logout" }
+    { "source": "/api/player/logout", "destination": "/api/player?action=logout" },
+    { "source": "/api/admin/stats", "destination": "/api/admin?action=stats" },
+    { "source": "/api/admin/players", "destination": "/api/admin?action=players" },
+    { "source": "/api/admin/accounts", "destination": "/api/admin?action=accounts" },
+    { "source": "/api/admin/chars", "destination": "/api/admin?action=chars" },
+    { "source": "/api/admin/ranking", "destination": "/api/admin?action=ranking" },
+    { "source": "/api/admin/ban", "destination": "/api/admin?action=ban" },
+    { "source": "/api/admin/unban", "destination": "/api/admin?action=unban" }
   ]
 }
