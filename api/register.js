@@ -74,7 +74,8 @@ export default async function handler(req, res) {
     const hashedPassword = crypto.createHash('sha1').update(password).digest('base64')
     const [existing] = await pool.query('SELECT login FROM accounts WHERE login = ?', [login])
     if (existing.length > 0) return res.status(409).json({ message: 'Este login já está em uso' })
-    await pool.query('INSERT INTO accounts (login, password, email) VALUES (?, ?, ?)', [login, hashedPassword, email ?? ''])
+    const createdTime = Math.floor(Date.now() / 1000)
+    await pool.query('INSERT INTO accounts (login, password, email, created_time) VALUES (?, ?, ?, ?)', [login, hashedPassword, email ?? '', createdTime])
     return res.status(200).json({ success: true, message: 'Conta criada com sucesso!' })
   } catch (err) {
     console.error('Register error:', err)
