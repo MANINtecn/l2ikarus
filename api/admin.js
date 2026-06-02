@@ -89,25 +89,24 @@ export default async function handler(req, res) {
 
     // GET /api/admin/players — jogadores online
     if (action === 'players') {
-      // Debug: conta total e por valor de online para entender divergência
-      const [[{ cnt }]] = await db.query('SELECT COUNT(*) as cnt FROM characters WHERE online = 1')
-      const [byVal] = await db.query('SELECT online, COUNT(*) as c FROM characters GROUP BY online')
-
       const [rows] = await db.query(
-        `SELECT obj_Id, char_name, level, classid, account_name, pvpkills, pkkills, onlinetime
-         FROM characters WHERE online > 0 ORDER BY char_name ASC LIMIT 100`
+        `SELECT * FROM characters WHERE online > 0 ORDER BY char_name ASC LIMIT 100`
       )
+      // Descobre os nomes reais das colunas
+      const cols = rows.length > 0 ? Object.keys(rows[0]) : []
+      const pick = (r, ...names) => { for (const n of names) if (r[n] !== undefined) return r[n]; return null }
+
       return res.status(200).json({
-        debug: { countOnline1: cnt, onlineValues: byVal },
+        debug: rows.length === 0 ? 'Nenhuma linha com online>0' : { colunas: cols },
         players: rows.map(r => ({
-          objId: r.obj_Id,
-          name: r.char_name,
-          level: r.level,
-          class: L2_CLASSES[r.classid] || `Class ${r.classid}`,
-          account: r.account_name,
-          pvp: r.pvpkills,
-          pk: r.pkkills,
-          onlineTime: r.onlinetime,
+          objId: pick(r, 'obj_Id', 'obj_id', 'charId', 'char_id', 'objId'),
+          name: pick(r, 'char_name', 'charName', 'name'),
+          level: pick(r, 'level'),
+          class: L2_CLASSES[pick(r, 'classid', 'classId', 'class_id')] || `Class ${pick(r, 'classid', 'classId', 'class_id')}`,
+          account: pick(r, 'account_name', 'accountName', 'account'),
+          pvp: pick(r, 'pvpkills', 'pvpKills', 'pvp_kills'),
+          pk: pick(r, 'pkkills', 'pkKills', 'pk_kills'),
+          onlineTime: pick(r, 'onlinetime', 'onlineTime', 'online_time'),
         }))
       })
     }
