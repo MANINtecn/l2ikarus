@@ -55,6 +55,7 @@ export default function AdminPanel({ user, onLogout }) {
   const [charModal, setCharModal] = useState(null)
   const [charLoading, setCharLoading] = useState(false)
   const [playersDebug, setPlayersDebug] = useState(null)
+  const [charTab, setCharTab] = useState('dados')
   const [deleteConfirm, setDeleteConfirm] = useState(null) // { objectId, name }
   const [deletePass, setDeletePass] = useState('')
   const [deleteMsg, setDeleteMsg] = useState('')
@@ -116,6 +117,7 @@ export default function AdminPanel({ user, onLogout }) {
     setCharLoading(true)
     setCharModal({ loading: true })
     setActionMsg('')
+    setCharTab('dados')
     try {
       const r = await fetch(`/api/admin/char-detail?objId=${objId}`).then(x => x.json())
       setCharModal(r)
@@ -447,8 +449,25 @@ export default function AdminPanel({ user, onLogout }) {
                   </button>
                 </div>
 
+                {/* ABAS DO MODAL */}
+                <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                  {[
+                    { id: 'dados', label: 'DADOS' },
+                    { id: 'equip', label: `EQUIPAMENTO (${charModal.equipped?.length || 0})` },
+                    { id: 'inv', label: `INVENTÁRIO (${charModal.inventory?.length || 0})` },
+                  ].map(t => (
+                    <button key={t.id} onClick={() => setCharTab(t.id)} style={{
+                      background: 'none', border: 'none', padding: '0.6rem 1rem',
+                      color: charTab === t.id ? 'var(--gold)' : 'rgba(255,255,255,0.4)',
+                      fontSize: '0.6rem', letterSpacing: '2px', cursor: 'pointer',
+                      borderBottom: `2px solid ${charTab === t.id ? 'var(--gold)' : 'transparent'}`,
+                    }}>{t.label}</button>
+                  ))}
+                </div>
+
                 {/* STATS */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.8rem', marginBottom: '1.5rem' }}>
+                {charTab === 'dados' && (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.8rem', marginBottom: '0.5rem' }}>
                   {[
                     { l: 'PVP', v: charModal.char.pvp, c: '#60a5fa' },
                     { l: 'PK', v: charModal.char.pk, c: '#ef4444' },
@@ -465,11 +484,12 @@ export default function AdminPanel({ user, onLogout }) {
                     </div>
                   ))}
                 </div>
+                )}
 
                 {/* EQUIPAMENTO */}
-                {charModal.equipped?.length > 0 && (
-                  <div style={{ marginBottom: '1.5rem' }}>
-                    <p style={{ fontSize: '0.58rem', color: 'var(--text-mute)', letterSpacing: '3px', marginBottom: '0.75rem' }}>EQUIPAMENTO</p>
+                {charTab === 'equip' && (
+                  <div style={{ marginBottom: '0.5rem' }}>
+                    {charModal.equipped?.length === 0 && <p style={{ color: 'var(--text-mute)', fontSize: '0.8rem' }}>Nenhum item equipado.</p>}
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '0.5rem' }}>
                       {charModal.equipped.map((item, i) => (
                         <div key={i} style={{ background: 'rgba(197,160,89,0.06)', border: '1px solid rgba(197,160,89,0.15)', padding: '0.6rem 0.8rem', borderRadius: '6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -488,12 +508,10 @@ export default function AdminPanel({ user, onLogout }) {
                 )}
 
                 {/* INVENTÁRIO */}
-                {charModal.inventory?.length > 0 && (
+                {charTab === 'inv' && (
                   <div>
-                    <p style={{ fontSize: '0.58rem', color: 'var(--text-mute)', letterSpacing: '3px', marginBottom: '0.75rem' }}>
-                      INVENTÁRIO ({charModal.inventory.length} itens)
-                    </p>
-                    <div style={{ maxHeight: '220px', overflow: 'auto' }}>
+                    {charModal.inventory?.length === 0 && <p style={{ color: 'var(--text-mute)', fontSize: '0.8rem' }}>Inventário vazio.</p>}
+                    <div style={{ maxHeight: '380px', overflow: 'auto' }}>
                       <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.75rem' }}>
                         <thead>
                           <tr>
