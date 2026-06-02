@@ -70,7 +70,7 @@ export default function RegisterModal({ isOpen, onClose, googleData }) {
       position: 'fixed', inset: 0, zIndex: 12000,
       background: 'rgba(5,5,8,0.95)', display: 'flex', alignItems: 'center', justifyContent: 'center',
       backdropFilter: 'blur(20px)', padding: '1rem',
-    }} onClick={onClose}>
+    }}>
       <div className="glass-panel" style={{
         padding: '3rem', width: '100%', maxWidth: '450px', position: 'relative',
         animation: 'fadeUp 0.5s ease-out forwards',
