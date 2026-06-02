@@ -366,7 +366,6 @@ export default function AdminPanel({ user, onLogout }) {
           </div>
         )}
       </div>
-      </div>
 
       {/* MODAL CONFIRMAÇÃO DELETE */}
       {deleteConfirm && (
