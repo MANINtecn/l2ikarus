@@ -86,11 +86,12 @@ export default async function handler(req, res) {
     // GET /api/admin/players — jogadores online
     if (action === 'players') {
       const [rows] = await db.query(
-        `SELECT char_name, level, classid, account_name, pvpkills, pkkills, onlinetime, x, y, z
+        `SELECT obj_Id, char_name, level, classid, account_name, pvpkills, pkkills, onlinetime
          FROM characters WHERE online = 1 ORDER BY level DESC LIMIT 100`
       )
       return res.status(200).json({
         players: rows.map(r => ({
+          objId: r.obj_Id,
           name: r.char_name,
           level: r.level,
           class: L2_CLASSES[r.classid] || `Class ${r.classid}`,
@@ -99,6 +100,52 @@ export default async function handler(req, res) {
           pk: r.pkkills,
           onlineTime: r.onlinetime,
         }))
+      })
+    }
+
+    // GET /api/admin/char-detail?objId=X — detalhes + inventário do personagem
+    if (action === 'char-detail') {
+      const objId = req.query.objId
+      if (!objId) return res.status(400).json({ error: 'objId obrigatório' })
+
+      const [[char]] = await db.query(
+        `SELECT obj_Id, char_name, level, classid, account_name, pvpkills, pkkills,
+                onlinetime, exp, sp, x, y, z, curHp, maxHp, curMp, maxMp, karma, sex, race
+         FROM characters WHERE obj_Id = ?`, [objId]
+      )
+      if (!char) return res.status(404).json({ error: 'Personagem não encontrado' })
+
+      const [items] = await db.query(
+        `SELECT item_id, count, enchant_level, loc, loc_data
+         FROM items WHERE owner_id = ? AND loc IN ('PAPERDOLL','INVENTORY')
+         ORDER BY loc DESC, loc_data ASC LIMIT 200`, [objId]
+      )
+
+      const SLOTS = {
+        1:'Mão Dir',2:'Ouvido Esq',3:'Ouvido Dir',4:'Pescoço',5:'Anel Esq',6:'Anel Dir',
+        7:'Cabeça',8:'Mão Esq',9:'Luvas',10:'Peito',11:'Pernas',12:'Botas',13:'Capa',14:'2 Mãos',
+        19:'Cabelo',20:'Chapéu',22:'Pulseira Dir',23:'Pulseira Esq',
+      }
+
+      const equipped = items.filter(i => i.loc === 'PAPERDOLL').map(i => ({
+        itemId: i.item_id, count: i.count, enchant: i.enchant_level,
+        slot: SLOTS[i.loc_data] || `Slot ${i.loc_data}`,
+      }))
+      const inventory = items.filter(i => i.loc === 'INVENTORY').map(i => ({
+        itemId: i.item_id, count: i.count, enchant: i.enchant_level,
+      }))
+
+      return res.status(200).json({
+        char: {
+          objId: char.obj_Id, name: char.char_name, level: char.level,
+          class: L2_CLASSES[char.classid] || `Class ${char.classid}`,
+          account: char.account_name, pvp: char.pvpkills, pk: char.pkkills,
+          onlineTime: char.onlinetime, exp: char.exp, sp: char.sp,
+          hp: `${char.curHp}/${char.maxHp}`, mp: `${char.curMp}/${char.maxMp}`,
+          karma: char.karma, sex: char.sex === 0 ? 'Masculino' : 'Feminino',
+          race: ['Humano','Elfo','Dark Elf','Orc','Anão'][char.race] || `Race ${char.race}`,
+        },
+        equipped, inventory,
       })
     }
 

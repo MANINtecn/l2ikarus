@@ -52,6 +52,8 @@ export default function AdminPanel({ user, onLogout }) {
   const [search, setSearch] = useState('')
   const [loading, setLoading] = useState(true)
   const [banMsg, setBanMsg] = useState('')
+  const [charModal, setCharModal] = useState(null)
+  const [charLoading, setCharLoading] = useState(false)
 
   useEffect(() => { fetchTab(tab) }, [tab])
 
@@ -96,6 +98,16 @@ export default function AdminPanel({ user, onLogout }) {
     setBanMsg(r.message || r.error)
     setTimeout(() => setBanMsg(''), 3000)
     searchAccounts()
+  }
+
+  const openCharDetail = async (objId) => {
+    setCharLoading(true)
+    setCharModal({ loading: true })
+    try {
+      const r = await fetch(`/api/admin/char-detail?objId=${objId}`).then(x => x.json())
+      setCharModal(r)
+    } catch { setCharModal(null) }
+    setCharLoading(false)
   }
 
   const fmtTime = (secs) => {
@@ -144,7 +156,9 @@ export default function AdminPanel({ user, onLogout }) {
         {!loading && tab === 'overview' && stats && (
           <div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1.2rem', marginBottom: '1.5rem' }}>
-              <StatCard label="ONLINE AGORA" value={stats.online} color="#4ade80" />
+              <div onClick={() => setTab('players')} style={{ cursor: 'pointer' }}>
+                <StatCard label="ONLINE AGORA ↗" value={stats.online} color="#4ade80" />
+              </div>
               <StatCard label="TOTAL DE CONTAS" value={stats.total_accounts?.toLocaleString()} />
               <StatCard label="CADASTROS HOJE" value={stats.today} color="#60a5fa" />
               <StatCard label="CADASTROS 7 DIAS" value={stats.week} color="#c084fc" />
@@ -177,21 +191,38 @@ export default function AdminPanel({ user, onLogout }) {
         {!loading && tab === 'players' && (
           <div className="glass-panel" style={{ padding: '1.5rem' }}>
             <p style={{ fontSize: '0.58rem', color: 'var(--text-mute)', letterSpacing: '3px', marginBottom: '1rem' }}>
-              JOGADORES ONLINE — {players.length} ATIVOS
+              JOGADORES ONLINE — {players.length} ATIVOS · <span style={{ color: 'rgba(255,255,255,0.3)' }}>clique no jogador para ver detalhes</span>
             </p>
-            <Table
-              cols={[
-                { key: 'name', label: 'PERSONAGEM', color: () => 'var(--gold)' },
-                { key: 'class', label: 'CLASSE' },
-                { key: 'level', label: 'NV', color: () => '#4ade80' },
-                { key: 'pvp', label: 'PVP', color: () => '#60a5fa' },
-                { key: 'pk', label: 'PK', color: () => '#ef4444' },
-                { key: 'onlineTime', label: 'TEMPO', render: r => fmtTime(r.onlineTime) },
-                { key: 'account', label: 'CONTA', color: () => 'var(--text-mute)' },
-              ]}
-              rows={players}
-              emptyMsg="Nenhum jogador online"
-            />
+            {players.length === 0
+              ? <p style={{ color: 'var(--text-mute)', fontSize: '0.8rem' }}>Nenhum jogador online</p>
+              : <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.78rem' }}>
+                  <thead>
+                    <tr>
+                      {['PERSONAGEM','CLASSE','NV','PVP','PK','TEMPO','CONTA'].map(h => (
+                        <th key={h} style={{ textAlign: 'left', padding: '0.5rem', borderBottom: '1px solid rgba(255,255,255,0.06)', color: 'var(--text-mute)', fontSize: '0.58rem', letterSpacing: '2px' }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {players.map((p, i) => (
+                      <tr key={i}
+                        onClick={() => openCharDetail(p.objId)}
+                        style={{ borderBottom: '1px solid rgba(255,255,255,0.03)', cursor: 'pointer', transition: 'background 0.15s' }}
+                        onMouseEnter={e => e.currentTarget.style.background = 'rgba(197,160,89,0.05)'}
+                        onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                      >
+                        <td style={{ padding: '0.6rem 0.5rem', color: 'var(--gold)', fontWeight: '700' }}>{p.name}</td>
+                        <td style={{ padding: '0.6rem 0.5rem', color: 'rgba(255,255,255,0.7)' }}>{p.class}</td>
+                        <td style={{ padding: '0.6rem 0.5rem', color: '#4ade80' }}>{p.level}</td>
+                        <td style={{ padding: '0.6rem 0.5rem', color: '#60a5fa' }}>{p.pvp}</td>
+                        <td style={{ padding: '0.6rem 0.5rem', color: '#ef4444' }}>{p.pk}</td>
+                        <td style={{ padding: '0.6rem 0.5rem', color: 'rgba(255,255,255,0.5)' }}>{fmtTime(p.onlineTime)}</td>
+                        <td style={{ padding: '0.6rem 0.5rem', color: 'var(--text-mute)' }}>{p.account}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+            }
           </div>
         )}
 
@@ -296,6 +327,111 @@ export default function AdminPanel({ user, onLogout }) {
           </div>
         )}
       </div>
+      </div>
+
+      {/* MODAL DETALHES DO PERSONAGEM */}
+      {charModal && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 30000,
+          background: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          backdropFilter: 'blur(10px)', padding: '1rem',
+        }} onClick={() => setCharModal(null)}>
+          <div className="glass-panel" style={{
+            width: '100%', maxWidth: '700px', maxHeight: '85vh', overflow: 'auto',
+            padding: '2rem', position: 'relative',
+            border: '1px solid rgba(197,160,89,0.3)',
+          }} onClick={e => e.stopPropagation()}>
+
+            {charModal.loading ? (
+              <p style={{ color: 'var(--text-mute)', letterSpacing: '3px' }}>CARREGANDO...</p>
+            ) : charModal.char ? (
+              <>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
+                  <div>
+                    <h3 className="cinzel" style={{ color: 'var(--gold)', fontSize: '1.3rem', margin: 0 }}>{charModal.char.name}</h3>
+                    <p style={{ color: 'var(--text-mute)', fontSize: '0.68rem', margin: '4px 0 0', letterSpacing: '2px' }}>
+                      {charModal.char.class} · Nv {charModal.char.level} · {charModal.char.race} · {charModal.char.sex}
+                    </p>
+                  </div>
+                  <button onClick={() => setCharModal(null)} style={{ background: 'none', border: 'none', color: '#666', fontSize: '1.4rem', cursor: 'pointer' }}>✕</button>
+                </div>
+
+                {/* STATS */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.8rem', marginBottom: '1.5rem' }}>
+                  {[
+                    { l: 'PVP', v: charModal.char.pvp, c: '#60a5fa' },
+                    { l: 'PK', v: charModal.char.pk, c: '#ef4444' },
+                    { l: 'HP', v: charModal.char.hp, c: '#4ade80' },
+                    { l: 'MP', v: charModal.char.mp, c: '#c084fc' },
+                    { l: 'EXP', v: Number(charModal.char.exp).toLocaleString(), c: 'var(--gold)' },
+                    { l: 'SP', v: Number(charModal.char.sp).toLocaleString(), c: 'rgba(255,255,255,0.6)' },
+                    { l: 'KARMA', v: charModal.char.karma, c: charModal.char.karma > 0 ? '#ef4444' : '#4ade80' },
+                    { l: 'TEMPO ONLINE', v: fmtTime(charModal.char.onlineTime), c: 'rgba(255,255,255,0.5)' },
+                  ].map(s => (
+                    <div key={s.l} style={{ background: 'rgba(0,0,0,0.3)', padding: '0.7rem', borderRadius: '6px' }}>
+                      <p style={{ fontSize: '0.52rem', color: 'var(--text-mute)', letterSpacing: '2px', margin: '0 0 4px' }}>{s.l}</p>
+                      <p style={{ fontSize: '0.85rem', color: s.c, fontWeight: '700', margin: 0 }}>{s.v}</p>
+                    </div>
+                  ))}
+                </div>
+
+                {/* EQUIPAMENTO */}
+                {charModal.equipped?.length > 0 && (
+                  <div style={{ marginBottom: '1.5rem' }}>
+                    <p style={{ fontSize: '0.58rem', color: 'var(--text-mute)', letterSpacing: '3px', marginBottom: '0.75rem' }}>EQUIPAMENTO</p>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '0.5rem' }}>
+                      {charModal.equipped.map((item, i) => (
+                        <div key={i} style={{ background: 'rgba(197,160,89,0.06)', border: '1px solid rgba(197,160,89,0.15)', padding: '0.6rem 0.8rem', borderRadius: '6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <div>
+                            <p style={{ fontSize: '0.6rem', color: 'var(--text-mute)', margin: 0 }}>{item.slot}</p>
+                            <p style={{ fontSize: '0.78rem', color: '#fff', margin: '2px 0 0', fontFamily: 'monospace' }}>ID: {item.itemId}</p>
+                          </div>
+                          {item.enchant > 0 && (
+                            <span style={{ color: 'var(--gold)', fontWeight: '900', fontSize: '0.85rem' }}>+{item.enchant}</span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* INVENTÁRIO */}
+                {charModal.inventory?.length > 0 && (
+                  <div>
+                    <p style={{ fontSize: '0.58rem', color: 'var(--text-mute)', letterSpacing: '3px', marginBottom: '0.75rem' }}>
+                      INVENTÁRIO ({charModal.inventory.length} itens)
+                    </p>
+                    <div style={{ maxHeight: '200px', overflow: 'auto' }}>
+                      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.75rem' }}>
+                        <thead>
+                          <tr>
+                            {['ITEM ID', 'QUANTIDADE', 'ENCANT'].map(h => (
+                              <th key={h} style={{ textAlign: 'left', padding: '0.4rem 0.5rem', borderBottom: '1px solid rgba(255,255,255,0.06)', color: 'var(--text-mute)', fontSize: '0.55rem', letterSpacing: '2px' }}>{h}</th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {charModal.inventory.map((item, i) => (
+                            <tr key={i} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
+                              <td style={{ padding: '0.4rem 0.5rem', color: '#fff', fontFamily: 'monospace' }}>{item.itemId}</td>
+                              <td style={{ padding: '0.4rem 0.5rem', color: 'rgba(255,255,255,0.7)' }}>{item.count?.toLocaleString()}</td>
+                              <td style={{ padding: '0.4rem 0.5rem', color: item.enchant > 0 ? 'var(--gold)' : 'var(--text-mute)' }}>
+                                {item.enchant > 0 ? `+${item.enchant}` : '—'}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+              </>
+            ) : (
+              <p style={{ color: '#ef4444' }}>Erro ao carregar dados do personagem.</p>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

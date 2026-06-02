@@ -18,6 +18,7 @@
     { "source": "/api/admin/chars", "destination": "/api/admin?action=chars" },
     { "source": "/api/admin/ranking", "destination": "/api/admin?action=ranking" },
     { "source": "/api/admin/ban", "destination": "/api/admin?action=ban" },
-    { "source": "/api/admin/unban", "destination": "/api/admin?action=unban" }
+    { "source": "/api/admin/unban", "destination": "/api/admin?action=unban" },
+    { "source": "/api/admin/char-detail", "destination": "/api/admin?action=char-detail" }
   ]
 }
