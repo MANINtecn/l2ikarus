@@ -116,17 +116,25 @@ export default async function handler(req, res) {
       const objId = req.query.objId
       if (!objId) return res.status(400).json({ error: 'objId obrigatório' })
 
-      const [[char]] = await db.query(
-        `SELECT obj_Id, char_name, level, classid, account_name, pvpkills, pkkills,
-                onlinetime, exp, sp, x, y, z, curHp, maxHp, curMp, maxMp, karma, sex, race
-         FROM characters WHERE obj_Id = ?`, [objId]
-      )
+      const pick = (r, ...names) => { for (const n of names) if (r && r[n] !== undefined) return r[n]; return null }
+
+      // Descobre o nome real da coluna de ID
+      const [colInfo] = await db.query(`SHOW COLUMNS FROM characters`)
+      const colNames = colInfo.map(c => c.Field)
+      const idCol = ['obj_Id', 'obj_id', 'charId', 'char_id', 'objId'].find(c => colNames.includes(c)) || 'obj_Id'
+
+      const [[char]] = await db.query(`SELECT * FROM characters WHERE \`${idCol}\` = ? LIMIT 1`, [objId])
       if (!char) return res.status(404).json({ error: 'Personagem não encontrado' })
 
+      const charId = pick(char, 'obj_Id', 'obj_id', 'charId', 'char_id', 'objId')
+
+      // Descobre a coluna de owner na tabela items
+      const [itemCols] = await db.query(`SHOW COLUMNS FROM items`)
+      const itemColNames = itemCols.map(c => c.Field)
+      const ownerCol = ['owner_id', 'ownerId', 'owner'].find(c => itemColNames.includes(c)) || 'owner_id'
+
       const [items] = await db.query(
-        `SELECT item_id, count, enchant_level, loc, loc_data
-         FROM items WHERE owner_id = ? AND loc IN ('PAPERDOLL','INVENTORY')
-         ORDER BY loc DESC, loc_data ASC LIMIT 200`, [objId]
+        `SELECT * FROM items WHERE \`${ownerCol}\` = ? AND loc IN ('PAPERDOLL','INVENTORY') LIMIT 300`, [charId]
       )
 
       const SLOTS = {
@@ -135,25 +143,36 @@ export default async function handler(req, res) {
         19:'Cabelo',20:'Chapéu',22:'Pulseira Dir',23:'Pulseira Esq',
       }
 
-      const equipped = items.filter(i => i.loc === 'PAPERDOLL').map(i => ({
-        objectId: i.object_id, itemId: i.item_id, name: itemName(i.item_id),
-        count: i.count, enchant: i.enchant_level,
-        slot: SLOTS[i.loc_data] || `Slot ${i.loc_data}`,
-      }))
-      const inventory = items.filter(i => i.loc === 'INVENTORY').map(i => ({
-        objectId: i.object_id, itemId: i.item_id, name: itemName(i.item_id),
-        count: i.count, enchant: i.enchant_level,
-      }))
+      const mapItem = (i) => ({
+        objectId: pick(i, 'object_id', 'objectId', 'item_obj_id'),
+        itemId: pick(i, 'item_id', 'itemId', 'item'),
+        name: itemName(pick(i, 'item_id', 'itemId', 'item')),
+        count: pick(i, 'count', 'item_count'),
+        enchant: pick(i, 'enchant_level', 'enchantLevel', 'enchant') || 0,
+        loc: pick(i, 'loc', 'location'),
+        locData: pick(i, 'loc_data', 'locData', 'slot'),
+      })
 
+      const allItems = items.map(mapItem)
+      const equipped = allItems.filter(i => i.loc === 'PAPERDOLL').map(i => ({ ...i, slot: SLOTS[i.locData] || `Slot ${i.locData}` }))
+      const inventory = allItems.filter(i => i.loc === 'INVENTORY')
+
+      const sex = pick(char, 'sex')
+      const race = pick(char, 'race')
       return res.status(200).json({
         char: {
-          objId: char.obj_Id, name: char.char_name, level: char.level,
-          class: L2_CLASSES[char.classid] || `Class ${char.classid}`,
-          account: char.account_name, pvp: char.pvpkills, pk: char.pkkills,
-          onlineTime: char.onlinetime, exp: char.exp, sp: char.sp,
-          hp: `${char.curHp}/${char.maxHp}`, mp: `${char.curMp}/${char.maxMp}`,
-          karma: char.karma, sex: char.sex === 0 ? 'Masculino' : 'Feminino',
-          race: ['Humano','Elfo','Dark Elf','Orc','Anão'][char.race] || `Race ${char.race}`,
+          objId: charId, name: pick(char, 'char_name', 'charName', 'name'),
+          level: pick(char, 'level'),
+          class: L2_CLASSES[pick(char, 'classid', 'classId')] || `Class ${pick(char, 'classid', 'classId')}`,
+          account: pick(char, 'account_name', 'accountName'),
+          pvp: pick(char, 'pvpkills', 'pvpKills'), pk: pick(char, 'pkkills', 'pkKills'),
+          onlineTime: pick(char, 'onlinetime', 'onlineTime'),
+          exp: pick(char, 'exp'), sp: pick(char, 'sp'),
+          hp: `${pick(char, 'curHp')}/${pick(char, 'maxHp')}`,
+          mp: `${pick(char, 'curMp')}/${pick(char, 'maxMp')}`,
+          karma: pick(char, 'karma'),
+          sex: sex === 0 ? 'Masculino' : 'Feminino',
+          race: ['Humano','Elfo','Dark Elf','Orc','Anão'][race] || `Race ${race}`,
         },
         equipped, inventory,
       })
