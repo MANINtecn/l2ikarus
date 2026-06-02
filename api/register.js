@@ -76,7 +76,8 @@ export default async function handler(req, res) {
     if (existing.length > 0) return res.status(409).json({ message: 'Este login já está em uso' })
     await pool.query('INSERT INTO accounts (login, password, email, access_level) VALUES (?, ?, ?, 0)', [login, hashedPassword, email ?? ''])
     return res.status(200).json({ success: true, message: 'Conta criada com sucesso!' })
-  } catch {
-    return res.status(500).json({ message: 'Erro ao criar conta. Tente novamente mais tarde.' })
+  } catch (err) {
+    console.error('Register error:', err)
+    return res.status(500).json({ message: err.message || 'Erro ao criar conta.' })
   }
 }
