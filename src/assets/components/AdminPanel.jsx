@@ -65,8 +65,13 @@ export default function AdminPanel({ user, onLogout }) {
     setLoading(true)
     try {
       if (t === 'overview') {
-        const r = await fetch('/api/admin/stats').then(x => x.json())
-        setStats(r)
+        // Busca stats e players juntos para o card e a lista nunca divergirem
+        const [s, p] = await Promise.all([
+          fetch('/api/admin/stats').then(x => x.json()),
+          fetch('/api/admin/players').then(x => x.json()),
+        ])
+        setStats(s)
+        setPlayers(p.players || [])
       } else if (t === 'players') {
         const r = await fetch('/api/admin/players').then(x => x.json())
         setPlayers(r.players || [])
@@ -196,7 +201,7 @@ export default function AdminPanel({ user, onLogout }) {
           <div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1.2rem', marginBottom: '1.5rem' }}>
               <div onClick={() => setTab('players')} style={{ cursor: 'pointer' }}>
-                <StatCard label="ONLINE AGORA ↗" value={stats.online} color="#4ade80" />
+                <StatCard label="ONLINE AGORA ↗" value={players.length} color="#4ade80" />
               </div>
               <StatCard label="TOTAL DE CONTAS" value={stats.total_accounts?.toLocaleString()} />
               <StatCard label="CADASTROS HOJE" value={stats.today} color="#60a5fa" />
