@@ -89,11 +89,16 @@ export default async function handler(req, res) {
 
     // GET /api/admin/players — jogadores online
     if (action === 'players') {
+      // Debug: conta total e por valor de online para entender divergência
+      const [[{ cnt }]] = await db.query('SELECT COUNT(*) as cnt FROM characters WHERE online = 1')
+      const [byVal] = await db.query('SELECT online, COUNT(*) as c FROM characters GROUP BY online')
+
       const [rows] = await db.query(
         `SELECT obj_Id, char_name, level, classid, account_name, pvpkills, pkkills, onlinetime
-         FROM characters WHERE online = 1 ORDER BY level DESC LIMIT 100`
+         FROM characters WHERE online > 0 ORDER BY char_name ASC LIMIT 100`
       )
       return res.status(200).json({
+        debug: { countOnline1: cnt, onlineValues: byVal },
         players: rows.map(r => ({
           objId: r.obj_Id,
           name: r.char_name,
