@@ -12,6 +12,10 @@
     { "source": "/api/player/login", "destination": "/api/player?action=login" },
     { "source": "/api/player/me", "destination": "/api/player?action=me" },
     { "source": "/api/player/logout", "destination": "/api/player?action=logout" },
+    { "source": "/api/player/wallet", "destination": "/api/player?action=wallet" },
+    { "source": "/api/payment/create", "destination": "/api/payment?action=create" },
+    { "source": "/api/payment/webhook", "destination": "/api/payment?action=webhook" },
+    { "source": "/api/payment/status", "destination": "/api/payment?action=status" },
     { "source": "/api/admin/stats", "destination": "/api/admin?action=stats" },
     { "source": "/api/admin/players", "destination": "/api/admin?action=players" },
     { "source": "/api/admin/accounts", "destination": "/api/admin?action=accounts" },
@@ -25,6 +29,7 @@
     { "source": "/api/admin/codes", "destination": "/api/admin?action=codes" },
     { "source": "/api/admin/code-create", "destination": "/api/admin?action=code-create" },
     { "source": "/api/admin/code-toggle", "destination": "/api/admin?action=code-toggle" },
-    { "source": "/api/admin/code-delete", "destination": "/api/admin?action=code-delete" }
+    { "source": "/api/admin/code-delete", "destination": "/api/admin?action=code-delete" },
+    { "source": "/api/admin/ikoin", "destination": "/api/admin?action=ikoin" }
   ]
 }

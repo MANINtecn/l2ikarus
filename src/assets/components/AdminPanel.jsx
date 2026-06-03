@@ -171,6 +171,19 @@ export default function AdminPanel({ user, onLogout }) {
     }
   }
 
+  const adjustIkoin = async (login) => {
+    const v = prompt(`Quantos Ikoin dar/remover de "${login}"?\n(use número negativo para remover)`)
+    if (!v) return
+    const amount = parseInt(v)
+    if (!amount) return
+    const r = await fetch('/api/admin/ikoin', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ login, amount }),
+    }).then(x => x.json())
+    setBanMsg(r.message || r.error)
+    setTimeout(() => setBanMsg(''), 4000)
+  }
+
   const createCode = async () => {
     setCodeMsg('')
     const r = await fetch('/api/admin/code-create', {
@@ -361,6 +374,9 @@ export default function AdminPanel({ user, onLogout }) {
                   <div style={{ display: 'flex', gap: '0.5rem' }}>
                     <button onClick={() => loadChars(acc.login)} style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', padding: '0.4rem 0.9rem', borderRadius: '5px', fontSize: '0.62rem', cursor: 'pointer', letterSpacing: '1px' }}>
                       {accountChars[acc.login] ? 'OCULTAR' : 'VER CHARS'}
+                    </button>
+                    <button onClick={() => adjustIkoin(acc.login)} style={{ background: 'rgba(197,160,89,0.1)', border: '1px solid rgba(197,160,89,0.3)', color: 'var(--gold)', padding: '0.4rem 0.9rem', borderRadius: '5px', fontSize: '0.62rem', cursor: 'pointer', letterSpacing: '1px' }}>
+                      + IKOIN
                     </button>
                     {acc.access_level < 0
                       ? <button onClick={() => banAccount(acc.login, false)} style={{ background: 'rgba(74,222,128,0.1)', border: '1px solid rgba(74,222,128,0.3)', color: '#4ade80', padding: '0.4rem 0.9rem', borderRadius: '5px', fontSize: '0.62rem', cursor: 'pointer' }}>DESBANIR</button>

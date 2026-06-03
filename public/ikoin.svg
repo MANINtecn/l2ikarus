@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <radialGradient id="coinFace" cx="38%" cy="32%" r="75%">
+      <stop offset="0%" stop-color="#fff4c2"/>
+      <stop offset="35%" stop-color="#f4d469"/>
+      <stop offset="70%" stop-color="#d4af37"/>
+      <stop offset="100%" stop-color="#a67c1a"/>
+    </radialGradient>
+    <linearGradient id="coinRim" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f9e08a"/>
+      <stop offset="50%" stop-color="#c5a059"/>
+      <stop offset="100%" stop-color="#8a661a"/>
+    </linearGradient>
+    <linearGradient id="ikText" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#7a5a12"/>
+      <stop offset="100%" stop-color="#5a3f08"/>
+    </linearGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="4" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- borda externa -->
+  <circle cx="100" cy="100" r="92" fill="url(#coinRim)"/>
+  <circle cx="100" cy="100" r="92" fill="none" stroke="#fff4c2" stroke-width="2" opacity="0.6"/>
+
+  <!-- entalhes da borda -->
+  <g fill="#8a661a" opacity="0.5">
+    <circle cx="100" cy="14" r="2.5"/><circle cx="100" cy="186" r="2.5"/>
+    <circle cx="14" cy="100" r="2.5"/><circle cx="186" cy="100" r="2.5"/>
+    <circle cx="40" cy="40" r="2"/><circle cx="160" cy="40" r="2"/>
+    <circle cx="40" cy="160" r="2"/><circle cx="160" cy="160" r="2"/>
+  </g>
+
+  <!-- face interna -->
+  <circle cx="100" cy="100" r="78" fill="url(#coinFace)"/>
+  <circle cx="100" cy="100" r="78" fill="none" stroke="#8a661a" stroke-width="1.5" opacity="0.4"/>
+  <circle cx="100" cy="100" r="70" fill="none" stroke="#fff4c2" stroke-width="1" opacity="0.5"/>
+
+  <!-- monograma IK -->
+  <text x="100" y="128" font-family="Georgia, 'Times New Roman', serif" font-size="78"
+        font-weight="bold" text-anchor="middle" fill="url(#ikText)" filter="url(#glow)">IK</text>
+
+  <!-- brilho superior -->
+  <ellipse cx="76" cy="58" rx="34" ry="18" fill="#ffffff" opacity="0.25"/>
+</svg>

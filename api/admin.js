@@ -287,6 +287,25 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, message: 'Código removido.' })
     }
 
+    // POST /api/admin/ikoin — credita/debita Ikoin de uma conta
+    if (action === 'ikoin' && req.method === 'POST') {
+      const { login, amount, reason } = req.body || {}
+      const amt = parseInt(amount)
+      if (!login || !amt) return res.status(400).json({ error: 'Login e quantidade obrigatórios' })
+      const now = Math.floor(Date.now() / 1000)
+      await db.query(
+        `INSERT INTO ikoin_balance (account_name, balance, updated_at) VALUES (?, ?, ?)
+         ON DUPLICATE KEY UPDATE balance = balance + ?, updated_at = ?`,
+        [login, amt, now, amt, now]
+      )
+      await db.query(
+        'INSERT INTO ikoin_transactions (account_name, amount, type, description, created_at) VALUES (?, ?, ?, ?, ?)',
+        [login, amt, 'admin', reason || `Ajuste admin (${admin.email})`, now]
+      )
+      const [[bal]] = await db.query('SELECT balance FROM ikoin_balance WHERE account_name = ?', [login])
+      return res.status(200).json({ success: true, message: `Saldo de ${login}: ${bal.balance} IK`, balance: bal.balance })
+    }
+
     // POST /api/admin/ban — banir conta
     if (action === 'ban' && req.method === 'POST') {
       const { login, reason } = req.body || {}

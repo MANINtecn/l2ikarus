@@ -1,4 +1,33 @@
+import { useState } from 'react'
+
+const PACKS = [50, 100, 250, 500, 1000]
+
 export default function PlayerPanel({ data, onLogout }) {
+  const [buyOpen, setBuyOpen] = useState(false)
+  const [amount, setAmount] = useState(100)
+  const [buying, setBuying] = useState(false)
+  const [buyError, setBuyError] = useState('')
+
+  const buyIkoin = async () => {
+    setBuying(true)
+    setBuyError('')
+    try {
+      const r = await fetch('/api/payment/create', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount }),
+      }).then(x => x.json())
+      if (r.checkoutUrl) {
+        window.location.href = r.checkoutUrl
+      } else {
+        setBuyError(r.error || 'Erro ao iniciar pagamento.')
+      }
+    } catch {
+      setBuyError('Erro de conexão.')
+    } finally {
+      setBuying(false)
+    }
+  }
+
   return (
     <div style={{
       position: 'fixed', inset: 0, zIndex: 20000,
@@ -33,6 +62,28 @@ export default function PlayerPanel({ data, onLogout }) {
 
       {/* CONTENT */}
       <div style={{ flex: 1, overflow: 'auto', padding: '2rem' }}>
+        {/* CARTEIRA IKOIN */}
+        <div className="glass-panel" style={{
+          padding: '1.5rem 2rem', marginBottom: '1.5rem',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          flexWrap: 'wrap', gap: '1rem',
+          border: '1px solid rgba(197,160,89,0.3)',
+          background: 'linear-gradient(135deg, rgba(197,160,89,0.08), rgba(197,160,89,0.02))',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1.2rem' }}>
+            <img src="/ikoin.svg" alt="Ikoin" style={{ width: '60px', height: '60px', filter: 'drop-shadow(0 0 12px rgba(212,175,55,0.4))' }} />
+            <div>
+              <p style={{ fontSize: '0.58rem', color: 'var(--text-mute)', letterSpacing: '3px', margin: 0 }}>SEU SALDO</p>
+              <p style={{ fontSize: '2rem', fontWeight: '900', color: 'var(--gold)', margin: '2px 0 0', fontFamily: 'Cinzel, serif' }}>
+                {(data.ikoin ?? 0).toLocaleString()} <span style={{ fontSize: '1rem' }}>IK</span>
+              </p>
+            </div>
+          </div>
+          <button onClick={() => setBuyOpen(true)} className="btn btn-primary" style={{ padding: '0.9rem 2rem', fontSize: '0.75rem', letterSpacing: '2px' }}>
+            + COMPRAR IKOIN
+          </button>
+        </div>
+
         {/* STATS */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
           <div className="glass-panel" style={{ padding: '1.5rem', borderLeft: '3px solid var(--gold)' }}>
@@ -94,6 +145,44 @@ export default function PlayerPanel({ data, onLogout }) {
           )}
         </div>
       </div>
+
+      {/* MODAL COMPRAR IKOIN */}
+      {buyOpen && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 30000, background: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(10px)', padding: '1rem' }} onClick={() => setBuyOpen(false)}>
+          <div className="glass-panel" style={{ width: '100%', maxWidth: '440px', padding: '2.5rem', border: '1px solid rgba(197,160,89,0.3)', textAlign: 'center' }} onClick={e => e.stopPropagation()}>
+            <img src="/ikoin.svg" alt="Ikoin" style={{ width: '70px', height: '70px', marginBottom: '1rem', filter: 'drop-shadow(0 0 15px rgba(212,175,55,0.5))' }} />
+            <h3 className="cinzel" style={{ color: 'var(--gold)', fontSize: '1.4rem', marginBottom: '0.5rem' }}>COMPRAR IKOIN</h3>
+            <p style={{ color: 'var(--text-mute)', fontSize: '0.75rem', marginBottom: '1.5rem' }}>1 Ikoin = R$ 1,00 · PIX, Boleto ou Cartão</p>
+
+            {/* Pacotes rápidos */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '0.5rem', marginBottom: '1rem' }}>
+              {PACKS.map(p => (
+                <button key={p} onClick={() => setAmount(p)} style={{
+                  background: amount === p ? 'rgba(197,160,89,0.2)' : 'rgba(255,255,255,0.04)',
+                  border: `1px solid ${amount === p ? 'var(--gold)' : 'rgba(255,255,255,0.1)'}`,
+                  color: amount === p ? 'var(--gold)' : 'rgba(255,255,255,0.6)',
+                  padding: '0.6rem 0', borderRadius: '6px', fontSize: '0.72rem', fontWeight: '700', cursor: 'pointer',
+                }}>{p}</button>
+              ))}
+            </div>
+
+            {/* Valor custom */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginBottom: '1.5rem' }}>
+              <input type="number" min="5" value={amount} onChange={e => setAmount(parseInt(e.target.value) || 0)}
+                style={{ flex: 1, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', padding: '0.9rem', color: '#fff', fontSize: '1rem', borderRadius: '6px', outline: 'none', textAlign: 'center', fontWeight: '700' }}
+              />
+              <span style={{ color: 'var(--gold)', fontWeight: '900', fontSize: '1.1rem', minWidth: '90px' }}>= R$ {amount.toFixed(2)}</span>
+            </div>
+
+            {buyError && <div style={{ background: 'rgba(255,68,68,0.1)', border: '1px solid rgba(255,68,68,0.3)', padding: '0.7rem', marginBottom: '1rem', color: '#ef4444', fontSize: '0.75rem' }}>{buyError}</div>}
+
+            <button onClick={buyIkoin} disabled={buying || amount < 5} className="btn btn-primary" style={{ width: '100%', padding: '1rem', marginBottom: '0.75rem', opacity: amount < 5 ? 0.5 : 1 }}>
+              {buying ? 'PROCESSANDO...' : `PAGAR R$ ${amount.toFixed(2)}`}
+            </button>
+            <button onClick={() => setBuyOpen(false)} style={{ background: 'none', border: 'none', color: 'var(--text-mute)', fontSize: '0.7rem', cursor: 'pointer', letterSpacing: '2px' }}>CANCELAR</button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

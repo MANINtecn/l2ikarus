@@ -44,6 +44,7 @@ function getAction(req) {
   if (url.includes('/login')) return 'login'
   if (url.includes('/logout')) return 'logout'
   if (url.includes('/me')) return 'me'
+  if (url.includes('/wallet')) return 'wallet'
   return req.query.action || ''
 }
 
@@ -89,16 +90,48 @@ export default async function handler(req, res) {
         'SELECT char_name, level, classid, online FROM characters WHERE account_name = ? ORDER BY level DESC',
         [payload.login]
       )
+      // Saldo Ikoin (cria registro se não existir)
+      let ikoin = 0
+      try {
+        const [bal] = await db.query('SELECT balance FROM ikoin_balance WHERE account_name = ?', [payload.login])
+        ikoin = bal.length > 0 ? bal[0].balance : 0
+      } catch {}
+
       return res.status(200).json({
         authenticated: true,
         login: payload.login,
         email: payload.email,
+        ikoin,
         characters: chars.map(c => ({
           name: c.char_name,
           level: c.level,
           class: L2_CLASSES[c.classid] || `Class ${c.classid}`,
           online: c.online === 1,
         })),
+      })
+    } catch (err) {
+      return res.status(500).json({ error: err.message })
+    }
+  }
+
+  // GET /api/player/wallet — saldo + histórico de transações
+  if (action === 'wallet') {
+    const cookies = req.headers.cookie || ''
+    const match = cookies.match(/player_session=([^;]+)/)
+    if (!match) return res.status(401).json({ authenticated: false })
+    const payload = verifyJWT(match[1], jwtSecret)
+    if (!payload) return res.status(401).json({ authenticated: false })
+
+    try {
+      const db = await getConnection()
+      const [bal] = await db.query('SELECT balance FROM ikoin_balance WHERE account_name = ?', [payload.login])
+      const [txs] = await db.query(
+        'SELECT amount, type, description, created_at FROM ikoin_transactions WHERE account_name = ? ORDER BY id DESC LIMIT 30',
+        [payload.login]
+      )
+      return res.status(200).json({
+        balance: bal.length > 0 ? bal[0].balance : 0,
+        transactions: txs,
       })
     } catch (err) {
       return res.status(500).json({ error: err.message })
