@@ -45,6 +45,7 @@ function getAction(req) {
   if (url.includes('/logout')) return 'logout'
   if (url.includes('/me')) return 'me'
   if (url.includes('/wallet')) return 'wallet'
+  if (url.includes('/redeem')) return 'redeem'
   return req.query.action || ''
 }
 
@@ -132,6 +133,59 @@ export default async function handler(req, res) {
       return res.status(200).json({
         balance: bal.length > 0 ? bal[0].balance : 0,
         transactions: txs,
+      })
+    } catch (err) {
+      return res.status(500).json({ error: err.message })
+    }
+  }
+
+  // POST /api/player/redeem — resgata código (credita Ikoin no site)
+  if (action === 'redeem') {
+    if (req.method !== 'POST') return res.status(405).json({ error: 'Método inválido' })
+    const cookies = req.headers.cookie || ''
+    const match = cookies.match(/player_session=([^;]+)/)
+    if (!match) return res.status(401).json({ error: 'Faça login.' })
+    const payload = verifyJWT(match[1], jwtSecret)
+    if (!payload) return res.status(401).json({ error: 'Sessão expirada.' })
+
+    const { code } = req.body || {}
+    if (!code) return res.status(400).json({ error: 'Informe o código.' })
+    const account = payload.login
+
+    try {
+      const db = await getConnection()
+      const [[promo]] = await db.query('SELECT * FROM promo_codes WHERE code = ?', [code.trim()])
+      if (!promo) return res.status(404).json({ error: 'Código inválido.' })
+      if (promo.active !== 1) return res.status(400).json({ error: 'Código inativo.' })
+      if (promo.max_uses > 0 && promo.uses >= promo.max_uses) return res.status(400).json({ error: 'Código esgotado.' })
+
+      if (!promo.ikoin || promo.ikoin <= 0) {
+        return res.status(400).json({ error: 'Este código é resgatável apenas no jogo com .code ' + code.trim() })
+      }
+
+      // Verifica resgate de Ikoin já feito
+      const [dup] = await db.query('SELECT 1 FROM promo_ikoin_redeemed WHERE code = ? AND account_name = ?', [code.trim(), account])
+      if (dup.length > 0) return res.status(409).json({ error: 'Você já resgatou o Ikoin deste código.' })
+
+      const now = Math.floor(Date.now() / 1000)
+      // Credita Ikoin
+      await db.query(
+        `INSERT INTO ikoin_balance (account_name, balance, updated_at) VALUES (?, ?, ?)
+         ON DUPLICATE KEY UPDATE balance = balance + ?, updated_at = ?`,
+        [account, promo.ikoin, now, promo.ikoin, now]
+      )
+      await db.query(
+        'INSERT INTO ikoin_transactions (account_name, amount, type, description, reference, created_at) VALUES (?, ?, ?, ?, ?, ?)',
+        [account, promo.ikoin, 'code', `Código ${code.trim()}`, code.trim(), now]
+      )
+      await db.query('INSERT INTO promo_ikoin_redeemed (code, account_name, redeemed_at) VALUES (?, ?, ?)', [code.trim(), account, now])
+      await db.query('UPDATE promo_codes SET uses = uses + 1 WHERE code = ?', [code.trim()])
+
+      const hasItems = promo.items && promo.items.length > 0
+      return res.status(200).json({
+        success: true,
+        ikoin: promo.ikoin,
+        message: `+${promo.ikoin} Ikoin creditados!` + (hasItems ? ` Este código também dá itens — resgate no jogo com .code ${code.trim()}` : ''),
       })
     } catch (err) {
       return res.status(500).json({ error: err.message })

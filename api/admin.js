@@ -252,16 +252,18 @@ export default async function handler(req, res) {
 
     // POST /api/admin/code-create — cria código
     if (action === 'code-create' && req.method === 'POST') {
-      const { code, items, description, maxUses } = req.body || {}
-      if (!code || !items) return res.status(400).json({ error: 'Código e itens obrigatórios' })
-      // valida formato items "id:count;id:count"
-      if (!/^(\d+:\d+;?)+$/.test(items.replace(/\s/g, ''))) {
+      const { code, items, ikoin, description, maxUses } = req.body || {}
+      const ikoinAmt = parseInt(ikoin) || 0
+      const itemsClean = (items || '').replace(/\s/g, '')
+      if (!code) return res.status(400).json({ error: 'Código obrigatório' })
+      if (!itemsClean && ikoinAmt <= 0) return res.status(400).json({ error: 'Informe itens, Ikoin, ou ambos.' })
+      if (itemsClean && !/^(\d+:\d+;?)+$/.test(itemsClean)) {
         return res.status(400).json({ error: 'Formato de itens inválido. Use: itemId:quantidade;itemId:quantidade' })
       }
       try {
         await db.query(
-          'INSERT INTO promo_codes (code, items, description, active, max_uses, uses, created_by, created_at) VALUES (?, ?, ?, 1, ?, 0, ?, ?)',
-          [code.trim(), items.replace(/\s/g, ''), description || null, parseInt(maxUses) || 0, admin.email || 'admin', Math.floor(Date.now() / 1000)]
+          'INSERT INTO promo_codes (code, items, ikoin, description, active, max_uses, uses, created_by, created_at) VALUES (?, ?, ?, ?, 1, ?, 0, ?, ?)',
+          [code.trim(), itemsClean || null, ikoinAmt, description || null, parseInt(maxUses) || 0, admin.email || 'admin', Math.floor(Date.now() / 1000)]
         )
         return res.status(200).json({ success: true, message: `Código ${code} criado.` })
       } catch (e) {

@@ -63,7 +63,7 @@ export default function AdminPanel({ user, onLogout }) {
   const [playersDebug, setPlayersDebug] = useState(null)
   const [charTab, setCharTab] = useState('dados')
   const [codes, setCodes] = useState([])
-  const [newCode, setNewCode] = useState({ code: '', items: '', description: '', maxUses: '' })
+  const [newCode, setNewCode] = useState({ code: '', items: '', ikoin: '', description: '', maxUses: '' })
   const [codeMsg, setCodeMsg] = useState('')
   const [deleteConfirm, setDeleteConfirm] = useState(null) // { objectId, name }
   const [deletePass, setDeletePass] = useState('')
@@ -192,7 +192,7 @@ export default function AdminPanel({ user, onLogout }) {
     }).then(x => x.json())
     if (r.success) {
       setCodeMsg('✓ ' + r.message)
-      setNewCode({ code: '', items: '', description: '', maxUses: '' })
+      setNewCode({ code: '', items: '', ikoin: '', description: '', maxUses: '' })
       fetchTab('codes')
     } else {
       setCodeMsg('✗ ' + r.error)
@@ -457,11 +457,12 @@ export default function AdminPanel({ user, onLogout }) {
                 <input value={newCode.code} onChange={e => setNewCode({ ...newCode, code: e.target.value.toUpperCase() })} placeholder="CÓDIGO (ex: STREAMER10)" style={inputStyleAdmin} />
                 <input value={newCode.maxUses} onChange={e => setNewCode({ ...newCode, maxUses: e.target.value })} placeholder="Máx. usos (0 = ilimitado)" type="number" style={inputStyleAdmin} />
               </div>
-              <input value={newCode.items} onChange={e => setNewCode({ ...newCode, items: e.target.value })} placeholder="Itens: itemId:quantidade;itemId:quantidade  (ex: 57:1000000;3470:5)" style={{ ...inputStyleAdmin, width: '100%', marginBottom: '0.8rem', boxSizing: 'border-box' }} />
+              <input value={newCode.items} onChange={e => setNewCode({ ...newCode, items: e.target.value })} placeholder="Itens (resgate no GAME): itemId:qtd;itemId:qtd  (ex: 57:1000000;3470:5)" style={{ ...inputStyleAdmin, width: '100%', marginBottom: '0.8rem', boxSizing: 'border-box' }} />
+              <input value={newCode.ikoin} onChange={e => setNewCode({ ...newCode, ikoin: e.target.value })} type="number" placeholder="Ikoin de bônus (resgate no SITE) — deixe 0 se não quiser" style={{ ...inputStyleAdmin, width: '100%', marginBottom: '0.8rem', boxSizing: 'border-box' }} />
               <input value={newCode.description} onChange={e => setNewCode({ ...newCode, description: e.target.value })} placeholder="Descrição (opcional)" style={{ ...inputStyleAdmin, width: '100%', marginBottom: '1rem', boxSizing: 'border-box' }} />
               <button onClick={createCode} className="btn btn-primary" style={{ padding: '0.7rem 2rem', fontSize: '0.7rem' }}>CRIAR CÓDIGO</button>
               <p style={{ fontSize: '0.62rem', color: 'var(--text-mute)', marginTop: '0.8rem', lineHeight: 1.5 }}>
-                💡 Jogador resgata no jogo digitando <span style={{ color: 'var(--gold)' }}>.code SEUCODIGO</span> — recebe os itens uma única vez por conta.
+                💡 <span style={{ color: 'var(--gold)' }}>Itens</span> são resgatados no jogo com <span style={{ color: 'var(--gold)' }}>.code SEUCODIGO</span>. <span style={{ color: 'var(--gold)' }}>Ikoin</span> é resgatado no painel do jogador. Cada conta resgata uma vez.
               </p>
             </div>
 
@@ -473,7 +474,7 @@ export default function AdminPanel({ user, onLogout }) {
                 : <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.76rem' }}>
                     <thead>
                       <tr>
-                        {['CÓDIGO', 'ITENS', 'USOS', 'STATUS', 'AÇÕES'].map(h => (
+                        {['CÓDIGO', 'ITENS', 'IKOIN', 'USOS', 'STATUS', 'AÇÕES'].map(h => (
                           <th key={h} style={{ textAlign: 'left', padding: '0.5rem', borderBottom: '1px solid rgba(255,255,255,0.06)', color: 'var(--text-mute)', fontSize: '0.55rem', letterSpacing: '2px' }}>{h}</th>
                         ))}
                       </tr>
@@ -482,7 +483,8 @@ export default function AdminPanel({ user, onLogout }) {
                       {codes.map((c, i) => (
                         <tr key={i} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
                           <td style={{ padding: '0.6rem 0.5rem', color: 'var(--gold)', fontWeight: '700', fontFamily: 'monospace' }}>{c.code}</td>
-                          <td style={{ padding: '0.6rem 0.5rem', color: 'rgba(255,255,255,0.6)', fontFamily: 'monospace', fontSize: '0.68rem' }}>{c.items}</td>
+                          <td style={{ padding: '0.6rem 0.5rem', color: 'rgba(255,255,255,0.6)', fontFamily: 'monospace', fontSize: '0.68rem' }}>{c.items || '—'}</td>
+                          <td style={{ padding: '0.6rem 0.5rem', color: c.ikoin > 0 ? 'var(--gold)' : 'var(--text-mute)' }}>{c.ikoin > 0 ? `${c.ikoin} IK` : '—'}</td>
                           <td style={{ padding: '0.6rem 0.5rem', color: 'rgba(255,255,255,0.7)' }}>{c.uses}{c.max_uses > 0 ? `/${c.max_uses}` : ''}</td>
                           <td style={{ padding: '0.6rem 0.5rem' }}>
                             <span style={{ color: c.active ? '#4ade80' : 'var(--text-mute)', fontSize: '0.6rem' }}>{c.active ? '● ATIVO' : '○ INATIVO'}</span>

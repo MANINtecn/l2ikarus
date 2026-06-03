@@ -13,6 +13,7 @@
     { "source": "/api/player/me", "destination": "/api/player?action=me" },
     { "source": "/api/player/logout", "destination": "/api/player?action=logout" },
     { "source": "/api/player/wallet", "destination": "/api/player?action=wallet" },
+    { "source": "/api/player/redeem", "destination": "/api/player?action=redeem" },
     { "source": "/api/payment/create", "destination": "/api/payment?action=create" },
     { "source": "/api/payment/webhook", "destination": "/api/payment?action=webhook" },
     { "source": "/api/payment/status", "destination": "/api/payment?action=status" },

@@ -7,6 +7,24 @@ export default function PlayerPanel({ data, onLogout }) {
   const [amount, setAmount] = useState(100)
   const [buying, setBuying] = useState(false)
   const [buyError, setBuyError] = useState('')
+  const [redeemCode, setRedeemCode] = useState('')
+  const [redeemMsg, setRedeemMsg] = useState(null)
+
+  const doRedeem = async () => {
+    setRedeemMsg(null)
+    if (!redeemCode.trim()) return
+    const r = await fetch('/api/player/redeem', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code: redeemCode.trim() }),
+    }).then(x => x.json())
+    if (r.success) {
+      setRedeemMsg({ ok: true, text: r.message })
+      setRedeemCode('')
+      setTimeout(() => window.location.reload(), 1800)
+    } else {
+      setRedeemMsg({ ok: false, text: r.error })
+    }
+  }
 
   const buyIkoin = async () => {
     setBuying(true)
@@ -82,6 +100,24 @@ export default function PlayerPanel({ data, onLogout }) {
           <button onClick={() => setBuyOpen(true)} className="btn btn-primary" style={{ padding: '0.9rem 2rem', fontSize: '0.75rem', letterSpacing: '2px' }}>
             + COMPRAR IKOIN
           </button>
+        </div>
+
+        {/* RESGATAR CÓDIGO */}
+        <div className="glass-panel" style={{ padding: '1.2rem 1.5rem', marginBottom: '1.5rem' }}>
+          <p style={{ fontSize: '0.58rem', color: 'var(--text-mute)', letterSpacing: '3px', marginBottom: '0.8rem' }}>RESGATAR CÓDIGO</p>
+          <div style={{ display: 'flex', gap: '0.8rem', flexWrap: 'wrap' }}>
+            <input
+              value={redeemCode}
+              onChange={e => setRedeemCode(e.target.value.toUpperCase())}
+              onKeyDown={e => e.key === 'Enter' && doRedeem()}
+              placeholder="DIGITE SEU CÓDIGO"
+              style={{ flex: 1, minWidth: '200px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', padding: '0.8rem 1rem', color: '#fff', fontSize: '0.85rem', borderRadius: '6px', outline: 'none', letterSpacing: '2px', fontFamily: 'monospace' }}
+            />
+            <button onClick={doRedeem} className="btn btn-primary" style={{ padding: '0.8rem 1.8rem', fontSize: '0.72rem' }}>RESGATAR</button>
+          </div>
+          {redeemMsg && (
+            <p style={{ marginTop: '0.8rem', fontSize: '0.75rem', color: redeemMsg.ok ? '#4ade80' : '#ef4444' }}>{redeemMsg.text}</p>
+          )}
         </div>
 
         {/* STATS */}
