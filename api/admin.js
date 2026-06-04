@@ -252,6 +252,73 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, message: gm ? 'GM (Master) concedido! Faça login no personagem.' : 'GM removido.' })
     }
 
+    // GET /api/admin/char-search?name=X — busca personagens por nome
+    if (action === 'char-search') {
+      const name = req.query.name || ''
+      if (!name.trim()) return res.status(200).json({ chars: [] })
+      const [cols] = await db.query('SHOW COLUMNS FROM characters')
+      const names = cols.map(c => c.Field)
+      const idCol = ['charId', 'obj_Id', 'obj_id', 'char_id', 'objId'].find(c => names.includes(c)) || 'charId'
+      const accessCol = ['accesslevel', 'accessLevel', 'access_level'].find(c => names.includes(c)) || 'accesslevel'
+      const [rows] = await db.query(
+        `SELECT \`${idCol}\` AS objId, char_name, level, classid, race, sex, online, \`${accessCol}\` AS access, account_name
+         FROM characters WHERE char_name LIKE ? ORDER BY char_name ASC LIMIT 30`,
+        [`%${name.trim()}%`]
+      )
+      return res.status(200).json({
+        chars: rows.map(r => ({
+          objId: r.objId, name: r.char_name, level: r.level,
+          classId: r.classid, class: L2_CLASSES[r.classid] || `Class ${r.classid}`,
+          online: r.online > 0, access: r.access, account: r.account_name,
+          isGM: r.access >= 100,
+        })),
+      })
+    }
+
+    // POST /api/admin/char-class — troca a classe do personagem (offline)
+    if (action === 'char-class' && req.method === 'POST') {
+      const { objId, classId } = req.body || {}
+      const cid = parseInt(classId)
+      if (!objId || isNaN(cid)) return res.status(400).json({ error: 'objId e classId obrigatórios' })
+      const [cols] = await db.query('SHOW COLUMNS FROM characters')
+      const names = cols.map(c => c.Field)
+      const idCol = ['charId', 'obj_Id', 'obj_id', 'char_id', 'objId'].find(c => names.includes(c)) || 'charId'
+      if (names.includes('online')) {
+        const [[c]] = await db.query(`SELECT online, char_name FROM characters WHERE \`${idCol}\` = ?`, [objId])
+        if (c && c.online > 0) return res.status(409).json({ error: `${c.char_name} está ONLINE. Deslogue antes de trocar a classe.` })
+      }
+      // base_class + classid (alguns servers tem as duas)
+      const sets = ['classid = ?']
+      const vals = [cid]
+      if (names.includes('base_class')) { sets.push('base_class = ?'); vals.push(cid) }
+      vals.push(objId)
+      await db.query(`UPDATE characters SET ${sets.join(', ')} WHERE \`${idCol}\` = ?`, vals)
+      return res.status(200).json({ success: true, message: `Classe alterada para ${L2_CLASSES[cid] || cid}. Faça login.` })
+    }
+
+    // POST /api/admin/char-teleport — reseta posição para uma cidade (destrava char)
+    if (action === 'char-teleport' && req.method === 'POST') {
+      const { objId, town } = req.body || {}
+      if (!objId) return res.status(400).json({ error: 'objId obrigatório' })
+      const TOWNS = {
+        giran: [83400, 147943, -3404], aden: [146783, 25808, -2000],
+        dion: [15670, 142983, -2700], gludio: [-14000, 123000, -3120],
+        gludin: [-84318, 244579, -3730], heine: [111409, 219364, -3545],
+        goddard: [147451, -56787, -2780], rune: [43835, -47749, -800],
+        schuttgart: [87386, -143288, -1293], floran: [17286, 170615, -3500],
+      }
+      const loc = TOWNS[town] || TOWNS.giran
+      const [cols] = await db.query('SHOW COLUMNS FROM characters')
+      const names = cols.map(c => c.Field)
+      const idCol = ['charId', 'obj_Id', 'obj_id', 'char_id', 'objId'].find(c => names.includes(c)) || 'charId'
+      if (names.includes('online')) {
+        const [[c]] = await db.query(`SELECT online, char_name FROM characters WHERE \`${idCol}\` = ?`, [objId])
+        if (c && c.online > 0) return res.status(409).json({ error: `${c.char_name} está ONLINE. Deslogue antes de teleportar.` })
+      }
+      await db.query(`UPDATE characters SET x = ?, y = ?, z = ? WHERE \`${idCol}\` = ?`, [loc[0], loc[1], loc[2], objId])
+      return res.status(200).json({ success: true, message: `Teleportado para ${town || 'giran'}. Faça login.` })
+    }
+
     // POST /api/admin/delete-item — deletar item com senha
     if (action === 'delete-item' && req.method === 'POST') {
       const { objectId, password } = req.body || {}

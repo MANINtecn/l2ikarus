@@ -7,6 +7,29 @@ const TABS = [
   { id: 'ranking', label: 'RANKING' },
   { id: 'codes', label: 'CÓDIGOS' },
   { id: 'offer', label: 'OFERTA' },
+  { id: 'charmgmt', label: 'PERSONAGENS' },
+]
+
+// Classes de 3ª profissão (disponíveis a partir do lvl 76)
+const CLASSES_76 = [
+  { id: 88, name: 'Duelist' }, { id: 89, name: 'Dreadnought' }, { id: 90, name: 'Phoenix Knight' },
+  { id: 91, name: 'Hell Knight' }, { id: 92, name: 'Sagittarius' }, { id: 93, name: 'Adventurer' },
+  { id: 94, name: 'Archmage' }, { id: 95, name: 'Soultaker' }, { id: 96, name: 'Arcana Lord' },
+  { id: 97, name: 'Cardinal' }, { id: 98, name: 'Hierophant' }, { id: 99, name: "Eva's Templar" },
+  { id: 100, name: 'Sword Muse' }, { id: 101, name: 'Wind Rider' }, { id: 102, name: 'Moonlight Sentinel' },
+  { id: 103, name: 'Mystic Muse' }, { id: 104, name: 'Elemental Master' }, { id: 105, name: "Eva's Saint" },
+  { id: 106, name: 'Shillien Templar' }, { id: 107, name: 'Spectral Dancer' }, { id: 108, name: 'Ghost Hunter' },
+  { id: 109, name: 'Ghost Sentinel' }, { id: 110, name: 'Storm Screamer' }, { id: 111, name: 'Spectral Master' },
+  { id: 112, name: 'Shillien Saint' }, { id: 113, name: 'Titan' }, { id: 114, name: 'Grand Khavatari' },
+  { id: 115, name: 'Dominator' }, { id: 116, name: 'Doomcryer' }, { id: 117, name: 'Fortune Seeker' },
+  { id: 118, name: 'Maestro' },
+]
+
+const TOWNS_LIST = [
+  { id: 'giran', name: 'Giran' }, { id: 'aden', name: 'Aden' }, { id: 'dion', name: 'Dion' },
+  { id: 'gludio', name: 'Gludio' }, { id: 'gludin', name: 'Gludin' }, { id: 'heine', name: 'Heine' },
+  { id: 'goddard', name: 'Goddard' }, { id: 'rune', name: 'Rune' }, { id: 'schuttgart', name: 'Schuttgart' },
+  { id: 'floran', name: 'Floran' },
 ]
 
 const inputStyleAdmin = {
@@ -74,6 +97,34 @@ export default function AdminPanel({ user, onLogout }) {
   const [offersData, setOffersData] = useState({ 1: null, 2: null })
   const [offer, setOffer] = useState({ item_id: '', count: 1, price_ikoin: 100, title: 'Oferta Limitada', active: 0 })
   const [offerMsg, setOfferMsg] = useState('')
+  const [charQuery, setCharQuery] = useState('')
+  const [charResults, setCharResults] = useState([])
+  const [selChar, setSelChar] = useState(null)
+  const [charMgmtMsg, setCharMgmtMsg] = useState('')
+  const [newClass, setNewClass] = useState('')
+  const [newTown, setNewTown] = useState('giran')
+
+  const searchChars = async () => {
+    if (!charQuery.trim()) return
+    setCharMgmtMsg('')
+    const r = await fetch(`/api/admin/char-search?name=${encodeURIComponent(charQuery.trim())}`).then(x => x.json())
+    setCharResults(r.chars || [])
+    if (!r.chars?.length) setCharMgmtMsg('Nenhum personagem encontrado.')
+  }
+
+  const charAction = async (endpoint, body, okMsg) => {
+    setCharMgmtMsg('⏳ Processando...')
+    try {
+      const r = await fetch(`/api/admin/${endpoint}`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      }).then(x => x.json())
+      setCharMgmtMsg(r.success ? '✓ ' + r.message : '✗ ' + (r.error || 'Erro'))
+      if (r.success) searchChars()
+    } catch {
+      setCharMgmtMsg('✗ Erro de conexão.')
+    }
+  }
 
   const blankOffer = { item_id: '', count: 1, price_ikoin: 100, title: 'Oferta Limitada', active: 0 }
   const loadOfferSlot = (slot, data) => {
@@ -611,6 +662,77 @@ export default function AdminPanel({ user, onLogout }) {
                 </div>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* ABA PERSONAGENS (edição offline) */}
+        {tab === 'charmgmt' && (
+          <div style={{ maxWidth: '720px' }}>
+            <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.8rem', marginBottom: '0.4rem' }}>
+              Busque um personagem pelo nome para editar. <b style={{ color: '#f87171' }}>O char precisa estar OFFLINE</b> — as mudanças valem ao logar.
+            </p>
+            <div style={{ display: 'flex', gap: '0.6rem', marginBottom: '1.2rem', marginTop: '1rem' }}>
+              <input value={charQuery} onChange={e => setCharQuery(e.target.value)} onKeyDown={e => e.key === 'Enter' && searchChars()}
+                placeholder="Nome do personagem" style={{ ...inputStyleAdmin, flex: 1 }} />
+              <button onClick={searchChars} className="btn btn-primary" style={{ padding: '0.7rem 1.5rem' }}>BUSCAR</button>
+            </div>
+
+            {charResults.length > 0 && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1.2rem' }}>
+                {charResults.map(c => (
+                  <div key={c.objId} onClick={() => { setSelChar(c); setNewClass(c.classId); setCharMgmtMsg('') }} style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.8rem 1rem',
+                    background: selChar?.objId === c.objId ? 'rgba(197,160,89,0.12)' : 'rgba(255,255,255,0.02)',
+                    border: `1px solid ${selChar?.objId === c.objId ? 'var(--gold)' : 'rgba(255,255,255,0.06)'}`,
+                    borderRadius: '8px', cursor: 'pointer',
+                  }}>
+                    <div>
+                      <span style={{ color: 'var(--gold)', fontWeight: '700', fontSize: '0.9rem' }}>{c.name}</span>
+                      <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.72rem', marginLeft: '0.8rem' }}>Lv {c.level} · {c.class} · {c.account}</span>
+                    </div>
+                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                      {c.isGM && <span style={{ color: '#00CCFF', fontSize: '0.6rem', fontWeight: '700' }}>GM</span>}
+                      <span style={{ color: c.online ? '#4ade80' : 'rgba(255,255,255,0.3)', fontSize: '0.6rem' }}>{c.online ? '● ONLINE' : '○ OFFLINE'}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {selChar && (
+              <div className="glass-panel" style={{ padding: '1.5rem', border: '1px solid rgba(197,160,89,0.3)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.2rem' }}>
+                  <h4 className="cinzel" style={{ color: 'var(--gold)', margin: 0 }}>{selChar.name}</h4>
+                  <span style={{ color: selChar.online ? '#f87171' : '#4ade80', fontSize: '0.7rem' }}>{selChar.online ? '⚠ ONLINE — deslogue antes' : '✓ Offline — pode editar'}</span>
+                </div>
+
+                {/* GM */}
+                <div style={{ display: 'flex', gap: '0.6rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
+                  <button onClick={() => charAction('set-gm', { objId: selChar.objId, gm: true }, 'GM')} style={{ flex: 1, minWidth: '140px', padding: '0.7rem', background: 'rgba(0,204,255,0.1)', border: '1px solid rgba(0,204,255,0.4)', color: '#00CCFF', borderRadius: '7px', cursor: 'pointer', fontSize: '0.75rem', fontWeight: '700' }}>★ DAR GM (Master)</button>
+                  <button onClick={() => charAction('set-gm', { objId: selChar.objId, gm: false }, 'GM')} style={{ flex: 1, minWidth: '140px', padding: '0.7rem', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.6)', borderRadius: '7px', cursor: 'pointer', fontSize: '0.75rem' }}>REMOVER GM</button>
+                </div>
+
+                {/* TROCAR CLASSE */}
+                <div style={{ display: 'flex', gap: '0.6rem', marginBottom: '1rem', alignItems: 'center' }}>
+                  <select value={newClass} onChange={e => setNewClass(e.target.value)} style={{ ...inputStyleAdmin, flex: 1 }}>
+                    <option value="">— Trocar classe (lvl 76) —</option>
+                    {CLASSES_76.map(cl => <option key={cl.id} value={cl.id}>{cl.name}</option>)}
+                  </select>
+                  <button onClick={() => charAction('char-class', { objId: selChar.objId, classId: newClass }, 'Classe')} disabled={!newClass} style={{ padding: '0.7rem 1.2rem', background: 'rgba(192,132,252,0.12)', border: '1px solid rgba(192,132,252,0.4)', color: '#c084fc', borderRadius: '7px', cursor: newClass ? 'pointer' : 'not-allowed', fontSize: '0.75rem', fontWeight: '700', opacity: newClass ? 1 : 0.5 }}>TROCAR</button>
+                </div>
+
+                {/* TELEPORTE (destravar) */}
+                <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center' }}>
+                  <select value={newTown} onChange={e => setNewTown(e.target.value)} style={{ ...inputStyleAdmin, flex: 1 }}>
+                    {TOWNS_LIST.map(t => <option key={t.id} value={t.id}>Teleportar para {t.name}</option>)}
+                  </select>
+                  <button onClick={() => charAction('char-teleport', { objId: selChar.objId, town: newTown }, 'Teleporte')} style={{ padding: '0.7rem 1.2rem', background: 'rgba(74,222,128,0.1)', border: '1px solid rgba(74,222,128,0.4)', color: '#4ade80', borderRadius: '7px', cursor: 'pointer', fontSize: '0.75rem', fontWeight: '700' }}>DESTRAVAR</button>
+                </div>
+
+                {charMgmtMsg && <p style={{ marginTop: '1rem', fontSize: '0.82rem', fontWeight: '600', textAlign: 'center', color: charMgmtMsg.startsWith('✓') ? '#4ade80' : charMgmtMsg.startsWith('⏳') ? 'var(--gold)' : '#ef4444' }}>{charMgmtMsg}</p>}
+              </div>
+            )}
+            {charMgmtMsg && !selChar && <p style={{ fontSize: '0.82rem', color: '#ef4444' }}>{charMgmtMsg}</p>}
           </div>
         )}
         </div>

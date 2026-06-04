@@ -33,6 +33,9 @@
     { "source": "/api/admin/code-delete", "destination": "/api/admin?action=code-delete" },
     { "source": "/api/admin/ikoin", "destination": "/api/admin?action=ikoin" },
     { "source": "/api/admin/offer", "destination": "/api/admin?action=offer" },
-    { "source": "/api/admin/offer-save", "destination": "/api/admin?action=offer-save" }
+    { "source": "/api/admin/offer-save", "destination": "/api/admin?action=offer-save" },
+    { "source": "/api/admin/char-search", "destination": "/api/admin?action=char-search" },
+    { "source": "/api/admin/char-class", "destination": "/api/admin?action=char-class" },
+    { "source": "/api/admin/char-teleport", "destination": "/api/admin?action=char-teleport" }
   ]
 }
