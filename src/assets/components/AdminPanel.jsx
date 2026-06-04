@@ -70,9 +70,18 @@ export default function AdminPanel({ user, onLogout }) {
   const [deletePass, setDeletePass] = useState('')
   const [deleteMsg, setDeleteMsg] = useState('')
   const [actionMsg, setActionMsg] = useState('')
+  const [offerSlot, setOfferSlot] = useState(1)
+  const [offersData, setOffersData] = useState({ 1: null, 2: null })
   const [offer, setOffer] = useState({ item_id: '', count: 1, price_ikoin: 100, title: 'Oferta Limitada', active: 0 })
-  const [offerItemName, setOfferItemName] = useState(null)
   const [offerMsg, setOfferMsg] = useState('')
+
+  const blankOffer = { item_id: '', count: 1, price_ikoin: 100, title: 'Oferta Limitada', active: 0 }
+  const loadOfferSlot = (slot, data) => {
+    const d = (data || offersData)[slot]
+    setOffer(d ? { item_id: d.item_id, count: d.count, price_ikoin: d.price_ikoin, title: d.title, active: d.active } : { ...blankOffer })
+    setOfferSlot(slot)
+    setOfferMsg('')
+  }
 
   useEffect(() => { fetchTab(tab) }, [tab])
 
@@ -100,8 +109,9 @@ export default function AdminPanel({ user, onLogout }) {
         setCodes(r.codes || [])
       } else if (t === 'offer') {
         const r = await fetch('/api/admin/offer').then(x => x.json())
-        if (r.offer) setOffer(r.offer)
-        setOfferItemName(r.itemName || null)
+        const data = r.offers || { 1: null, 2: null }
+        setOffersData(data)
+        loadOfferSlot(offerSlot, data)
       }
     } catch {}
     setLoading(false)
@@ -113,7 +123,7 @@ export default function AdminPanel({ user, onLogout }) {
       const r = await fetch('/api/admin/offer-save', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          itemId: offer.item_id, count: offer.count,
+          offerId: offerSlot, itemId: offer.item_id, count: offer.count,
           price: offer.price_ikoin, title: offer.title, active: offer.active,
         }),
       }).then(x => x.json())
@@ -535,15 +545,28 @@ export default function AdminPanel({ user, onLogout }) {
         {/* ABA OFERTA LIMITADA */}
         {!loading && tab === 'offer' && (
           <div style={{ maxWidth: '560px' }}>
-            <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.8rem', marginBottom: '1.5rem' }}>
-              Configure a <b style={{ color: 'var(--gold)' }}>Oferta Limitada</b> que aparece no Community Board do jogo. O ícone e o nome são puxados automaticamente do item pelo ID.
+            <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.8rem', marginBottom: '1rem' }}>
+              Configure as <b style={{ color: 'var(--gold)' }}>2 Ofertas Limitadas</b> do Community Board. O ícone e o nome são puxados automaticamente do item pelo ID.
             </p>
+            {/* SELETOR DE SLOT */}
+            <div style={{ display: 'flex', gap: '0.6rem', marginBottom: '1.2rem' }}>
+              {[1, 2].map(slot => (
+                <button key={slot} onClick={() => loadOfferSlot(slot)} style={{
+                  flex: 1, padding: '0.7rem', borderRadius: '8px', cursor: 'pointer',
+                  background: offerSlot === slot ? 'rgba(197,160,89,0.15)' : 'rgba(255,255,255,0.03)',
+                  border: `1px solid ${offerSlot === slot ? 'var(--gold)' : 'rgba(255,255,255,0.1)'}`,
+                  color: offerSlot === slot ? 'var(--gold)' : 'rgba(255,255,255,0.5)',
+                  fontSize: '0.78rem', fontWeight: '700', letterSpacing: '1px',
+                }}>
+                  OFERTA {slot} {offersData[slot]?.active ? '●' : ''}
+                </button>
+              ))}
+            </div>
             <div className="glass-panel" style={{ padding: '1.8rem', border: '1px solid rgba(197,160,89,0.3)' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
                 <div>
                   <label style={{ fontSize: '0.6rem', color: 'var(--text-mute)', letterSpacing: '2px', display: 'block', marginBottom: '0.4rem' }}>ID DO ITEM</label>
                   <input value={offer.item_id} onChange={e => setOffer({ ...offer, item_id: e.target.value })} placeholder="ex: 22078" style={{ ...inputStyleAdmin, width: '100%' }} />
-                  {offerItemName && <p style={{ fontSize: '0.7rem', color: '#4ade80', margin: '0.4rem 0 0' }}>✓ {offerItemName}</p>}
                 </div>
                 <div>
                   <label style={{ fontSize: '0.6rem', color: 'var(--text-mute)', letterSpacing: '2px', display: 'block', marginBottom: '0.4rem' }}>QUANTIDADE</label>
@@ -568,7 +591,7 @@ export default function AdminPanel({ user, onLogout }) {
 
             {/* PREVIEW DA OFERTA ATUAL */}
             <div style={{ marginTop: '1.5rem' }}>
-              <p style={{ fontSize: '0.55rem', color: 'rgba(255,255,255,0.4)', letterSpacing: '3px', marginBottom: '0.8rem' }}>PREVIEW (COMO APARECE NO JOGO)</p>
+              <p style={{ fontSize: '0.55rem', color: 'rgba(255,255,255,0.4)', letterSpacing: '3px', marginBottom: '0.8rem' }}>PREVIEW DA OFERTA (COMO APARECE NO JOGO)</p>
               <div style={{
                 background: 'linear-gradient(135deg, rgba(255,170,68,0.08), rgba(0,0,0,0.3))',
                 border: `1px solid ${offer.active ? 'rgba(255,170,68,0.4)' : 'rgba(255,255,255,0.08)'}`,
@@ -579,7 +602,7 @@ export default function AdminPanel({ user, onLogout }) {
                 <div style={{ flex: 1 }}>
                   <p style={{ color: '#FFAA44', fontWeight: '700', fontSize: '0.95rem', margin: 0 }}>{offer.title || 'Oferta Limitada'}</p>
                   <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.75rem', margin: '2px 0 0' }}>
-                    {offerItemName || `Item ${offer.item_id || '—'}`}{offer.count > 1 ? ` x${offer.count}` : ''}
+                    {`Item ${offer.item_id || '—'}`}{offer.count > 1 ? ` x${offer.count}` : ''}
                   </p>
                 </div>
                 <div style={{ textAlign: 'right' }}>

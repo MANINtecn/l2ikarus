@@ -310,20 +310,18 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, message: `Saldo de ${login}: ${bal.balance} IK`, balance: bal.balance })
     }
 
-    // GET /api/admin/offer — lê a oferta limitada atual
+    // GET /api/admin/offer — lê as 2 ofertas limitadas
     if (action === 'offer') {
-      const [[offer]] = await db.query('SELECT * FROM game_offer WHERE id = 1')
-      let itemName = null
-      if (offer && offer.item_id) {
-        const [[it]] = await db.query('SELECT name FROM item_name WHERE id = ? LIMIT 1', [offer.item_id]).catch(() => [[null]])
-        itemName = it?.name || null
-      }
-      return res.status(200).json({ offer: offer || null, itemName })
+      const [rows] = await db.query('SELECT * FROM game_offer WHERE id IN (1,2)')
+      const offers = { 1: null, 2: null }
+      for (const r of rows) offers[r.id] = r
+      return res.status(200).json({ offers })
     }
 
-    // POST /api/admin/offer-save — cria/atualiza a oferta limitada
+    // POST /api/admin/offer-save — cria/atualiza uma oferta (offerId 1 ou 2)
     if (action === 'offer-save' && req.method === 'POST') {
-      const { itemId, count, price, title, active } = req.body || {}
+      const { offerId, itemId, count, price, title, active } = req.body || {}
+      const oid = (parseInt(offerId) === 2) ? 2 : 1
       const iid = parseInt(itemId)
       const cnt = parseInt(count) || 1
       const prc = parseInt(price) || 100
@@ -331,12 +329,12 @@ export default async function handler(req, res) {
       const now = Date.now()
       await db.query(
         `INSERT INTO game_offer (id, item_id, count, price_ikoin, title, active, updated_at)
-         VALUES (1, ?, ?, ?, ?, ?, ?)
+         VALUES (?, ?, ?, ?, ?, ?, ?)
          ON DUPLICATE KEY UPDATE item_id=?, count=?, price_ikoin=?, title=?, active=?, updated_at=?`,
-        [iid, cnt, prc, title || 'Oferta Limitada', active ? 1 : 0, now,
+        [oid, iid, cnt, prc, title || 'Oferta Limitada', active ? 1 : 0, now,
          iid, cnt, prc, title || 'Oferta Limitada', active ? 1 : 0, now]
       )
-      return res.status(200).json({ success: true, message: 'Oferta salva com sucesso.' })
+      return res.status(200).json({ success: true, message: `Oferta ${oid} salva com sucesso.` })
     }
 
     // POST /api/admin/ban — banir conta
