@@ -850,13 +850,14 @@ export default function AdminPanel({ user, onLogout }) {
                 </div>
 
                 {/* TROCAR CLASSE */}
-                <div style={{ display: 'flex', gap: '0.6rem', marginBottom: '1rem', alignItems: 'center' }}>
+                <div style={{ display: 'flex', gap: '0.6rem', marginBottom: '0.4rem', alignItems: 'center' }}>
                   <select value={newClass} onChange={e => setNewClass(e.target.value)} style={{ ...inputStyleAdmin, flex: 1 }}>
-                    <option value="" style={{ background: '#1a1a1f', color: '#fff' }}>— Trocar classe (escolha p/ a raça) —</option>
+                    <option value="" style={{ background: '#1a1a1f', color: '#fff' }}>— Trocar classe (mesma raça do char) —</option>
                     {ALL_CLASSES.map(cl => <option key={cl.id} value={cl.id} style={{ background: '#1a1a1f', color: '#fff' }}>{cl.id} — {cl.name}</option>)}
                   </select>
                   <button onClick={() => charAction('char-class', { objId: selChar.objId, classId: newClass }, 'Classe')} disabled={!newClass} style={{ padding: '0.7rem 1.2rem', background: 'rgba(192,132,252,0.12)', border: '1px solid rgba(192,132,252,0.4)', color: '#c084fc', borderRadius: '7px', cursor: newClass ? 'pointer' : 'not-allowed', fontSize: '0.75rem', fontWeight: '700', opacity: newClass ? 1 : 0.5 }}>TROCAR</button>
                 </div>
+                <p style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.3)', margin: '0 0 1rem' }}>⚠ Troca só o classId (mantenha a raça do char). Para trocar raça+classe completo, use <b style={{ color: '#c084fc' }}>Alt+G</b> no jogo (logado como GM).</p>
 
                 {/* TELEPORTE (destravar) */}
                 <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center' }}>
