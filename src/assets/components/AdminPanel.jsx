@@ -715,8 +715,8 @@ export default function AdminPanel({ user, onLogout }) {
                 {/* TROCAR CLASSE */}
                 <div style={{ display: 'flex', gap: '0.6rem', marginBottom: '1rem', alignItems: 'center' }}>
                   <select value={newClass} onChange={e => setNewClass(e.target.value)} style={{ ...inputStyleAdmin, flex: 1 }}>
-                    <option value="">— Trocar classe (lvl 76) —</option>
-                    {CLASSES_76.map(cl => <option key={cl.id} value={cl.id}>{cl.name}</option>)}
+                    <option value="" style={{ background: '#1a1a1f', color: '#fff' }}>— Trocar classe (lvl 76) —</option>
+                    {CLASSES_76.map(cl => <option key={cl.id} value={cl.id} style={{ background: '#1a1a1f', color: '#fff' }}>{cl.name}</option>)}
                   </select>
                   <button onClick={() => charAction('char-class', { objId: selChar.objId, classId: newClass }, 'Classe')} disabled={!newClass} style={{ padding: '0.7rem 1.2rem', background: 'rgba(192,132,252,0.12)', border: '1px solid rgba(192,132,252,0.4)', color: '#c084fc', borderRadius: '7px', cursor: newClass ? 'pointer' : 'not-allowed', fontSize: '0.75rem', fontWeight: '700', opacity: newClass ? 1 : 0.5 }}>TROCAR</button>
                 </div>
@@ -724,7 +724,7 @@ export default function AdminPanel({ user, onLogout }) {
                 {/* TELEPORTE (destravar) */}
                 <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center' }}>
                   <select value={newTown} onChange={e => setNewTown(e.target.value)} style={{ ...inputStyleAdmin, flex: 1 }}>
-                    {TOWNS_LIST.map(t => <option key={t.id} value={t.id}>Teleportar para {t.name}</option>)}
+                    {TOWNS_LIST.map(t => <option key={t.id} value={t.id} style={{ background: '#1a1a1f', color: '#fff' }}>Teleportar para {t.name}</option>)}
                   </select>
                   <button onClick={() => charAction('char-teleport', { objId: selChar.objId, town: newTown }, 'Teleporte')} style={{ padding: '0.7rem 1.2rem', background: 'rgba(74,222,128,0.1)', border: '1px solid rgba(74,222,128,0.4)', color: '#4ade80', borderRadius: '7px', cursor: 'pointer', fontSize: '0.75rem', fontWeight: '700' }}>DESTRAVAR</button>
                 </div>
