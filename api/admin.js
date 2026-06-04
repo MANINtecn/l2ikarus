@@ -155,6 +155,9 @@ const L2_CLASSES = {
   263: "Samurai",
 }
 
+// classId -> race (ordinal). HUMAN0 ELF1 DARKELF2 ORC3 DWARF4 KAMAEL5 ERTHEIA6 SYLPH30 HIGHELF31
+const CLASS_RACE = { 0: 0,1: 0,2: 0,3: 0,4: 0,5: 0,6: 0,7: 0,8: 0,9: 0,10: 0,11: 0,12: 0,13: 0,14: 0,15: 0,16: 0,17: 0,18: 1,19: 1,20: 1,21: 1,22: 1,23: 1,24: 1,25: 1,26: 1,27: 1,28: 1,29: 1,30: 1,31: 2,32: 2,33: 2,34: 2,35: 2,36: 2,37: 2,38: 2,39: 2,40: 2,41: 2,42: 2,43: 2,44: 3,45: 3,46: 3,47: 3,48: 3,49: 3,50: 3,51: 3,52: 3,53: 4,54: 4,55: 4,56: 4,57: 4,88: 0,89: 0,90: 0,91: 0,92: 0,93: 0,94: 0,95: 0,96: 0,97: 0,98: 0,99: 1,100: 1,101: 1,102: 1,103: 1,104: 1,105: 1,106: 2,107: 2,108: 2,109: 2,110: 2,111: 2,112: 2,113: 3,114: 3,115: 3,116: 3,117: 4,118: 4,125: 5,126: 5,127: 5,130: 5,131: 5,134: 5,192: 5,193: 5,194: 5,195: 5,196: 0,197: 0,198: 0,199: 0,200: 1,201: 1,202: 1,203: 1,204: 2,205: 2,206: 2,207: 2,208: 30,209: 30,210: 30,211: 30,217: 3,218: 3,219: 3,220: 3,221: 0,222: 0,223: 0,224: 0,225: 2,226: 2,227: 2,228: 2,236: 31,237: 31,238: 31,239: 31,240: 31,241: 31,242: 31,243: 31,247: 0,248: 0,249: 0,250: 0,251: 2,252: 2,253: 2,254: 2,260: 5,261: 5,262: 5,263: 5 }
+
 function verifyJWT(token, secret) {
   try {
     const [header, payload, sig] = token.split('.')
@@ -399,31 +402,47 @@ export default async function handler(req, res) {
         chars: rows.map(r => ({
           objId: r.objId, name: r.char_name, level: r.level,
           classId: r.classid, class: L2_CLASSES[r.classid] || `Class ${r.classid}`,
-          online: r.online > 0, access: r.access, account: r.account_name,
+          race: r.race, online: r.online > 0, access: r.access, account: r.account_name,
           isGM: r.access >= 100,
         })),
       })
     }
 
-    // POST /api/admin/char-class — troca a classe do personagem (offline)
+    // POST /api/admin/char-class — troca classe E raça do personagem (offline)
     if (action === 'char-class' && req.method === 'POST') {
       const { objId, classId } = req.body || {}
       const cid = parseInt(classId)
       if (!objId || isNaN(cid)) return res.status(400).json({ error: 'objId e classId obrigatórios' })
+      if (CLASS_RACE[cid] === undefined) return res.status(400).json({ error: `classId ${cid} inválido (não existe no servidor).` })
+
       const [cols] = await db.query('SHOW COLUMNS FROM characters')
       const names = cols.map(c => c.Field)
       const idCol = ['charId', 'obj_Id', 'obj_id', 'char_id', 'objId'].find(c => names.includes(c)) || 'charId'
-      if (names.includes('online')) {
-        const [[c]] = await db.query(`SELECT online, char_name FROM characters WHERE \`${idCol}\` = ?`, [objId])
-        if (c && c.online > 0) return res.status(409).json({ error: `${c.char_name} está ONLINE. Deslogue antes de trocar a classe.` })
-      }
-      // base_class + classid (alguns servers tem as duas)
+
+      const [[cur]] = await db.query(`SELECT classid, race, online, char_name FROM characters WHERE \`${idCol}\` = ?`, [objId])
+      if (!cur) return res.status(404).json({ error: 'Personagem não encontrado' })
+      if (cur.online > 0) return res.status(409).json({ error: `${cur.char_name} está ONLINE. Deslogue antes de trocar a classe.` })
+
+      const newRace = CLASS_RACE[cid]
+      const raceChanged = cur.race !== newRace
+
+      // classid (+ base_class) + race
       const sets = ['classid = ?']
       const vals = [cid]
       if (names.includes('base_class')) { sets.push('base_class = ?'); vals.push(cid) }
+      if (names.includes('race')) { sets.push('race = ?'); vals.push(newRace) }
+      // Ao mudar de raça, reseta aparência (face/cabelo são específicos da raça)
+      if (raceChanged) {
+        if (names.includes('face')) { sets.push('face = 0') }
+        if (names.includes('hairStyle')) { sets.push('hairStyle = 0') }
+        if (names.includes('hairColor')) { sets.push('hairColor = 0') }
+      }
       vals.push(objId)
       await db.query(`UPDATE characters SET ${sets.join(', ')} WHERE \`${idCol}\` = ?`, vals)
-      return res.status(200).json({ success: true, message: `Classe alterada para ${L2_CLASSES[cid] || cid}. Faça login.` })
+
+      const RACE_NAMES = { 0: 'Human', 1: 'Elf', 2: 'Dark Elf', 3: 'Orc', 4: 'Dwarf', 5: 'Kamael', 6: 'Ertheia', 30: 'Sylph', 31: 'High Elf' }
+      const msg = `Classe: ${L2_CLASSES[cid] || cid} (${RACE_NAMES[newRace] || 'race ' + newRace})${raceChanged ? ' — raça e aparência ajustadas' : ''}. Faça login.`
+      return res.status(200).json({ success: true, message: msg })
     }
 
     // POST /api/admin/char-teleport — reseta posição para uma cidade (destrava char)
