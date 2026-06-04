@@ -31,6 +31,8 @@
     { "source": "/api/admin/code-create", "destination": "/api/admin?action=code-create" },
     { "source": "/api/admin/code-toggle", "destination": "/api/admin?action=code-toggle" },
     { "source": "/api/admin/code-delete", "destination": "/api/admin?action=code-delete" },
-    { "source": "/api/admin/ikoin", "destination": "/api/admin?action=ikoin" }
+    { "source": "/api/admin/ikoin", "destination": "/api/admin?action=ikoin" },
+    { "source": "/api/admin/offer", "destination": "/api/admin?action=offer" },
+    { "source": "/api/admin/offer-save", "destination": "/api/admin?action=offer-save" }
   ]
 }
