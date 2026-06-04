@@ -108,16 +108,20 @@ export default function AdminPanel({ user, onLogout }) {
   }
 
   const saveOffer = async () => {
-    setOfferMsg('')
-    const r = await fetch('/api/admin/offer-save', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        itemId: offer.item_id, count: offer.count,
-        price: offer.price_ikoin, title: offer.title, active: offer.active,
-      }),
-    }).then(x => x.json())
-    setOfferMsg(r.success ? r.message : (r.error || 'Erro ao salvar'))
-    if (r.success) fetchTab('offer')
+    setOfferMsg('⏳ Salvando...')
+    try {
+      const r = await fetch('/api/admin/offer-save', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          itemId: offer.item_id, count: offer.count,
+          price: offer.price_ikoin, title: offer.title, active: offer.active,
+        }),
+      }).then(x => x.json())
+      setOfferMsg(r.success ? '✓ ' + r.message : '✗ ' + (r.error || 'Erro ao salvar'))
+      if (r.success) fetchTab('offer')
+    } catch {
+      setOfferMsg('✗ Erro de conexão com o servidor.')
+    }
   }
 
   const searchAccounts = async () => {
@@ -559,7 +563,30 @@ export default function AdminPanel({ user, onLogout }) {
                 <span style={{ color: offer.active ? '#4ade80' : 'rgba(255,255,255,0.5)', fontSize: '0.85rem' }}>{offer.active ? 'OFERTA ATIVA (visível no jogo)' : 'Oferta desativada (oculta no jogo)'}</span>
               </label>
               <button onClick={saveOffer} className="btn btn-primary" style={{ width: '100%', padding: '0.9rem' }}>SALVAR OFERTA</button>
-              {offerMsg && <p style={{ marginTop: '0.8rem', fontSize: '0.78rem', color: offerMsg.includes('sucesso') ? '#4ade80' : '#ef4444', textAlign: 'center' }}>{offerMsg}</p>}
+              {offerMsg && <p style={{ marginTop: '0.8rem', fontSize: '0.82rem', fontWeight: '600', color: offerMsg.startsWith('✓') ? '#4ade80' : offerMsg.startsWith('⏳') ? 'var(--gold)' : '#ef4444', textAlign: 'center' }}>{offerMsg}</p>}
+            </div>
+
+            {/* PREVIEW DA OFERTA ATUAL */}
+            <div style={{ marginTop: '1.5rem' }}>
+              <p style={{ fontSize: '0.55rem', color: 'rgba(255,255,255,0.4)', letterSpacing: '3px', marginBottom: '0.8rem' }}>PREVIEW (COMO APARECE NO JOGO)</p>
+              <div style={{
+                background: 'linear-gradient(135deg, rgba(255,170,68,0.08), rgba(0,0,0,0.3))',
+                border: `1px solid ${offer.active ? 'rgba(255,170,68,0.4)' : 'rgba(255,255,255,0.08)'}`,
+                borderRadius: '12px', padding: '1.2rem', display: 'flex', alignItems: 'center', gap: '1rem',
+                opacity: offer.active ? 1 : 0.5,
+              }}>
+                <div style={{ width: '52px', height: '52px', borderRadius: '8px', background: 'rgba(255,170,68,0.12)', border: '1px solid rgba(255,170,68,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem' }}>🎁</div>
+                <div style={{ flex: 1 }}>
+                  <p style={{ color: '#FFAA44', fontWeight: '700', fontSize: '0.95rem', margin: 0 }}>{offer.title || 'Oferta Limitada'}</p>
+                  <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.75rem', margin: '2px 0 0' }}>
+                    {offerItemName || `Item ${offer.item_id || '—'}`}{offer.count > 1 ? ` x${offer.count}` : ''}
+                  </p>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <p style={{ color: 'var(--gold)', fontWeight: '800', fontSize: '1rem', margin: 0 }}>{offer.price_ikoin} IK</p>
+                  <p style={{ color: offer.active ? '#4ade80' : 'rgba(255,255,255,0.3)', fontSize: '0.6rem', letterSpacing: '1px', margin: '2px 0 0' }}>{offer.active ? '● ATIVA' : '○ OCULTA'}</p>
+                </div>
+              </div>
             </div>
           </div>
         )}
