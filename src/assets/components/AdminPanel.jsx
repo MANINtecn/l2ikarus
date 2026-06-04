@@ -6,6 +6,7 @@ const TABS = [
   { id: 'accounts', label: 'CONTAS' },
   { id: 'ranking', label: 'RANKING' },
   { id: 'codes', label: 'CÓDIGOS' },
+  { id: 'offer', label: 'OFERTA' },
 ]
 
 const inputStyleAdmin = {
@@ -69,6 +70,9 @@ export default function AdminPanel({ user, onLogout }) {
   const [deletePass, setDeletePass] = useState('')
   const [deleteMsg, setDeleteMsg] = useState('')
   const [actionMsg, setActionMsg] = useState('')
+  const [offer, setOffer] = useState({ item_id: '', count: 1, price_ikoin: 100, title: 'Oferta Limitada', active: 0 })
+  const [offerItemName, setOfferItemName] = useState(null)
+  const [offerMsg, setOfferMsg] = useState('')
 
   useEffect(() => { fetchTab(tab) }, [tab])
 
@@ -94,9 +98,26 @@ export default function AdminPanel({ user, onLogout }) {
       } else if (t === 'codes') {
         const r = await fetch('/api/admin/codes').then(x => x.json())
         setCodes(r.codes || [])
+      } else if (t === 'offer') {
+        const r = await fetch('/api/admin/offer').then(x => x.json())
+        if (r.offer) setOffer(r.offer)
+        setOfferItemName(r.itemName || null)
       }
     } catch {}
     setLoading(false)
+  }
+
+  const saveOffer = async () => {
+    setOfferMsg('')
+    const r = await fetch('/api/admin/offer-save', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        itemId: offer.item_id, count: offer.count,
+        price: offer.price_ikoin, title: offer.title, active: offer.active,
+      }),
+    }).then(x => x.json())
+    setOfferMsg(r.success ? r.message : (r.error || 'Erro ao salvar'))
+    if (r.success) fetchTab('offer')
   }
 
   const searchAccounts = async () => {
@@ -498,6 +519,42 @@ export default function AdminPanel({ user, onLogout }) {
                     </tbody>
                   </table>
               }
+            </div>
+          </div>
+        )}
+
+        {/* ABA OFERTA LIMITADA */}
+        {!loading && tab === 'offer' && (
+          <div style={{ maxWidth: '560px' }}>
+            <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.8rem', marginBottom: '1.5rem' }}>
+              Configure a <b style={{ color: 'var(--gold)' }}>Oferta Limitada</b> que aparece no Community Board do jogo. O ícone e o nome são puxados automaticamente do item pelo ID.
+            </p>
+            <div className="glass-panel" style={{ padding: '1.8rem', border: '1px solid rgba(197,160,89,0.3)' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                <div>
+                  <label style={{ fontSize: '0.6rem', color: 'var(--text-mute)', letterSpacing: '2px', display: 'block', marginBottom: '0.4rem' }}>ID DO ITEM</label>
+                  <input value={offer.item_id} onChange={e => setOffer({ ...offer, item_id: e.target.value })} placeholder="ex: 22078" style={{ ...inputStyleAdmin, width: '100%' }} />
+                  {offerItemName && <p style={{ fontSize: '0.7rem', color: '#4ade80', margin: '0.4rem 0 0' }}>✓ {offerItemName}</p>}
+                </div>
+                <div>
+                  <label style={{ fontSize: '0.6rem', color: 'var(--text-mute)', letterSpacing: '2px', display: 'block', marginBottom: '0.4rem' }}>QUANTIDADE</label>
+                  <input type="number" value={offer.count} onChange={e => setOffer({ ...offer, count: e.target.value })} style={{ ...inputStyleAdmin, width: '100%' }} />
+                </div>
+                <div>
+                  <label style={{ fontSize: '0.6rem', color: 'var(--text-mute)', letterSpacing: '2px', display: 'block', marginBottom: '0.4rem' }}>PREÇO (IKOIN)</label>
+                  <input type="number" value={offer.price_ikoin} onChange={e => setOffer({ ...offer, price_ikoin: e.target.value })} style={{ ...inputStyleAdmin, width: '100%' }} />
+                </div>
+                <div>
+                  <label style={{ fontSize: '0.6rem', color: 'var(--text-mute)', letterSpacing: '2px', display: 'block', marginBottom: '0.4rem' }}>TÍTULO</label>
+                  <input value={offer.title} onChange={e => setOffer({ ...offer, title: e.target.value })} style={{ ...inputStyleAdmin, width: '100%' }} />
+                </div>
+              </div>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', cursor: 'pointer', marginBottom: '1.5rem' }}>
+                <input type="checkbox" checked={!!offer.active} onChange={e => setOffer({ ...offer, active: e.target.checked ? 1 : 0 })} style={{ width: '18px', height: '18px', accentColor: 'var(--gold)' }} />
+                <span style={{ color: offer.active ? '#4ade80' : 'rgba(255,255,255,0.5)', fontSize: '0.85rem' }}>{offer.active ? 'OFERTA ATIVA (visível no jogo)' : 'Oferta desativada (oculta no jogo)'}</span>
+              </label>
+              <button onClick={saveOffer} className="btn btn-primary" style={{ width: '100%', padding: '0.9rem' }}>SALVAR OFERTA</button>
+              {offerMsg && <p style={{ marginTop: '0.8rem', fontSize: '0.78rem', color: offerMsg.includes('sucesso') ? '#4ade80' : '#ef4444', textAlign: 'center' }}>{offerMsg}</p>}
             </div>
           </div>
         )}

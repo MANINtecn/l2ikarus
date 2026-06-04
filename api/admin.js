@@ -55,6 +55,8 @@ function getAction(req) {
   if (url.includes('/ban')) return 'ban'
   if (url.includes('/unban')) return 'unban'
   if (url.includes('/chars')) return 'chars'
+  if (url.includes('/offer-save')) return 'offer-save'
+  if (url.includes('/offer')) return 'offer'
   return req.query.action || ''
 }
 
@@ -306,6 +308,35 @@ export default async function handler(req, res) {
       )
       const [[bal]] = await db.query('SELECT balance FROM ikoin_balance WHERE account_name = ?', [login])
       return res.status(200).json({ success: true, message: `Saldo de ${login}: ${bal.balance} IK`, balance: bal.balance })
+    }
+
+    // GET /api/admin/offer — lê a oferta limitada atual
+    if (action === 'offer') {
+      const [[offer]] = await db.query('SELECT * FROM game_offer WHERE id = 1')
+      let itemName = null
+      if (offer && offer.item_id) {
+        const [[it]] = await db.query('SELECT name FROM item_name WHERE id = ? LIMIT 1', [offer.item_id]).catch(() => [[null]])
+        itemName = it?.name || null
+      }
+      return res.status(200).json({ offer: offer || null, itemName })
+    }
+
+    // POST /api/admin/offer-save — cria/atualiza a oferta limitada
+    if (action === 'offer-save' && req.method === 'POST') {
+      const { itemId, count, price, title, active } = req.body || {}
+      const iid = parseInt(itemId)
+      const cnt = parseInt(count) || 1
+      const prc = parseInt(price) || 100
+      if (!iid) return res.status(400).json({ error: 'ID do item obrigatório' })
+      const now = Date.now()
+      await db.query(
+        `INSERT INTO game_offer (id, item_id, count, price_ikoin, title, active, updated_at)
+         VALUES (1, ?, ?, ?, ?, ?, ?)
+         ON DUPLICATE KEY UPDATE item_id=?, count=?, price_ikoin=?, title=?, active=?, updated_at=?`,
+        [iid, cnt, prc, title || 'Oferta Limitada', active ? 1 : 0, now,
+         iid, cnt, prc, title || 'Oferta Limitada', active ? 1 : 0, now]
+      )
+      return res.status(200).json({ success: true, message: 'Oferta salva com sucesso.' })
     }
 
     // POST /api/admin/ban — banir conta
