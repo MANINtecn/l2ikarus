@@ -265,21 +265,26 @@ export default function AdminPanel({ user, onLogout }) {
         </div>
       </div>
 
-      {/* TABS */}
-      <div style={{ display: 'flex', borderBottom: '1px solid rgba(255,255,255,0.05)', padding: '0 2rem', flexShrink: 0 }}>
-        {TABS.map(t => (
-          <button key={t.id} onClick={() => setTab(t.id)} style={{
-            background: 'none', border: 'none', padding: '0.9rem 1.5rem',
-            color: tab === t.id ? 'var(--gold)' : 'rgba(255,255,255,0.35)',
-            fontSize: '0.62rem', letterSpacing: '3px', cursor: 'pointer',
-            borderBottom: `2px solid ${tab === t.id ? 'var(--gold)' : 'transparent'}`,
-          }}>{t.label}</button>
-        ))}
-        <button onClick={() => fetchTab(tab)} style={{ marginLeft: 'auto', background: 'none', border: 'none', color: 'rgba(255,255,255,0.25)', fontSize: '0.65rem', cursor: 'pointer', padding: '0.9rem' }}>↻ ATUALIZAR</button>
-      </div>
+      {/* BODY: SIDEBAR + CONTENT */}
+      <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
 
-      {/* CONTENT */}
-      <div style={{ flex: 1, overflow: 'auto', padding: '1.5rem 2rem' }}>
+        {/* SIDEBAR */}
+        <div style={{ width: '210px', flexShrink: 0, borderRight: '1px solid rgba(255,255,255,0.06)', background: 'rgba(0,0,0,0.25)', display: 'flex', flexDirection: 'column', padding: '1rem 0.8rem' }}>
+          {TABS.map(t => (
+            <button key={t.id} onClick={() => setTab(t.id)} style={{
+              background: tab === t.id ? 'rgba(197,160,89,0.12)' : 'none',
+              border: 'none', borderLeft: `3px solid ${tab === t.id ? 'var(--gold)' : 'transparent'}`,
+              padding: '0.8rem 1rem', marginBottom: '0.2rem', textAlign: 'left',
+              color: tab === t.id ? 'var(--gold)' : 'rgba(255,255,255,0.4)',
+              fontSize: '0.7rem', letterSpacing: '2px', cursor: 'pointer', borderRadius: '0 6px 6px 0',
+              transition: 'all 0.15s',
+            }}>{t.label}</button>
+          ))}
+          <button onClick={() => fetchTab(tab)} style={{ marginTop: 'auto', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.4)', fontSize: '0.62rem', letterSpacing: '2px', cursor: 'pointer', padding: '0.7rem', borderRadius: '6px' }}>↻ ATUALIZAR</button>
+        </div>
+
+        {/* CONTENT */}
+        <div style={{ flex: 1, overflow: 'auto', padding: '1.5rem 2rem' }}>
         {loading && <p style={{ color: 'var(--text-mute)', letterSpacing: '3px', fontSize: '0.75rem' }}>CARREGANDO...</p>}
 
         {/* VISÃO GERAL */}
@@ -558,6 +563,7 @@ export default function AdminPanel({ user, onLogout }) {
             </div>
           </div>
         )}
+        </div>
       </div>
 
       {/* MODAL CONFIRMAÇÃO DELETE */}
