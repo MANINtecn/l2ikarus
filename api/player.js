@@ -88,7 +88,7 @@ export default async function handler(req, res) {
     try {
       const db = await getConnection()
       const [chars] = await db.query(
-        'SELECT char_name, level, classid, online FROM characters WHERE account_name = ? ORDER BY level DESC',
+        'SELECT char_name, level, classid, online, pvpkills, onlinetime FROM characters WHERE account_name = ? ORDER BY level DESC',
         [payload.login]
       )
       // Saldo Ikoin (cria registro se não existir)
@@ -108,6 +108,8 @@ export default async function handler(req, res) {
           level: c.level,
           class: L2_CLASSES[c.classid] || `Class ${c.classid}`,
           online: c.online === 1,
+          pvp: c.pvpkills || 0,
+          onlinetime: c.onlinetime || 0,
         })),
       })
     } catch (err) {
