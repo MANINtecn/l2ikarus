@@ -231,9 +231,25 @@ export default async function handler(req, res) {
     if (action === 'set-gm' && req.method === 'POST') {
       const { objId, gm } = req.body || {}
       if (!objId) return res.status(400).json({ error: 'objId obrigatório' })
-      const level = gm ? 100 : 0
-      await db.query('UPDATE characters SET accesslevel = ? WHERE obj_Id = ?', [level, objId])
-      return res.status(200).json({ success: true, message: gm ? 'GM concedido.' : 'GM removido.' })
+      const level = gm ? 100 : 0 // 100 = Master (isGM=true)
+
+      // Descobre o nome real da coluna de ID + a coluna de access level + online
+      const [cols] = await db.query('SHOW COLUMNS FROM characters')
+      const names = cols.map(c => c.Field)
+      const idCol = ['charId', 'obj_Id', 'obj_id', 'char_id', 'objId'].find(c => names.includes(c)) || 'charId'
+      const accessCol = ['accesslevel', 'accessLevel', 'access_level'].find(c => names.includes(c)) || 'accesslevel'
+      const onlineCol = names.includes('online') ? 'online' : null
+
+      // Avisa se estiver online (mudanca so vale apos relogar e pode ser sobrescrita)
+      if (onlineCol) {
+        const [[c]] = await db.query(`SELECT \`${onlineCol}\` AS on0, char_name FROM characters WHERE \`${idCol}\` = ?`, [objId])
+        if (c && c.on0 > 0) {
+          return res.status(409).json({ error: `${c.char_name} está ONLINE. Peça para deslogar, depois aplique o GM (senão é sobrescrito ao sair).` })
+        }
+      }
+
+      await db.query(`UPDATE characters SET \`${accessCol}\` = ? WHERE \`${idCol}\` = ?`, [level, objId])
+      return res.status(200).json({ success: true, message: gm ? 'GM (Master) concedido! Faça login no personagem.' : 'GM removido.' })
     }
 
     // POST /api/admin/delete-item — deletar item com senha
