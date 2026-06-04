@@ -119,7 +119,7 @@ export default function PlayerPanel({ data, onLogout }) {
                 <p style={{ fontSize: '2.8rem', fontWeight: '900', color: 'var(--gold)', margin: 0, lineHeight: 1, fontFamily: 'Cinzel, serif' }}>
                   {(data.ikoin ?? 0).toLocaleString()}
                 </p>
-                <p style={{ fontSize: '0.75rem', color: 'rgba(197,160,89,0.6)', margin: '2px 0 0', letterSpacing: '2px' }}>iKOIN</p>
+                <p style={{ fontSize: '0.75rem', color: 'rgba(197,160,89,0.6)', margin: '2px 0 0', letterSpacing: '2px' }}>Ikoin</p>
               </div>
             </div>
             <button onClick={() => setBuyOpen(true)} className="btn btn-primary" style={{ width: '100%', padding: '0.8rem', fontSize: '0.72rem', letterSpacing: '2px' }}>
@@ -143,7 +143,7 @@ export default function PlayerPanel({ data, onLogout }) {
             {redeemMsg && (
               <p style={{ marginTop: '0.6rem', fontSize: '0.75rem', color: redeemMsg.ok ? '#4ade80' : '#ef4444', margin: '0.6rem 0 0' }}>{redeemMsg.text}</p>
             )}
-            <p style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.25)', margin: '0.5rem 0 0' }}>Códigos também podem ser usados no jogo com .code SEUCODIGO</p>
+            <p style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.25)', margin: '0.5rem 0 0' }}>Códigos também podem ser resgatados no jogo, no Community Board (Alt+B → Referral).</p>
           </div>
 
           {/* STATS */}
@@ -158,6 +158,42 @@ export default function PlayerPanel({ data, onLogout }) {
                 <p style={{ fontSize: '1.8rem', fontWeight: '900', color: s.color, margin: 0, fontFamily: 'Cinzel, serif' }}>{s.value}</p>
               </div>
             ))}
+          </div>
+
+          {/* SERVIÇOS */}
+          <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', padding: '1.2rem' }}>
+            <p style={{ fontSize: '0.55rem', color: 'rgba(255,255,255,0.4)', letterSpacing: '4px', margin: '0 0 1rem' }}>SERVIÇOS</p>
+            {[
+              { name: 'Troca de Classe', price: '150 Ikoin', soon: false },
+              { name: 'Doar Ikoin a um amigo', price: 'Em breve', soon: true },
+              { name: 'Vender Personagem', price: 'Em breve', soon: true },
+            ].map(srv => (
+              <div key={srv.name} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.7rem 0', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                <span style={{ color: srv.soon ? 'rgba(255,255,255,0.4)' : '#fff', fontSize: '0.82rem' }}>{srv.name}</span>
+                {srv.soon ? (
+                  <span style={{ color: 'rgba(255,255,255,0.25)', fontSize: '0.65rem', letterSpacing: '1px', fontStyle: 'italic' }}>EM BREVE</span>
+                ) : (
+                  <button style={{ background: 'rgba(197,160,89,0.12)', border: '1px solid rgba(197,160,89,0.35)', color: 'var(--gold)', padding: '0.35rem 0.9rem', borderRadius: '6px', fontSize: '0.68rem', fontWeight: '700', cursor: 'pointer', whiteSpace: 'nowrap' }}>{srv.price}</button>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* INDICAÇÕES */}
+          <div style={{ background: 'linear-gradient(135deg, rgba(124,184,232,0.08), rgba(124,184,232,0.02))', border: '1px solid rgba(124,184,232,0.25)', borderRadius: '12px', padding: '1.2rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.8rem' }}>
+              <p style={{ fontSize: '0.55rem', color: 'rgba(124,184,232,0.8)', letterSpacing: '4px', margin: 0 }}>INDICAÇÕES</p>
+              <span style={{ color: 'rgba(255,255,255,0.25)', fontSize: '0.6rem', letterSpacing: '1px', fontStyle: 'italic' }}>EM BREVE</span>
+            </div>
+            <p style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.55)', margin: '0 0 0.8rem', lineHeight: 1.5 }}>
+              Compartilhe seu código com amigos. Quando eles gastarem no servidor, você ganha uma recompensa!
+            </p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+              <div style={{ flex: 1, background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(124,184,232,0.2)', borderRadius: '8px', padding: '0.7rem 1rem', fontFamily: 'monospace', color: '#7cb8e8', letterSpacing: '2px', fontSize: '0.9rem', fontWeight: '700' }}>
+                {(data.login || 'PLAYER').toUpperCase()}-IK
+              </div>
+              <button onClick={() => navigator.clipboard?.writeText(`${(data.login || 'PLAYER').toUpperCase()}-IK`)} style={{ background: 'rgba(124,184,232,0.12)', border: '1px solid rgba(124,184,232,0.3)', color: '#7cb8e8', padding: '0.7rem 1rem', borderRadius: '8px', fontSize: '0.68rem', fontWeight: '700', cursor: 'pointer' }}>COPIAR</button>
+            </div>
           </div>
         </div>
 
