@@ -1,4 +1,3 @@
-import { getConnection } from './_db.js'
 import crypto from 'crypto'
 
 const LOGIN_RE = /^[a-zA-Z0-9_]{4,16}$/
@@ -70,15 +69,19 @@ export default async function handler(req, res) {
   if (email && !EMAIL_RE.test(email)) return res.status(400).json({ message: 'E-mail inválido' })
 
   try {
-    const pool = await getConnection()
+    // Hasheia a senha AQUI (texto puro nunca trafega) e manda só o hash pra VPS.
     const hashedPassword = crypto.createHash('sha1').update(password).digest('base64')
-    const [existing] = await pool.query('SELECT login FROM accounts WHERE login = ?', [login])
-    if (existing.length > 0) return res.status(409).json({ message: 'Este login já está em uso' })
-    const createdTime = Math.floor(Date.now() / 1000)
-    await pool.query('INSERT INTO accounts (login, password, email, created_time) VALUES (?, ?, ?, ?)', [login, hashedPassword, email ?? '', createdTime])
-    return res.status(200).json({ success: true, message: 'Conta criada com sucesso!' })
+    const base = process.env.VPS_API_URL || (process.env.VPS_STATUS_URL || '').replace(/\/status$/, '')
+    if (!base) return res.status(500).json({ message: 'Servidor de cadastro não configurado (VPS_API_URL).' })
+    const vpsRes = await fetch(base + '/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': process.env.VPS_STATUS_TOKEN },
+      body: JSON.stringify({ login, passwordHash: hashedPassword, email: email ?? '' }),
+    })
+    const data = await vpsRes.json().catch(() => ({}))
+    return res.status(vpsRes.status).json(data)
   } catch (err) {
-    console.error('Register error:', err)
-    return res.status(500).json({ message: err.message || 'Erro ao criar conta.' })
+    console.error('Register proxy error:', err)
+    return res.status(502).json({ message: 'Servidor de cadastro indisponível. Tente novamente.' })
   }
 }
