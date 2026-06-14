@@ -2,12 +2,12 @@ import { useState } from 'react'
 
 export default function FeaturesTerminal() {
   const [features, setFeatures] = useState([
-    { title: 'INSTANCED DUNGEONS', desc: 'Enfrente chefes lendários em instâncias solo ou em grupo com loot exclusivo.', icon: '🏰' },
-    { title: 'ELITE PVP BALANCE', desc: 'Sistema de classes refinado para garantir que a habilidade seja o único diferencial.', icon: '⚔️' },
-    { title: 'FAIR ECONOMY', desc: 'Comércio livre e mercado estável baseado em Adena e Ancient Adena.', icon: '💎' },
-    { title: 'CUSTOM BOSSES', desc: 'Raid Bosses mundiais com mecânicas de luta renovadas e recompensas AAA.', icon: '🐉' },
-    { title: 'CRAFTING MASTERY', desc: 'Sistema de craft valorizado, tornando cada item forjado uma conquista real.', icon: '🛠️' },
-    { title: 'DAILY REWARDS', desc: 'Holograma de login diário com itens de suporte para sua evolução.', icon: '🎁' }
+    { title: 'COMBATE DE AÇÃO', desc: 'Mod No-Target exclusivo: skills saem na direção que você mira, acertam pelo posicionamento e alcance. Quem joga melhor vence — não o auto-target.', icon: '⚔️' },
+    { title: 'ZONA MORTAL · D · C · B', desc: 'Áreas de risco extremo por grade. Morreu lá dentro, perde TUDO. Mas os drops recompensam quem tem coragem de entrar.', icon: '☠️' },
+    { title: 'QUESTS DE PROGRESSÃO', desc: 'Quests iniciais que aceleram sua evolução desde o nível 1. Low-rate justo: o esforço importa, mas você nunca fica travado.', icon: '📜' },
+    { title: 'ECONOMIA DE MINERAÇÃO', desc: 'Parte das doações é minerada DENTRO do jogo e volta para os jogadores. Qualquer um pode gerar renda jogando. (em breve)', icon: '⛏️' },
+    { title: 'START PACKS', desc: 'Pacotes iniciais Basic · Raro · Lendário para começar forte e focar na ação desde o primeiro login.', icon: '🎁' },
+    { title: 'LOW-RATE JUSTO', desc: 'Rates equilibrados com progressão sólida e VIP opcional. Mercado estável, sem inflação — cada conquista tem valor real.', icon: '💠' }
   ])
 
   return (
