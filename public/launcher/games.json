@@ -1,0 +1,32 @@
+{
+  "games": [
+    {
+      "id": "l2ikarus",
+      "name": "L2 Ikarus Essence",
+      "status": "available",
+      "image": "https://l2ikarus.vercel.app/launcher/cards/l2ikarus.jpg",
+      "manifestUrl": "https://l2ikarus.vercel.app/launcher/manifest.json",
+      "installDir": "L2 Ikarus Essence",
+      "exe": "system\\L2.exe",
+      "exeArgs": "-INI=\".\\L2_decoded.ini\" -noStartupMovies"
+    },
+    {
+      "id": "l2nexus",
+      "name": "L2 Nexus Interlude",
+      "status": "soon",
+      "image": "https://l2ikarus.vercel.app/launcher/cards/l2nexus.jpg"
+    },
+    {
+      "id": "mu",
+      "name": "MuOnline",
+      "status": "soon",
+      "image": "https://l2ikarus.vercel.app/launcher/cards/mu.jpg"
+    },
+    {
+      "id": "dragonnest",
+      "name": "Dragon Nest",
+      "status": "soon",
+      "image": "https://l2ikarus.vercel.app/launcher/cards/dragonnest.jpg"
+    }
+  ]
+}
