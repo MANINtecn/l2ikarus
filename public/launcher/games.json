@@ -27,6 +27,12 @@
       "name": "Dragon Nest",
       "status": "soon",
       "image": "https://l2ikarus.vercel.app/launcher/cards/dragonnest.jpg"
+    },
+    {
+      "id": "pristontale",
+      "name": "Priston Tale",
+      "status": "soon",
+      "image": "https://l2ikarus.vercel.app/launcher/cards/pristontale.jpg"
     }
   ]
 }
