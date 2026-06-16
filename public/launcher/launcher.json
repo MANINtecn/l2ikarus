@@ -1,6 +1,6 @@
 {
-  "version": "1.2",
+  "version": "1.3",
   "url": "http://192.99.110.164:8081/IkarusGames.exe",
-  "hash": "b94ee168e943968c3e30de95ca3d04ab",
-  "notes": "Cards centralizados, painel de novidades, acesso ao site (conta/Ikoins), sem nome em cima da arte."
+  "hash": "f98d92dc77dd937d73f16b0535f42d04",
+  "notes": "Download paralelo (6 simultaneos) - usa a banda toda, vence o limite de stream unico."
 }
