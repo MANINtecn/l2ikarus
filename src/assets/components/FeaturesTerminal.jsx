@@ -24,53 +24,63 @@ export default function FeaturesTerminal() {
           gap: '3rem' 
         }}>
           {features.map((f, i) => (
-            <div 
-              key={i} 
-              className="glass-panel" 
-              style={{ 
-                padding: '3rem 2.5rem',
-                borderLeft: '4px solid transparent',
-                transition: '0.4s cubic-bezier(0.4, 0, 0.2, 1)'
+            <div
+              key={i}
+              style={{
+                padding: '3rem 2rem',
+                textAlign: 'center',
+                borderRadius: '16px',
+                background: 'linear-gradient(165deg, rgba(212,175,55,0.07) 0%, rgba(22,22,28,0.65) 55%)',
+                border: '1px solid rgba(255,255,255,0.08)',
+                boxShadow: '0 8px 24px rgba(0,0,0,0.35)',
+                transition: '0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                display: 'flex', flexDirection: 'column', alignItems: 'center',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.borderLeftColor = 'var(--gold)';
-                e.currentTarget.style.background = 'rgba(212, 175, 55, 0.03)';
-                e.currentTarget.style.transform = 'scale(1.02)';
+                e.currentTarget.style.borderColor = 'rgba(212,175,55,0.5)';
+                e.currentTarget.style.boxShadow = '0 18px 50px rgba(0,0,0,0.5), 0 0 40px rgba(212,175,55,0.18)';
+                e.currentTarget.style.transform = 'translateY(-8px)';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.borderLeftColor = 'transparent';
-                e.currentTarget.style.background = 'var(--glass-bg)';
-                e.currentTarget.style.transform = 'scale(1)';
+                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
+                e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.35)';
+                e.currentTarget.style.transform = 'translateY(0)';
               }}
             >
-              <div style={{ fontSize: '2.5rem', marginBottom: '2rem', opacity: 0.8 }}>{f.icon}</div>
-              <h3 className="cinzel" style={{ 
-                fontSize: '1.2rem', 
-                color: '#fff', 
+              {/* Badge do ícone */}
+              <div style={{
+                width: '72px', height: '72px', borderRadius: '50%',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: '2.1rem', marginBottom: '1.6rem',
+                background: 'radial-gradient(circle, rgba(212,175,55,0.22) 0%, rgba(212,175,55,0.05) 70%)',
+                border: '1px solid rgba(212,175,55,0.3)',
+                boxShadow: '0 0 24px rgba(212,175,55,0.15)',
+              }}>{f.icon}</div>
+
+              <h3 className="cinzel" style={{
+                fontSize: '1.15rem',
+                color: '#fff',
                 marginBottom: '1rem',
-                letterSpacing: '2px'
+                letterSpacing: '2px',
               }}>
                 {f.title}
               </h3>
-              <p style={{ 
-                fontSize: '0.85rem', 
-                color: 'var(--text-mute)', 
+              <p style={{
+                fontSize: '0.85rem',
+                color: 'rgba(255,255,255,0.7)',
                 lineHeight: 1.8,
-                letterSpacing: '0.5px'
+                letterSpacing: '0.3px',
+                maxWidth: '300px',
               }}>
                 {f.desc}
               </p>
-              
-              {/* TERMINAL FOOTER DECOR */}
-              <div style={{ 
-                marginTop: '2rem', 
-                fontSize: '0.6rem', 
-                color: 'rgba(255,255,255,0.1)',
-                fontFamily: 'monospace',
-                letterSpacing: '2px'
-              }}>
-                SYS_IDENT_ID: 00{i+1}_IKARUS_CORE
-              </div>
+
+              {/* Linha de acento */}
+              <div style={{
+                marginTop: '1.8rem', width: '40px', height: '2px',
+                background: 'linear-gradient(90deg, transparent, var(--gold), transparent)',
+                opacity: 0.6,
+              }} />
             </div>
           ))}
         </div>

@@ -5,53 +5,59 @@ const packs = [
     id: 1,
     name: 'BÁSICO',
     subtitle: 'Start Pack',
-    price: '29,90',
-    color: 'rgba(180,180,200,0.8)',
-    borderColor: 'rgba(180,180,200,0.4)',
+    claim: 'GRÁTIS',
+    claimNote: 'Resgate no Community Board (Alt+B)',
+    color: '#cfd2dc',
+    borderColor: 'rgba(207,210,220,0.45)',
+    bg: 'linear-gradient(160deg, rgba(120,125,145,0.20) 0%, rgba(20,20,26,0.6) 60%)',
+    glow: 'rgba(180,185,205,0.25)',
     items: [
-      'Arma Grau C (à escolha)',
-      'Armadura Completa Grau C',
-      '500.000 Adena',
-      '2.000 Soulshots Grau C',
-      '30 Poções de HP Superiores',
+      'Kit de armas e armadura inicial',
+      'Adena para o começo',
+      'Soulshots / Spiritshots',
+      'Poções de HP',
+      'Consumíveis essenciais',
     ],
-    description: 'Tudo que você precisa para começar a jornada sem depender de farm inicial.',
+    description: 'Tudo que você precisa para começar sem depender de farm inicial. Pra todos, de graça.',
   },
   {
     id: 2,
-    name: 'ÉPICO',
+    name: 'RARO',
     subtitle: 'Start Pack',
-    price: '59,90',
+    claim: 'IKOIN',
+    claimNote: 'Resgate no Community Board (Alt+B)',
     color: 'var(--gold)',
-    borderColor: 'rgba(197,160,89,0.5)',
+    borderColor: 'rgba(197,160,89,0.55)',
+    bg: 'linear-gradient(160deg, rgba(197,160,89,0.20) 0%, rgba(20,20,26,0.6) 60%)',
+    glow: 'rgba(197,160,89,0.30)',
     isPopular: true,
     items: [
-      'Arma Grau B+5 (à escolha)',
-      'Set Completo Grau B',
-      '2.000.000 Adena',
-      '5.000 Soulshots Grau B',
-      'Scroll de XP x3 (30min)',
-      'Pack de Consumíveis Premium',
+      'Tudo do Básico em maior quantidade',
+      'Mais Adena e shots',
+      'Scrolls de XP',
+      'Pack de consumíveis premium',
+      '★ 1 item exclusivo do tier Raro',
     ],
-    description: 'Vantagem real desde o início. Entre no jogo pronto para competir.',
+    description: 'Mais recursos pra acelerar de verdade — e um item único só do Raro.',
   },
   {
     id: 3,
     name: 'LENDÁRIO',
     subtitle: 'Start Pack',
-    price: '99,90',
+    claim: 'IKOIN',
+    claimNote: 'Resgate no Community Board (Alt+B)',
     color: '#c084fc',
-    borderColor: 'rgba(192,132,252,0.4)',
+    borderColor: 'rgba(192,132,252,0.5)',
+    bg: 'linear-gradient(160deg, rgba(168,110,240,0.22) 0%, rgba(20,20,26,0.6) 60%)',
+    glow: 'rgba(192,132,252,0.30)',
     items: [
-      'Arma Grau A+8 (à escolha)',
-      'Set Completo Grau A Encantado',
-      '10.000.000 Adena',
-      '10.000 Soulshots Grau A',
-      'Scroll de XP x7 (1h cada)',
-      'Pack Premium + Buff Cosmético',
-      'Acesso VIP por 30 dias',
+      'Tudo do Raro em quantidade máxima',
+      'Muito mais Adena e shots',
+      'Scrolls de XP turbo',
+      'Pack premium completo',
+      '★ 1 item exclusivo do tier Lendário',
     ],
-    description: 'O pacote definitivo. Entre no topo e mostre quem você é desde o primeiro login.',
+    description: 'O pacote definitivo. Comece no topo com o item único mais raro.',
   },
 ]
 
@@ -77,8 +83,8 @@ export default function DonateTerminal() {
           letterSpacing: '2px',
           lineHeight: '1.6'
         }}>
-          Pacotes de início pensados para você entrar no servidor com vantagem real.
-          Sem Pay-to-Win — apenas tempo e conveniência.
+          Todo jogador começa com o pack Básico GRÁTIS, resgatado dentro do jogo no Community Board (Alt+B).
+          Quer mais? Os tiers Raro e Lendário são resgatados com Ikoin — sem Pay-to-Win, só conveniência.
         </p>
 
         <div style={{
@@ -94,8 +100,12 @@ export default function DonateTerminal() {
               onMouseLeave={() => setHovered(null)}
               style={{
                 padding: '2.5rem 2rem',
-                background: hovered === pkg.id ? 'rgba(197,160,89,0.04)' : 'rgba(255,255,255,0.02)',
-                border: `1px solid ${hovered === pkg.id ? pkg.borderColor : 'rgba(197,160,89,0.1)'}`,
+                background: pkg.bg,
+                border: `1px solid ${hovered === pkg.id ? pkg.borderColor : 'rgba(255,255,255,0.08)'}`,
+                borderRadius: '14px',
+                boxShadow: hovered === pkg.id
+                  ? `0 18px 50px rgba(0,0,0,0.5), 0 0 40px ${pkg.glow}`
+                  : '0 8px 24px rgba(0,0,0,0.35)',
                 transition: 'all 0.4s cubic-bezier(0.4,0,0.2,1)',
                 transform: hovered === pkg.id ? 'translateY(-12px) scale(1.02)' : 'translateY(0) scale(1)',
                 position: 'relative',
@@ -120,8 +130,16 @@ export default function DonateTerminal() {
               </h4>
 
               <div style={{ marginBottom: '2rem' }}>
-                <span style={{ fontSize: '0.85rem', color: 'var(--text-mute)' }}>R$</span>
-                <span style={{ fontSize: '3rem', fontWeight: '900', color: '#fff', marginLeft: '4px' }}>{pkg.price}</span>
+                <span style={{
+                  display: 'inline-block', padding: '0.45rem 1.1rem', borderRadius: '8px',
+                  background: pkg.claim === 'GRÁTIS' ? 'rgba(76,175,80,0.15)' : 'rgba(197,160,89,0.15)',
+                  border: `1px solid ${pkg.claim === 'GRÁTIS' ? 'rgba(76,175,80,0.45)' : 'rgba(197,160,89,0.45)'}`,
+                  color: pkg.claim === 'GRÁTIS' ? '#7BD88F' : 'var(--gold)',
+                  fontWeight: '900', fontSize: '1.25rem', letterSpacing: '2px',
+                }}>{pkg.claim}</span>
+                <p style={{ fontSize: '0.62rem', letterSpacing: '1px', color: 'var(--text-mute)', marginTop: '0.7rem', textTransform: 'uppercase' }}>
+                  {pkg.claimNote}
+                </p>
               </div>
 
               <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 2rem', display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
@@ -137,9 +155,14 @@ export default function DonateTerminal() {
                 {pkg.description}
               </p>
 
-              <button className="btn btn-primary" style={{ width: '100%', padding: '1.1rem', borderColor: pkg.color }}>
-                ADQUIRIR PACOTE
-              </button>
+              <div style={{
+                width: '100%', padding: '0.95rem', textAlign: 'center', borderRadius: '8px',
+                background: 'rgba(255,255,255,0.04)', border: '1px dashed rgba(255,255,255,0.2)',
+                color: '#dcdcdc', fontSize: '0.7rem', letterSpacing: '2px', fontWeight: '700',
+                boxSizing: 'border-box',
+              }}>
+                🎮 RESGATE NO JOGO · ALT+B
+              </div>
 
               <div style={{
                 position: 'absolute', bottom: 0, left: 0, width: '100%', height: '3px',
@@ -151,15 +174,12 @@ export default function DonateTerminal() {
           ))}
         </div>
 
-        <div style={{ marginTop: '4rem', opacity: 0.55 }}>
-          <p style={{ fontSize: '0.7rem', letterSpacing: '2px', color: 'var(--text-mute)' }}>
-            TRANSAÇÕES PROCESSADAS COM SEGURANÇA VIA SISTEMA TECX
+        <div style={{ marginTop: '3.5rem', maxWidth: '760px', margin: '3.5rem auto 0' }}>
+          <p style={{ fontSize: '0.78rem', letterSpacing: '1px', color: 'var(--text-mute)', lineHeight: '1.8' }}>
+            💰 <strong style={{ color: 'var(--gold)' }}>Ikoin</strong> é a moeda do servidor — comprada aqui no site e usada para
+            resgatar os tiers <strong style={{ color: 'var(--gold)' }}>Raro</strong> e <strong style={{ color: '#c084fc' }}>Lendário</strong> dentro
+            do jogo (Community Board · Alt+B). O <strong style={{ color: '#7BD88F' }}>Básico</strong> é sempre grátis pra todos.
           </p>
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', marginTop: '1.2rem', fontSize: '1.3rem' }}>
-            <span title="PIX">💠 PIX</span>
-            <span title="Stripe">💳 STRIPE</span>
-            <span title="PayPal">🅿️ PAYPAL</span>
-          </div>
         </div>
       </div>
     </section>

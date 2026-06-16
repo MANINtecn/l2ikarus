@@ -128,8 +128,8 @@ function App() {
 
           <div ref={containerRef} className="scroll-content-container" style={{ position: 'relative', zIndex: 5, background: 'transparent' }}>
             <div className="section-divider" />
-            <FeaturesTerminal />
             <DonateTerminal />
+            <FeaturesTerminal />
             <DownloadTerminal />
             <DiscordCommunity />
             <div className="section-divider" style={{ opacity: 0.1 }} />
