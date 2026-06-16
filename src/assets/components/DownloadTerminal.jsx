@@ -1,13 +1,11 @@
 const DISCORD_INVITE = 'https://discord.gg/KF5AzGT7Y9'
-// Launcher IKARUS GAMES (~150 MB). 2 meios de download:
-const MEGA_DOWNLOAD = 'https://mega.nz/file/SkU1nBBK#28vLSl7D6FVYFN2TAIbOhcdB4_ySt1QIFlqfpXeOWaI'
 const DRIVE_DOWNLOAD = 'https://drive.google.com/file/d/1mevVcw8FLb8lEWelBwYCbbqTH7M_0taP/view?usp=sharing'
 
 const STEPS = [
   {
     num: '01',
     title: 'BAIXE O LAUNCHER',
-    desc: 'Só o IKARUS GAMES (~150 MB) pelo MEGA ou Google Drive. Rápido e leve.',
+    desc: 'Só o IKARUS GAMES (~150 MB) pelo Google Drive. Rápido e leve.',
     color: 'var(--gold)',
   },
   {
@@ -133,22 +131,13 @@ export default function DownloadTerminal() {
               </p>
             </div>
 
-            {/* Botões de download — 2 meios */}
+            {/* Botão de download */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', width: '100%' }}>
-              <a
-                href={MEGA_DOWNLOAD || DISCORD_INVITE}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-primary"
-                style={{ padding: '0.9rem 2rem', fontSize: '0.85rem', letterSpacing: '3px', width: '100%' }}
-              >
-                ⬇ BAIXAR · MEGA
-              </a>
               <a
                 href={DRIVE_DOWNLOAD || DISCORD_INVITE}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn btn-ghost"
+                className="btn btn-primary"
                 style={{ padding: '0.9rem 2rem', fontSize: '0.85rem', letterSpacing: '3px', width: '100%' }}
               >
                 ⬇ BAIXAR · GOOGLE DRIVE
