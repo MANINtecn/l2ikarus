@@ -69,8 +69,9 @@ export default function DownloadTerminal() {
         }}>
           {STEPS.map((s) => (
             <div key={s.num} className="glass-panel" style={{
-              padding: '2rem 1.5rem',
+              padding: '2.2rem 1.5rem',
               display: 'flex', flexDirection: 'column', gap: '0.75rem',
+              alignItems: 'center', textAlign: 'center',
               borderTop: `2px solid ${s.color}`,
               transition: 'transform 0.2s',
             }}
@@ -79,15 +80,15 @@ export default function DownloadTerminal() {
             >
               <span style={{
                 fontSize: '2rem', fontWeight: '900',
-                color: s.color, opacity: 0.3,
+                color: s.color, opacity: 0.35,
                 fontFamily: 'Cinzel, serif', letterSpacing: '4px',
               }}>{s.num}</span>
               <h3 className="cinzel" style={{
-                fontSize: '0.75rem', letterSpacing: '3px',
+                fontSize: '0.78rem', letterSpacing: '3px',
                 color: '#fff', margin: 0,
               }}>{s.title}</h3>
               <p style={{
-                fontSize: '0.8rem', color: 'var(--text-mute)',
+                fontSize: '0.8rem', color: 'rgba(255,255,255,0.82)',
                 lineHeight: '1.7', margin: 0,
               }}>{s.desc}</p>
             </div>
