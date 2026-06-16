@@ -1,6 +1,6 @@
 {
-  "version": "1.3",
+  "version": "1.4",
   "url": "http://192.99.110.164:8081/IkarusGames.exe",
-  "hash": "bd4216222d81e363ab5333b98e83766a",
-  "notes": "Download paralelo (6 simultaneos) + versao visivel no rodape."
+  "hash": "e6b5488ca2186f121def56c7126fc703",
+  "notes": "Launcher agora se instala em C:\\IkarusGames na primeira execucao, garantindo que o atalho da Area de Trabalho nunca aponte pra um exe movido/apagado."
 }
