@@ -1,7 +1,7 @@
 const DISCORD_INVITE = 'https://discord.gg/KF5AzGT7Y9'
 // Launcher IKARUS GAMES (~150 MB). 2 meios de download:
-const MEGA_DOWNLOAD = ''   // TODO: link do IkarusGames.exe no MEGA
-const DRIVE_DOWNLOAD = ''  // TODO: link do IkarusGames.exe no Google Drive
+const MEGA_DOWNLOAD = 'https://mega.nz/file/SkU1nBBK#28vLSl7D6FVYFN2TAIbOhcdB4_ySt1QIFlqfpXeOWaI'
+const DRIVE_DOWNLOAD = 'https://drive.google.com/file/d/1mevVcw8FLb8lEWelBwYCbbqTH7M_0taP/view?usp=sharing'
 
 const STEPS = [
   {
