@@ -60,6 +60,10 @@ function App() {
       setIsRegisterOpen(true)
       window.history.replaceState({}, '', '/')
     }
+    if (params.get('register') === '1') {
+      setIsRegisterOpen(true)
+      window.history.replaceState({}, '', '/')
+    }
     if (params.get('admin') === '1') {
       fetch('/api/auth/me').then(r => r.json()).then(d => {
         if (d.authenticated) setAdminUser(d.user)
