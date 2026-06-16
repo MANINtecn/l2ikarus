@@ -1,6 +1,6 @@
 {
-  "version": "1.4",
-  "url": "http://192.99.110.164:8081/IkarusGames.exe",
+  "version": "1.5",
+  "url": "https://firebasestorage.googleapis.com/v0/b/papaleguastoc.firebasestorage.app/o/l2ikarus%2FIkarusGames.exe?alt=media",
   "hash": "e6b5488ca2186f121def56c7126fc703",
-  "notes": "Launcher agora se instala em C:\\IkarusGames na primeira execucao, garantindo que o atalho da Area de Trabalho nunca aponte pra um exe movido/apagado."
+  "notes": "Downloads agora servidos via Firebase Storage (CDN global) - muito mais rapido."
 }
