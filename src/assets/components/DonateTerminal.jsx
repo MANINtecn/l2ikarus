@@ -9,7 +9,7 @@ const packs = [
     claimNote: 'Resgate no Community Board (Alt+B)',
     color: '#cfd2dc',
     borderColor: 'rgba(207,210,220,0.45)',
-    bg: 'linear-gradient(160deg, rgba(120,125,145,0.20) 0%, rgba(20,20,26,0.6) 60%)',
+    bg: 'linear-gradient(160deg, #282830 0%, #1b1b22 62%)',
     glow: 'rgba(180,185,205,0.25)',
     items: [
       'Kit de armas e armadura inicial',
@@ -28,7 +28,7 @@ const packs = [
     claimNote: 'Resgate no Community Board (Alt+B)',
     color: 'var(--gold)',
     borderColor: 'rgba(197,160,89,0.55)',
-    bg: 'linear-gradient(160deg, rgba(197,160,89,0.20) 0%, rgba(20,20,26,0.6) 60%)',
+    bg: 'linear-gradient(160deg, #2d2820 0%, #1c1b22 62%)',
     glow: 'rgba(197,160,89,0.30)',
     isPopular: true,
     items: [
@@ -48,7 +48,7 @@ const packs = [
     claimNote: 'Resgate no Community Board (Alt+B)',
     color: '#c084fc',
     borderColor: 'rgba(192,132,252,0.5)',
-    bg: 'linear-gradient(160deg, rgba(168,110,240,0.22) 0%, rgba(20,20,26,0.6) 60%)',
+    bg: 'linear-gradient(160deg, #2a2233 0%, #1c1b22 62%)',
     glow: 'rgba(192,132,252,0.30)',
     items: [
       'Tudo do Raro em quantidade máxima',
@@ -101,11 +101,11 @@ export default function DonateTerminal() {
               style={{
                 padding: '2.5rem 2rem',
                 background: pkg.bg,
-                border: `1px solid ${hovered === pkg.id ? pkg.borderColor : 'rgba(255,255,255,0.08)'}`,
+                border: `1px solid ${hovered === pkg.id ? 'var(--gold)' : 'rgba(255,255,255,0.1)'}`,
                 borderRadius: '14px',
                 boxShadow: hovered === pkg.id
-                  ? `0 18px 50px rgba(0,0,0,0.5), 0 0 40px ${pkg.glow}`
-                  : '0 8px 24px rgba(0,0,0,0.35)',
+                  ? '0 0 0 1px var(--gold), 0 18px 50px rgba(0,0,0,0.55), 0 0 45px rgba(212,175,55,0.32)'
+                  : '0 8px 24px rgba(0,0,0,0.4)',
                 transition: 'all 0.4s cubic-bezier(0.4,0,0.2,1)',
                 transform: hovered === pkg.id ? 'translateY(-12px) scale(1.02)' : 'translateY(0) scale(1)',
                 position: 'relative',

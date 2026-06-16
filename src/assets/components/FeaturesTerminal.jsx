@@ -12,9 +12,14 @@ export default function FeaturesTerminal() {
   return (
     <section id="features" className="status-section">
       <div className="container">
-        <div style={{ textAlign: 'center', marginBottom: '6rem' }}>
-          <p className="section-subtitle">TECNOLOGIA & MECÂNICAS</p>
-          <h2 className="section-title">NÚCLEO DO <span style={{ color: 'var(--gold)' }}>SISTEMA</span></h2>
+        <div style={{ textAlign: 'center', marginBottom: '5rem' }}>
+          <h2 className="section-title cinzel" style={{
+            color: 'var(--gold)',
+            textShadow: '0 0 25px rgba(212,175,55,0.55), 0 0 50px rgba(212,175,55,0.3)',
+            letterSpacing: '4px',
+          }}>
+            TECNOLOGIA & MECÂNICAS
+          </h2>
         </div>
 
         <div style={{ 
@@ -29,20 +34,22 @@ export default function FeaturesTerminal() {
                 padding: '3rem 2rem',
                 textAlign: 'center',
                 borderRadius: '16px',
-                background: 'linear-gradient(165deg, rgba(212,175,55,0.07) 0%, rgba(22,22,28,0.65) 55%)',
-                border: '1px solid rgba(255,255,255,0.08)',
-                boxShadow: '0 8px 24px rgba(0,0,0,0.35)',
+                background: 'linear-gradient(165deg, #232128 0%, #1b1b22 60%)',
+                border: '1px solid rgba(255,255,255,0.1)',
+                boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
                 transition: '0.4s cubic-bezier(0.4, 0, 0.2, 1)',
                 display: 'flex', flexDirection: 'column', alignItems: 'center',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = 'rgba(212,175,55,0.5)';
-                e.currentTarget.style.boxShadow = '0 18px 50px rgba(0,0,0,0.5), 0 0 40px rgba(212,175,55,0.18)';
+                e.currentTarget.style.borderColor = 'var(--gold)';
+                e.currentTarget.style.background = 'linear-gradient(165deg, #2a2730 0%, #201f27 60%)';
+                e.currentTarget.style.boxShadow = '0 0 0 1px var(--gold), 0 18px 50px rgba(0,0,0,0.55), 0 0 45px rgba(212,175,55,0.32)';
                 e.currentTarget.style.transform = 'translateY(-8px)';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
-                e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.35)';
+                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
+                e.currentTarget.style.background = 'linear-gradient(165deg, #232128 0%, #1b1b22 60%)';
+                e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.4)';
                 e.currentTarget.style.transform = 'translateY(0)';
               }}
             >
