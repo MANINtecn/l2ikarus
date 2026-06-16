@@ -120,7 +120,7 @@ h1, h2, h3, h4, .cinzel {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-family: var(--font-main);
+  font-family: 'Cinzel', serif;
   font-weight: 700;
   padding: 1rem 2.5rem;
   cursor: pointer;

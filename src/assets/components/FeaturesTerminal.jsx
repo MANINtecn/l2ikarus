@@ -2,7 +2,6 @@ import { useState } from 'react'
 
 export default function FeaturesTerminal() {
   const [features, setFeatures] = useState([
-    { title: 'COMBATE DE AÇÃO', desc: 'Mod No-Target exclusivo: skills saem na direção que você mira, acertam pelo posicionamento e alcance. Quem joga melhor vence — não o auto-target.', icon: '⚔️' },
     { title: 'ZONA MORTAL · D · C · B', desc: 'Áreas de risco extremo por grade. Morreu lá dentro, perde TUDO. Mas os drops recompensam quem tem coragem de entrar.', icon: '☠️' },
     { title: 'QUESTS DE PROGRESSÃO', desc: 'Quests iniciais que aceleram sua evolução desde o nível 1. Low-rate justo: o esforço importa, mas você nunca fica travado.', icon: '📜' },
     { title: 'ECONOMIA DE MINERAÇÃO', desc: 'Parte das doações é minerada DENTRO do jogo e volta para os jogadores. Qualquer um pode gerar renda jogando. (em breve)', icon: '⛏️' },

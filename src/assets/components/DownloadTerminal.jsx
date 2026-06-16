@@ -13,7 +13,7 @@ const STEPS = [
   {
     num: '02',
     title: 'ABRA E CLIQUE EM INSTALAR',
-    desc: 'No card do L2 Ikarus Essence, clique em INSTALAR. O launcher baixa o jogo inteiro pra você.',
+    desc: 'No card do L2 Ikarus Essence, clique em INSTALAR. O launcher baixa o jogo inteiro — e SALVA O PROGRESSO: se a internet cair, ele continua de onde parou.',
     color: '#5865F2',
   },
   {

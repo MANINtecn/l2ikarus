@@ -33,11 +33,12 @@ export default function Navbar({ onRegisterClick, onLoginClick, topOffset = 0 })
   const discordInvite = "https://discord.gg/KF5AzGT7Y9"
 
   const navLinkStyle = {
-    fontSize: '0.65rem',
+    fontFamily: "'Cinzel', serif",
+    fontSize: '0.78rem',
     fontWeight: '700',
     letterSpacing: '2px',
     textTransform: 'uppercase',
-    color: 'rgba(255,255,255,0.65)',
+    color: 'rgba(255,255,255,0.88)',
     transition: 'color 0.25s',
     textDecoration: 'none',
     whiteSpace: 'nowrap',
@@ -76,7 +77,7 @@ export default function Navbar({ onRegisterClick, onLoginClick, topOffset = 0 })
                 href={l.href}
                 style={navLinkStyle}
                 onMouseEnter={e => e.target.style.color = 'var(--gold)'}
-                onMouseLeave={e => e.target.style.color = 'rgba(255,255,255,0.65)'}
+                onMouseLeave={e => e.target.style.color = 'rgba(255,255,255,0.88)'}
               >
                 {l.label}
               </a>
@@ -95,15 +96,16 @@ export default function Navbar({ onRegisterClick, onLoginClick, topOffset = 0 })
               rel="noopener noreferrer"
               style={{
                 display: 'flex', alignItems: 'center', gap: '7px',
-                color: 'rgba(255,255,255,0.55)',
+                fontFamily: "'Cinzel', serif",
+                color: 'rgba(255,255,255,0.8)',
                 textDecoration: 'none',
-                fontSize: '0.65rem',
+                fontSize: '0.72rem',
                 fontWeight: '700',
                 letterSpacing: '1.5px',
                 transition: 'color 0.25s',
               }}
-              onMouseEnter={e => e.currentTarget.style.color = '#fff'}
-              onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.55)'}
+              onMouseEnter={e => e.currentTarget.style.color = 'var(--gold)'}
+              onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.8)'}
             >
               <DiscordIcon />
               DISCORD
@@ -115,12 +117,13 @@ export default function Navbar({ onRegisterClick, onLoginClick, topOffset = 0 })
               onClick={onLoginClick}
               style={{
                 background: 'none', border: 'none',
-                color: 'rgba(255,255,255,0.6)',
-                fontSize: '0.65rem', fontWeight: '700', letterSpacing: '2px',
+                fontFamily: "'Cinzel', serif",
+                color: 'rgba(255,255,255,0.85)',
+                fontSize: '0.72rem', fontWeight: '700', letterSpacing: '2px',
                 cursor: 'pointer', transition: 'color 0.25s', textTransform: 'uppercase',
               }}
-              onMouseEnter={e => e.target.style.color = '#fff'}
-              onMouseLeave={e => e.target.style.color = 'rgba(255,255,255,0.6)'}
+              onMouseEnter={e => e.target.style.color = 'var(--gold)'}
+              onMouseLeave={e => e.target.style.color = 'rgba(255,255,255,0.85)'}
             >
               LOGIN
             </button>
