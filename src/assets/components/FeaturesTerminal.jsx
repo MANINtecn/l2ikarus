@@ -73,7 +73,7 @@ export default function FeaturesTerminal() {
               </h3>
               <p style={{
                 fontSize: '0.85rem',
-                color: 'rgba(255,255,255,0.7)',
+                color: 'rgba(255,255,255,0.92)',
                 lineHeight: 1.8,
                 letterSpacing: '0.3px',
                 maxWidth: '300px',

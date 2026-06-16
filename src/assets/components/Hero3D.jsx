@@ -106,7 +106,7 @@ export default function Hero3D({ onRegisterClick }) {
               alt="L2 Ikarus"
               style={{
                 height: '240px', width: 'auto',
-                filter: 'drop-shadow(0 0 50px rgba(212,175,55,0.6)) drop-shadow(0 0 120px rgba(212,175,55,0.25))',
+                filter: 'brightness(0) invert(1) drop-shadow(0 0 45px rgba(255,255,255,0.35)) drop-shadow(0 0 110px rgba(255,255,255,0.12))',
                 animation: 'logoPulse 4s ease-in-out infinite',
               }}
             />
@@ -128,7 +128,7 @@ export default function Hero3D({ onRegisterClick }) {
         {/* MOBILE — logo + botões abaixo do texto */}
         {isMobile && (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem', marginTop: '1.5rem' }}>
-            <img src="/logo.png" alt="L2 Ikarus" style={{ height: '130px', width: 'auto', filter: 'drop-shadow(0 0 30px rgba(212,175,55,0.5))', animation: 'logoPulse 4s ease-in-out infinite' }} />
+            <img src="/logo.png" alt="L2 Ikarus" style={{ height: '130px', width: 'auto', filter: 'brightness(0) invert(1) drop-shadow(0 0 30px rgba(255,255,255,0.3))', animation: 'logoPulse 4s ease-in-out infinite' }} />
             <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', justifyContent: 'center' }}>
               <button onClick={onRegisterClick} className="btn btn-primary" style={{ padding: '0.85rem 1.8rem', fontSize: '0.75rem' }}>CRIAR CONTA</button>
               <a href="#download" className="btn btn-ghost" style={{ padding: '0.85rem 1.8rem', fontSize: '0.75rem' }}>BAIXAR JOGO</a>

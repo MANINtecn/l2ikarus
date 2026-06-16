@@ -144,14 +144,14 @@ export default function DonateTerminal() {
 
               <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 2rem', display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
                 {pkg.items.map((item, i) => (
-                  <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.6rem', fontSize: '0.72rem', color: 'rgba(255,255,255,0.75)', letterSpacing: '0.5px' }}>
+                  <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.6rem', fontSize: '0.74rem', color: 'rgba(255,255,255,0.92)', letterSpacing: '0.5px' }}>
                     <span style={{ color: pkg.color, flexShrink: 0, marginTop: '1px' }}>▸</span>
                     {item}
                   </li>
                 ))}
               </ul>
 
-              <p style={{ fontSize: '0.7rem', color: 'var(--text-mute)', marginBottom: '2rem', lineHeight: 1.6 }}>
+              <p style={{ fontSize: '0.74rem', color: 'rgba(255,255,255,0.8)', marginBottom: '2rem', lineHeight: 1.7 }}>
                 {pkg.description}
               </p>
 
