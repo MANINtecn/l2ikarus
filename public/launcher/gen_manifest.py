@@ -31,9 +31,13 @@ def firebase_url(rel_path):
     full = f"{PREFIX}/{rel_path}".replace("\\", "/")
     return BASE_URL + urllib.parse.quote(full, safe="") + "?alt=media"
 
+# Pastas que NAO entram no manifest (lixo do usuario, recriadas pelo jogo).
+SKIP_DIRS = {"Screenshot"}
+
 files = []
 count = 0
-for root, _, names in os.walk(CLIENT_DIR):
+for root, dirs, names in os.walk(CLIENT_DIR):
+    dirs[:] = [d for d in dirs if d not in SKIP_DIRS]
     for name in names:
         full = os.path.join(root, name)
         rel = os.path.relpath(full, CLIENT_DIR).replace("\\", "/")
