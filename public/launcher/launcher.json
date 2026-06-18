@@ -1,6 +1,6 @@
 {
   "version": "1.6",
   "url": "https://firebasestorage.googleapis.com/v0/b/papaleguastoc.firebasestorage.app/o/l2ikarus%2FIkarusGames.exe?alt=media",
-  "hash": "83431e5ebdd3e93cc3962cb231ce1de8",
-  "notes": "JOGAR abre o jogo na hora (checa so a versao, sem re-verificar 37GB). Botao 'Verificar Arquivos' para reparo manual opcional."
+  "hash": "fc28479f0b3e4c712738ac5e0ef3f485",
+  "notes": "JOGAR abre o jogo na hora (checa so a versao). Botao 'Verificar Arquivos' para reparo. Cancelar o UAC nao mostra mais erro."
 }
