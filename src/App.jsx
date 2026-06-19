@@ -46,6 +46,19 @@ function App() {
       if (d.authenticated) setPlayerData(d)
     }).catch(() => {})
 
+    // Link de afiliado/streamer: /r/<slug> -> guarda no localStorage por 30 dias (first-touch)
+    const refMatch = window.location.pathname.match(/^\/r\/([a-zA-Z0-9_-]{2,32})\/?$/)
+    if (refMatch) {
+      try {
+        const existing = JSON.parse(localStorage.getItem('ref') || 'null')
+        // first-touch: so grava se nao houver um valido ainda
+        if (!existing || !existing.exp || existing.exp < Date.now()) {
+          localStorage.setItem('ref', JSON.stringify({ slug: refMatch[1].toLowerCase(), exp: Date.now() + 30 * 86400000 }))
+        }
+      } catch {}
+      window.history.replaceState({}, '', '/')
+    }
+
     const params = new URLSearchParams(window.location.search)
 
     if (params.get('google_data')) {

@@ -78,3 +78,22 @@ CREATE TABLE IF NOT EXISTS `game_offer` (
   `updated_at` BIGINT DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ---- Afiliados/streamers (link /r/<slug>) ----
+CREATE TABLE IF NOT EXISTS `streamers` (
+  `slug` VARCHAR(45) NOT NULL,
+  `name` VARCHAR(100) DEFAULT NULL,
+  `commission_pct` INT NOT NULL DEFAULT 30,
+  `active` TINYINT NOT NULL DEFAULT 1,
+  `payout_info` VARCHAR(255) DEFAULT NULL,
+  `created_at` BIGINT DEFAULT NULL,
+  PRIMARY KEY (`slug`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS `account_referrals` (
+  `account_name` VARCHAR(45) NOT NULL,
+  `streamer_slug` VARCHAR(45) NOT NULL,
+  `created_at` BIGINT DEFAULT NULL,
+  PRIMARY KEY (`account_name`),
+  INDEX `idx_streamer` (`streamer_slug`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

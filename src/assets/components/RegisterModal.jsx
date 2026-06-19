@@ -40,15 +40,22 @@ export default function RegisterModal({ isOpen, onClose, googleData }) {
       return setMessage({ type: 'error', text: 'As senhas não coincidem.' })
 
     setLoading(true)
+    // Streamer/afiliado: pega o ref guardado (se valido) pra vincular a conta
+    let referredBy = null
+    try {
+      const r = JSON.parse(localStorage.getItem('ref') || 'null')
+      if (r && r.slug && r.exp > Date.now()) referredBy = r.slug
+    } catch {}
     try {
       const res = await fetch('/api/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ login: formData.login, email: formData.email, password: formData.password }),
+        body: JSON.stringify({ login: formData.login, email: formData.email, password: formData.password, referredBy }),
       })
       const data = await res.json()
       if (res.ok) {
         setSuccess(true)
+        try { localStorage.removeItem('ref') } catch {}
         // Loga automaticamente após cadastro
         await fetch('/api/player/login', {
           method: 'POST',

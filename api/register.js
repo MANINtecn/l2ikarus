@@ -62,7 +62,8 @@ export default async function handler(req, res) {
   const ip = req.headers['x-forwarded-for']?.split(',')[0] ?? 'unknown'
   if (isRateLimited(ip)) return res.status(429).json({ message: 'Muitas tentativas. Aguarde 1 minuto.' })
 
-  const { login, password, email } = req.body ?? {}
+  const { login, password, email, referredBy } = req.body ?? {}
+  const refSlug = (typeof referredBy === 'string' && /^[a-z0-9_-]{2,32}$/i.test(referredBy)) ? referredBy.toLowerCase() : ''
   if (!login || !password) return res.status(400).json({ message: 'Login e senha são obrigatórios' })
   if (!LOGIN_RE.test(login)) return res.status(400).json({ message: 'Login: 4-16 caracteres, apenas letras, números e _' })
   if (!PASS_RE.test(password)) return res.status(400).json({ message: 'Senha: mínimo 6 caracteres, sem espaços' })
@@ -76,7 +77,7 @@ export default async function handler(req, res) {
     const vpsRes = await fetch(base + '/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-api-key': process.env.VPS_STATUS_TOKEN },
-      body: JSON.stringify({ login, passwordHash: hashedPassword, email: email ?? '' }),
+      body: JSON.stringify({ login, passwordHash: hashedPassword, email: email ?? '', referredBy: refSlug }),
     })
     const data = await vpsRes.json().catch(() => ({}))
     return res.status(vpsRes.status).json(data)
