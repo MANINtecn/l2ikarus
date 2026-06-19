@@ -585,6 +585,54 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, message: `${login} desbanido.` })
     }
 
+    // ===== STREAMERS / AFILIADOS =====
+    // Lista streamers + relatorio (contas indicadas, Ikoin comprado, comissao)
+    if (action === 'streamers' && req.method !== 'POST') {
+      const [streamers] = await db.query('SELECT slug, name, commission_pct, active, payout_info, created_at FROM streamers ORDER BY created_at DESC')
+      // contas indicadas por streamer
+      const [refs] = await db.query('SELECT streamer_slug, COUNT(*) AS accounts FROM account_referrals GROUP BY streamer_slug')
+      // Ikoin COMPRADO (orders pagas) pelos indicados, por streamer; exclui a propria conta do streamer (slug)
+      const [paid] = await db.query(
+        `SELECT ar.streamer_slug, COALESCE(SUM(o.amount),0) AS ikoin_bought
+         FROM account_referrals ar
+         JOIN ikoin_orders o ON o.account_name = ar.account_name AND o.status = 'paid'
+         WHERE ar.account_name <> ar.streamer_slug
+         GROUP BY ar.streamer_slug`
+      )
+      const refMap = Object.fromEntries(refs.map(r => [r.streamer_slug, r.accounts]))
+      const paidMap = Object.fromEntries(paid.map(r => [r.streamer_slug, r.ikoin_bought]))
+      const report = streamers.map(s => {
+        const ikoin = paidMap[s.slug] || 0
+        return {
+          ...s,
+          accounts: refMap[s.slug] || 0,
+          ikoin_bought: ikoin,
+          commission: Math.floor(ikoin * (s.commission_pct / 100)),
+          link: `https://l2ikarus.com/r/${s.slug}`,
+        }
+      })
+      return res.status(200).json({ streamers: report })
+    }
+    // Criar/atualizar streamer
+    if (action === 'streamer-save' && req.method === 'POST') {
+      let { slug, name, commission_pct, payout_info } = req.body || {}
+      slug = (slug || '').trim().toLowerCase()
+      if (!/^[a-z0-9_-]{2,32}$/.test(slug)) return res.status(400).json({ error: 'Slug invalido (2-32: letras, numeros, _ , -)' })
+      const pct = Math.max(0, Math.min(100, parseInt(commission_pct) || 30))
+      await db.query(
+        `INSERT INTO streamers (slug, name, commission_pct, active, payout_info, created_at) VALUES (?, ?, ?, 1, ?, ?)
+         ON DUPLICATE KEY UPDATE name = VALUES(name), commission_pct = VALUES(commission_pct), payout_info = VALUES(payout_info)`,
+        [slug, name || slug, pct, payout_info || null, Date.now()]
+      )
+      return res.status(200).json({ success: true, message: `Streamer ${slug} salvo.`, link: `https://l2ikarus.com/r/${slug}` })
+    }
+    // Ativar/desativar streamer
+    if (action === 'streamer-toggle' && req.method === 'POST') {
+      const { slug, active } = req.body || {}
+      await db.query('UPDATE streamers SET active = ? WHERE slug = ?', [active ? 1 : 0, (slug || '').toLowerCase()])
+      return res.status(200).json({ success: true })
+    }
+
     res.status(400).json({ error: 'Ação inválida' })
   } catch (err) {
     console.error('Admin error:', err)

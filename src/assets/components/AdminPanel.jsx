@@ -7,6 +7,7 @@ const TABS = [
   { id: 'ranking', label: 'RANKING' },
   { id: 'codes', label: 'CÓDIGOS' },
   { id: 'offer', label: 'OFERTA' },
+  { id: 'streamers', label: 'STREAMERS' },
   { id: 'charmgmt', label: 'PERSONAGENS' },
 ]
 
@@ -229,6 +230,9 @@ export default function AdminPanel({ user, onLogout }) {
   const [playersDebug, setPlayersDebug] = useState(null)
   const [charTab, setCharTab] = useState('dados')
   const [codes, setCodes] = useState([])
+  const [streamers, setStreamers] = useState([])
+  const [strForm, setStrForm] = useState({ slug: '', name: '', commission_pct: 30, payout_info: '' })
+  const [strMsg, setStrMsg] = useState('')
   const [newCode, setNewCode] = useState({ code: '', items: '', ikoin: '', description: '', maxUses: '' })
   const [codeMsg, setCodeMsg] = useState('')
   const [deleteConfirm, setDeleteConfirm] = useState(null) // { objectId, name }
@@ -306,6 +310,9 @@ export default function AdminPanel({ user, onLogout }) {
         const data = r.offers || { 1: null, 2: null }
         setOffersData(data)
         loadOfferSlot(offerSlot, data)
+      } else if (t === 'streamers') {
+        const r = await fetch('/api/admin/streamers').then(x => x.json())
+        setStreamers(r.streamers || [])
       }
     } catch {}
     setLoading(false)
@@ -446,6 +453,27 @@ export default function AdminPanel({ user, onLogout }) {
     }).then(x => x.json())
     if (r.success) fetchTab('codes')
     else alert(r.error)
+  }
+
+  const saveStreamer = async () => {
+    setStrMsg('')
+    const r = await fetch('/api/admin/streamer-save', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(strForm),
+    }).then(x => x.json())
+    if (r.success) {
+      setStrMsg(`✓ Salvo! Link: ${r.link}`)
+      setStrForm({ slug: '', name: '', commission_pct: 30, payout_info: '' })
+      fetchTab('streamers')
+    } else setStrMsg(r.error || 'Erro ao salvar')
+  }
+
+  const toggleStreamer = async (slug, active) => {
+    await fetch('/api/admin/streamer-toggle', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ slug, active }),
+    })
+    fetchTab('streamers')
   }
 
   const fmtTime = (secs) => {
@@ -805,6 +833,38 @@ export default function AdminPanel({ user, onLogout }) {
                 </div>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* ABA STREAMERS / AFILIADOS */}
+        {!loading && tab === 'streamers' && (
+          <div style={{ maxWidth: '860px' }}>
+            <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.8rem', marginBottom: '0.8rem' }}>
+              Cada streamer ganha o link <b style={{ color: 'var(--gold)' }}>l2ikarus.com/r/&lt;slug&gt;</b>. Quem se cadastra por ele fica vinculado (30 dias, first-touch). Comissão = % sobre Ikoin comprado pelos indicados.
+            </p>
+            {/* Form criar/editar */}
+            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'flex-end', marginBottom: '0.6rem', background: 'rgba(255,255,255,0.03)', padding: '0.8rem', borderRadius: '8px' }}>
+              <div><label style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.4)', display: 'block' }}>SLUG (link)</label>
+                <input value={strForm.slug} onChange={e => setStrForm({ ...strForm, slug: e.target.value })} placeholder="nickdostreamer" style={{ background: '#1a1a1a', border: '1px solid #333', color: '#fff', padding: '0.4rem', borderRadius: '4px', width: '140px' }} /></div>
+              <div><label style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.4)', display: 'block' }}>NOME</label>
+                <input value={strForm.name} onChange={e => setStrForm({ ...strForm, name: e.target.value })} placeholder="Nome" style={{ background: '#1a1a1a', border: '1px solid #333', color: '#fff', padding: '0.4rem', borderRadius: '4px', width: '140px' }} /></div>
+              <div><label style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.4)', display: 'block' }}>COMISSÃO %</label>
+                <input type="number" value={strForm.commission_pct} onChange={e => setStrForm({ ...strForm, commission_pct: e.target.value })} style={{ background: '#1a1a1a', border: '1px solid #333', color: '#fff', padding: '0.4rem', borderRadius: '4px', width: '70px' }} /></div>
+              <div><label style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.4)', display: 'block' }}>PIX/PAGAMENTO</label>
+                <input value={strForm.payout_info} onChange={e => setStrForm({ ...strForm, payout_info: e.target.value })} placeholder="chave pix" style={{ background: '#1a1a1a', border: '1px solid #333', color: '#fff', padding: '0.4rem', borderRadius: '4px', width: '160px' }} /></div>
+              <button onClick={saveStreamer} style={{ background: 'var(--gold)', color: '#0d0d0d', border: 'none', padding: '0.5rem 1rem', borderRadius: '4px', fontWeight: 'bold', cursor: 'pointer' }}>SALVAR</button>
+            </div>
+            {strMsg && <p style={{ color: strMsg.startsWith('✓') ? '#6c6' : '#e66', fontSize: '0.8rem', marginBottom: '0.6rem' }}>{strMsg}</p>}
+            {/* Tabela relatorio */}
+            <Table
+              cols={['Slug', 'Nome', 'Contas', 'Ikoin comprado', 'Comissão (R$)', '%', 'Status', 'Ação']}
+              rows={streamers.map(s => [
+                s.slug, s.name, s.accounts, s.ikoin_bought, s.commission, s.commission_pct + '%',
+                s.active ? 'Ativo' : 'Inativo',
+                <button key={s.slug} onClick={() => toggleStreamer(s.slug, !s.active)} style={{ background: 'none', border: '1px solid #555', color: '#aaa', fontSize: '0.65rem', padding: '0.2rem 0.5rem', borderRadius: '4px', cursor: 'pointer' }}>{s.active ? 'Desativar' : 'Ativar'}</button>
+              ])}
+              emptyMsg="Nenhum streamer cadastrado"
+            />
           </div>
         )}
 

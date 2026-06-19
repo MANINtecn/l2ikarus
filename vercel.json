@@ -37,6 +37,9 @@
     { "source": "/api/admin/offer-save", "destination": "/api/admin?action=offer-save" },
     { "source": "/api/admin/char-search", "destination": "/api/admin?action=char-search" },
     { "source": "/api/admin/char-class", "destination": "/api/admin?action=char-class" },
-    { "source": "/api/admin/char-teleport", "destination": "/api/admin?action=char-teleport" }
+    { "source": "/api/admin/char-teleport", "destination": "/api/admin?action=char-teleport" },
+    { "source": "/api/admin/streamers", "destination": "/api/admin?action=streamers" },
+    { "source": "/api/admin/streamer-save", "destination": "/api/admin?action=streamer-save" },
+    { "source": "/api/admin/streamer-toggle", "destination": "/api/admin?action=streamer-toggle" }
   ]
 }
