@@ -10,4 +10,6 @@ dist
 dist_electron/
 build_log.txt
 push_error.txt
-vps/
+vps/config.js
+vps/node_modules/
+vps/package-lock.json

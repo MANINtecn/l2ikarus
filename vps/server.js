@@ -1,5 +1,6 @@
 import http from 'http'
 import net from 'net'
+import crypto from 'crypto'
 import mysql from 'mysql2/promise'
 import { config } from './config.js'
 
@@ -115,13 +116,56 @@ http.createServer(async (req, res) => {
 
   const path = (req.url || '').split('?')[0]
 
-  // /status é PÚBLICO (online/players é info não-sensível; o launcher distribuído chama sem chave).
+  // /status é PÚBLICO
   if (req.method === 'GET' && path === '/status') {
     res.writeHead(200)
     return res.end(JSON.stringify(await getStats()))
   }
 
-  // Daqui pra baixo exige a chave secreta (NUNCA vai pro launcher/cliente — só servidor-a-servidor).
+  // QR Code PIX — PÚBLICO (cliente do jogo carrega a imagem sem api-key)
+  if (req.method === 'GET' && path.startsWith('/ikoin/qr/')) {
+    const mpgId = path.replace('/ikoin/qr/', '').replace(/[^0-9]/g, '')
+    const b64 = qrCache.get(mpgId)
+    if (!b64) { res.writeHead(404); return res.end('not found') }
+    const buf = Buffer.from(b64, 'base64')
+    res.setHeader('Content-Type', 'image/png')
+    res.setHeader('Cache-Control', 'no-cache')
+    res.writeHead(200)
+    return res.end(buf)
+  }
+
+  // Webhook MPG — PÚBLICO (MPG chama de fora, sem api-key). Responde 200 imediatamente.
+  if (req.method === 'POST' && path === '/mpg/webhook') {
+    res.writeHead(200); res.end('{}')
+    readBody(req).then(async (body) => {
+      try {
+        const mpgPaymentId = String(body.data?.id || body.id || '')
+        if (!mpgPaymentId || body.action === 'payment.created') return
+        const payment = await mpgGetPayment(mpgPaymentId)
+        if (payment.status !== 'approved') return
+        const p = getPool()
+        const [rows] = await p.query(
+          "SELECT * FROM ikoin_orders WHERE mp_payment_id=? AND status='pending'",
+          [mpgPaymentId]
+        )
+        if (!rows.length) return
+        const order = rows[0]
+        await p.query("UPDATE ikoin_orders SET status='paid', paid_at=? WHERE id=?", [Date.now(), order.id])
+        await p.query(
+          'INSERT INTO ikoin_balance (account_name, balance, updated_at) VALUES (?,?,?) ON DUPLICATE KEY UPDATE balance=balance+?, updated_at=?',
+          [order.account_name, order.amount, Date.now(), order.amount, Date.now()]
+        )
+        await p.query(
+          'INSERT INTO ikoin_transactions (account_name, amount, type, description, reference, created_at) VALUES (?,?,?,?,?,?)',
+          [order.account_name, order.amount, 'purchase', `PIX aprovado - ${order.amount} Ikoins`, mpgPaymentId, Date.now()]
+        )
+        console.log(`✅ PIX pago: ${order.account_name} +${order.amount} Ikoins (mpg_id=${mpgPaymentId})`)
+      } catch (e) { console.error('webhook error:', e.message) }
+    }).catch(() => {})
+    return
+  }
+
+  // Daqui pra baixo exige a chave secreta (só servidor-a-servidor)
   if (req.headers['x-api-key'] !== config.apiKey) {
     res.writeHead(401)
     return res.end(JSON.stringify({ error: 'unauthorized' }))
@@ -150,8 +194,84 @@ http.createServer(async (req, res) => {
     }
   }
 
+  // ===== CRIAR PIX (GS chama isso ao jogador pedir compra) =====
+  if (req.method === 'POST' && path === '/ikoin/pix') {
+    const body = await readBody(req)
+    const account = (body.account || '').trim()
+    const ikoins = parseInt(body.ikoins) || 0
+    if (!account || ikoins < 10 || ikoins > 5000) {
+      res.writeHead(400)
+      return res.end(JSON.stringify({ error: 'Quantidade inválida (mín 10, máx 5000).' }))
+    }
+    try {
+      const orderId = crypto.randomUUID()
+      const mpgRes = await fetch('https://api.mercadopago.com/v1/payments', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${config.mpgToken}`,
+          'Content-Type': 'application/json',
+          'X-Idempotency-Key': orderId,
+        },
+        body: JSON.stringify({
+          transaction_amount: ikoins,
+          description: `${ikoins} Ikoins - L2 Ikarus`,
+          payment_method_id: 'pix',
+          payer: { email: `${account}@l2ikarus.com` },
+        })
+      })
+      const mpg = await mpgRes.json()
+      if (!mpg.id) throw new Error(mpg.message || JSON.stringify(mpg))
+      const mpgId = String(mpg.id)
+      const txData = mpg.point_of_interaction?.transaction_data || {}
+      const pixCode = txData.qr_code || ''
+      const qrBase64 = txData.qr_code_base64 || ''
+      if (qrBase64) {
+        qrCache.set(mpgId, qrBase64)
+        setTimeout(() => qrCache.delete(mpgId), 31 * 60 * 1000)
+      }
+      const p = getPool()
+      await p.query(
+        'INSERT INTO ikoin_orders (id, account_name, amount, status, mp_payment_id, created_at) VALUES (?,?,?,?,?,?)',
+        [orderId, account, ikoins, 'pending', mpgId, Date.now()]
+      )
+      res.writeHead(200)
+      res.end(JSON.stringify({ ok: true, mpgId, pixCode, hasQr: !!qrBase64 }))
+    } catch (e) {
+      console.error('create pix error:', e.message)
+      res.writeHead(500)
+      res.end(JSON.stringify({ error: e.message }))
+    }
+    return
+  }
+
+  // ===== STATUS DO PIX (GS verifica se foi pago) =====
+  if (req.method === 'GET' && path.startsWith('/ikoin/pix/')) {
+    const mpgId = path.replace('/ikoin/pix/', '').replace(/[^0-9]/g, '')
+    try {
+      const p = getPool()
+      const [rows] = await p.query("SELECT status, amount FROM ikoin_orders WHERE mp_payment_id=?", [mpgId])
+      const order = rows[0] || { status: 'not_found', amount: 0 }
+      res.writeHead(200)
+      res.end(JSON.stringify(order))
+    } catch (e) {
+      res.writeHead(500)
+      res.end(JSON.stringify({ error: e.message }))
+    }
+    return
+  }
+
   res.writeHead(404)
   res.end(JSON.stringify({ error: 'not found' }))
 }).listen(config.port, () => {
   console.log('✅ Status/API server rodando na porta ' + config.port)
 })
+
+// ===== HELPERS MERCADO PAGO =====
+const qrCache = new Map() // mpgId -> base64 QR (expira em 31min via setTimeout)
+
+async function mpgGetPayment(id) {
+  const res = await fetch(`https://api.mercadopago.com/v1/payments/${id}`, {
+    headers: { 'Authorization': `Bearer ${config.mpgToken}` }
+  })
+  return res.json()
+}
