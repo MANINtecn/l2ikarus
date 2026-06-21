@@ -59,7 +59,7 @@ export default function DiscordCommunity() {
         </div>
 
         <a
-          href="https://discord.gg/KF5AzGT7Y9"
+          href="https://discord.gg/BGs8mkUrmE"
           target="_blank"
           rel="noopener noreferrer"
           className="btn btn-primary"

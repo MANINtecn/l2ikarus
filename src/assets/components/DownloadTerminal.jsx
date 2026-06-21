@@ -1,4 +1,4 @@
-const DISCORD_INVITE = 'https://discord.gg/KF5AzGT7Y9'
+const DISCORD_INVITE = 'https://discord.gg/BGs8mkUrmE'
 const DRIVE_DOWNLOAD = 'https://drive.google.com/file/d/1mevVcw8FLb8lEWelBwYCbbqTH7M_0taP/view?usp=sharing'
 
 const STEPS = [
