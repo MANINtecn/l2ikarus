@@ -4,8 +4,8 @@
       "id": "l2ikarus",
       "name": "L2 Ikarus Essence",
       "status": "available",
-      "image": "https://l2ikarus.vercel.app/launcher/cards/l2ikarus.jpg",
-      "manifestUrl": "https://l2ikarus.vercel.app/launcher/manifest.json",
+      "image": "https://www.l2ikarus.com/launcher/cards/l2ikarus.jpg",
+      "manifestUrl": "https://www.l2ikarus.com/launcher/manifest.json",
       "installDir": "L2 Ikarus Essence",
       "exe": "system\\L2.exe",
       "exeArgs": "-INI=\".\\L2_decoded.ini\" -noStartupMovies"
@@ -14,19 +14,19 @@
       "id": "l2nexus",
       "name": "L2 Nexus Interlude",
       "status": "soon",
-      "image": "https://l2ikarus.vercel.app/launcher/cards/l2nexus.jpg"
+      "image": "https://www.l2ikarus.com/launcher/cards/l2nexus.jpg"
     },
     {
       "id": "mu",
       "name": "MuOnline",
       "status": "soon",
-      "image": "https://l2ikarus.vercel.app/launcher/cards/mu.jpg"
+      "image": "https://www.l2ikarus.com/launcher/cards/mu.jpg"
     },
     {
       "id": "cabal",
       "name": "Cabal Online",
       "status": "soon",
-      "image": "https://l2ikarus.vercel.app/launcher/cards/cabal.jpg"
+      "image": "https://www.l2ikarus.com/launcher/cards/cabal.jpg"
     }
   ]
 }
