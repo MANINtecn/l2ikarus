@@ -49,6 +49,55 @@ async function creditIkoin(db, account, amount, type, description, reference) {
   )
 }
 
+const PAGBANK_API = process.env.PAGBANK_BASE || 'https://api.pagseguro.com'
+
+async function fetchPngBase64(url) {
+  try {
+    const r = await fetch(url)
+    if (!r.ok) return ''
+    const buf = Buffer.from(await r.arrayBuffer())
+    return buf.toString('base64')
+  } catch { return '' }
+}
+
+// Cria cobranca PIX no PagBank (PagSeguro). SEM CPF (doacao anonima).
+// Retorna no mesmo formato do MP: { pbOrderId, qrText, qrBase64 } ou { error }.
+async function createPagbankPix({ pbToken, orderId, account, email, qty, siteUrl }) {
+  const amountCents = qty * 100
+  const body = {
+    reference_id: orderId,
+    customer: { name: account, email },
+    items: [{ reference_id: 'ikoin', name: `${qty} Ikoin - L2 Ikarus`, quantity: 1, unit_amount: amountCents }],
+    qr_codes: [{ amount: { value: amountCents } }],
+    notification_urls: [`${siteUrl}/api/payment/webhook?provider=pagbank`],
+  }
+  const r = await fetch(`${PAGBANK_API}/orders`, {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${pbToken}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  })
+  const data = await r.json()
+  const qr = data?.qr_codes?.[0]
+  if (!qr || !qr.text) {
+    const msg = data?.error_messages?.[0]?.description || data?.message || 'Falha ao gerar PIX (PagBank).'
+    return { error: msg }
+  }
+  const pngLink = (qr.links || []).find(l => /PNG/i.test(l.rel || ''))
+  const qrBase64 = pngLink ? await fetchPngBase64(pngLink.href) : ''
+  return { pbOrderId: data.id, qrText: qr.text, qrBase64 }
+}
+
+// Consulta o status de uma order no PagBank; true se houver charge PAID.
+async function pagbankIsPaid(pbToken, pbOrderId) {
+  try {
+    const r = await fetch(`${PAGBANK_API}/orders/${pbOrderId}`, {
+      headers: { 'Authorization': `Bearer ${pbToken}` },
+    })
+    const o = await r.json()
+    return (o.charges || []).some(c => c.status === 'PAID')
+  } catch { return false }
+}
+
 export default async function handler(req, res) {
   const action = getAction(req)
   const token = process.env.MP_ACCESS_TOKEN
@@ -115,10 +164,9 @@ export default async function handler(req, res) {
     }
   }
 
-  // POST /api/payment/pix — cria pagamento PIX e retorna QR (base64) + copia-e-cola
+  // POST /api/payment/pix — cria PIX (PagBank por padrao, MP fallback) e retorna QR base64 + copia-e-cola
   if (action === 'pix') {
     if (req.method !== 'POST') return res.status(405).json({ error: 'Método inválido' })
-    if (!token) return res.status(500).json({ error: 'MP_ACCESS_TOKEN não configurado' })
 
     const cookies = req.headers.cookie || ''
     const m = cookies.match(/player_session=([^;]+)/)
@@ -130,6 +178,9 @@ export default async function handler(req, res) {
     if (!qty || qty < 1) return res.status(400).json({ error: 'Quantidade mínima: 1 Ikoin.' })
     if (qty > 100000) return res.status(400).json({ error: 'Quantidade máxima: 100.000 Ikoin.' })
 
+    const provider = (req.body?.provider || 'pagbank').toLowerCase()
+    const payerEmail = (player.email && player.email.includes('@')) ? player.email : `${player.login}@l2ikarus.com`
+
     try {
       const db = await getConnection()
       const orderId = crypto.randomUUID()
@@ -139,14 +190,24 @@ export default async function handler(req, res) {
         [orderId, player.login, qty, 'pending', now]
       )
 
-      const payerEmail = (player.email && player.email.includes('@')) ? player.email : `${player.login}@l2ikarus.com`
+      // ----- PagBank (PRINCIPAL) -----
+      if (provider !== 'mp') {
+        const pbToken = process.env.PAGBANK_TOKEN
+        if (!pbToken) return res.status(500).json({ error: 'PAGBANK_TOKEN não configurado' })
+        const pb = await createPagbankPix({ pbToken, orderId, account: player.login, email: payerEmail, qty, siteUrl })
+        if (pb.error) {
+          console.error('PagBank pix error:', pb.error)
+          return res.status(500).json({ error: pb.error })
+        }
+        await db.query('UPDATE ikoin_orders SET mp_payment_id = ? WHERE id = ?', ['PB:' + pb.pbOrderId, orderId])
+        return res.status(200).json({ orderId, qrBase64: pb.qrBase64, qrCode: pb.qrText, amount: qty })
+      }
+
+      // ----- MercadoPago (fallback) -----
+      if (!token) return res.status(500).json({ error: 'MP_ACCESS_TOKEN não configurado' })
       const payRes = await fetch(`${MP_API}/v1/payments`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-          'X-Idempotency-Key': orderId,
-        },
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json', 'X-Idempotency-Key': orderId },
         body: JSON.stringify({
           transaction_amount: qty,
           description: `${qty} Ikoin — L2 Ikarus`,
@@ -163,13 +224,7 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: pay.message || 'Falha ao gerar PIX.' })
       }
       await db.query('UPDATE ikoin_orders SET mp_payment_id = ? WHERE id = ?', [String(pay.id), orderId])
-      return res.status(200).json({
-        orderId,
-        qrBase64: tx.qr_code_base64 || '',
-        qrCode: tx.qr_code,
-        ticketUrl: tx.ticket_url || '',
-        amount: qty,
-      })
+      return res.status(200).json({ orderId, qrBase64: tx.qr_code_base64 || '', qrCode: tx.qr_code, amount: qty })
     } catch (err) {
       console.error('Pix create error:', err)
       return res.status(500).json({ error: err.message })
@@ -234,8 +289,30 @@ export default async function handler(req, res) {
     }
   }
 
-  // POST /api/payment/webhook — Mercado Pago confirma pagamento
+  // POST /api/payment/webhook — confirma pagamento (PagBank ou Mercado Pago)
   if (action === 'webhook') {
+    // ----- PagBank: notification_url tem ?provider=pagbank -----
+    if (req.query.provider === 'pagbank') {
+      try {
+        const order = req.body || {}
+        const orderId = order.reference_id
+        const paid = (order.charges || []).some(c => c.status === 'PAID')
+        if (orderId && paid) {
+          const db = await getConnection()
+          const [r] = await db.query(
+            'UPDATE ikoin_orders SET status = ?, paid_at = ? WHERE id = ? AND status = ?',
+            ['paid', Math.floor(Date.now() / 1000), orderId, 'pending'])
+          if (r && r.affectedRows > 0) {
+            const [[ord]] = await db.query('SELECT account_name, amount FROM ikoin_orders WHERE id = ?', [orderId])
+            if (ord) await creditIkoin(db, ord.account_name, ord.amount, 'purchase', `Compra de ${ord.amount} Ikoin (PIX PagBank)`, String(order.id || orderId))
+          }
+        }
+        return res.status(200).send('ok')
+      } catch (err) {
+        console.error('PagBank webhook error:', err)
+        return res.status(200).send('ok')
+      }
+    }
     if (!token) return res.status(200).send('ok')
     try {
       const paymentId = req.body?.data?.id || req.query['data.id'] || req.query.id
@@ -275,6 +352,22 @@ export default async function handler(req, res) {
       const db = await getConnection()
       const [[order]] = await db.query('SELECT status, amount, account_name, mp_payment_id FROM ikoin_orders WHERE id = ?', [orderId])
       if (!order) return res.status(200).json({ status: 'not_found' })
+
+      // ----- PagBank: mp_payment_id no formato "PB:<orderId>" -----
+      if (order.status === 'pending' && order.mp_payment_id && order.mp_payment_id.startsWith('PB:')) {
+        const pbToken = process.env.PAGBANK_TOKEN
+        if (pbToken && await pagbankIsPaid(pbToken, order.mp_payment_id.slice(3))) {
+          const [r] = await db.query(
+            'UPDATE ikoin_orders SET status = ?, paid_at = ? WHERE id = ? AND status = ?',
+            ['paid', Math.floor(Date.now() / 1000), orderId, 'pending'])
+          if (r && r.affectedRows > 0) {
+            await creditIkoin(db, order.account_name, order.amount, 'purchase', `Compra de ${order.amount} Ikoin (PIX PagBank)`, order.mp_payment_id)
+          }
+          return res.status(200).json({ status: 'paid', amount: order.amount })
+        }
+        return res.status(200).json({ status: order.status, amount: order.amount })
+      }
+
       // Se ainda pendente e tem pagamento MP, consulta direto (não depende só do webhook)
       if (order.status === 'pending' && order.mp_payment_id && token) {
         try {
