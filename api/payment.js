@@ -193,18 +193,19 @@ export default async function handler(req, res) {
       // ----- PagBank (PRINCIPAL) -----
       if (provider !== 'mp') {
         const pbToken = process.env.PAGBANK_TOKEN
-        if (!pbToken) return res.status(500).json({ error: 'PAGBANK_TOKEN não configurado' })
-        const pb = await createPagbankPix({ pbToken, orderId, account: player.login, email: payerEmail, qty, siteUrl })
-        if (pb.error) {
-          console.error('PagBank pix error:', pb.error)
-          return res.status(500).json({ error: pb.error })
+        if (pbToken) {
+          const pb = await createPagbankPix({ pbToken, orderId, account: player.login, email: payerEmail, qty, siteUrl })
+          if (!pb.error) {
+            await db.query('UPDATE ikoin_orders SET mp_payment_id = ? WHERE id = ?', ['PB:' + pb.pbOrderId, orderId])
+            return res.status(200).json({ orderId, qrBase64: pb.qrBase64, qrCode: pb.qrText, amount: qty })
+          }
+          // PagBank indisponivel (ex: whitelist nao liberada) -> cai pro MP automaticamente
+          console.error('PagBank pix indisponivel, fallback p/ MP:', pb.error)
         }
-        await db.query('UPDATE ikoin_orders SET mp_payment_id = ? WHERE id = ?', ['PB:' + pb.pbOrderId, orderId])
-        return res.status(200).json({ orderId, qrBase64: pb.qrBase64, qrCode: pb.qrText, amount: qty })
       }
 
-      // ----- MercadoPago (fallback) -----
-      if (!token) return res.status(500).json({ error: 'MP_ACCESS_TOKEN não configurado' })
+      // ----- MercadoPago (fallback automatico) -----
+      if (!token) return res.status(500).json({ error: 'PIX indisponível no momento. Tente novamente.' })
       const payRes = await fetch(`${MP_API}/v1/payments`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json', 'X-Idempotency-Key': orderId },
