@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 
 const PACKS = [50, 100, 250, 500, 1000]
 
@@ -25,6 +25,49 @@ export default function PlayerPanel({ data, onLogout }) {
   const [buyError, setBuyError] = useState('')
   const [redeemCode, setRedeemCode] = useState('')
   const [redeemMsg, setRedeemMsg] = useState(null)
+  const [method, setMethod] = useState('pix')
+  const [pix, setPix] = useState(null)
+  const [paid, setPaid] = useState(false)
+  const [copied, setCopied] = useState(false)
+  const pollRef = useRef(null)
+
+  useEffect(() => () => { if (pollRef.current) clearInterval(pollRef.current) }, [])
+
+  const startPolling = (orderId) => {
+    if (pollRef.current) clearInterval(pollRef.current)
+    pollRef.current = setInterval(async () => {
+      try {
+        const s = await fetch(`/api/payment/status?orderId=${orderId}`).then(x => x.json())
+        if (s.status === 'paid') {
+          clearInterval(pollRef.current)
+          setPaid(true)
+          setTimeout(() => window.location.reload(), 2500)
+        }
+      } catch {}
+    }, 4000)
+  }
+
+  const genPix = async () => {
+    setBuying(true); setBuyError(''); setPaid(false)
+    try {
+      const r = await fetch('/api/payment/pix', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount }),
+      }).then(x => x.json())
+      if (r.qrCode) { setPix(r); startPolling(r.orderId) }
+      else setBuyError(r.error || 'Erro ao gerar PIX.')
+    } catch { setBuyError('Erro de conexão.') }
+    finally { setBuying(false) }
+  }
+
+  const copyPix = () => {
+    if (pix?.qrCode) { navigator.clipboard?.writeText(pix.qrCode); setCopied(true); setTimeout(() => setCopied(false), 1500) }
+  }
+
+  const closeBuy = () => {
+    setBuyOpen(false); setPix(null); setPaid(false); setBuyError('')
+    if (pollRef.current) clearInterval(pollRef.current)
+  }
 
   const doRedeem = async () => {
     setRedeemMsg(null)
@@ -269,32 +312,70 @@ export default function PlayerPanel({ data, onLogout }) {
 
       {/* MODAL COMPRAR IKOIN */}
       {buyOpen && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 30000, background: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(10px)', padding: '1rem' }} onClick={() => setBuyOpen(false)}>
+        <div style={{ position: 'fixed', inset: 0, zIndex: 30000, background: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(10px)', padding: '1rem' }} onClick={closeBuy}>
           <div className="glass-panel" style={{ width: '100%', maxWidth: '440px', padding: '2.5rem', border: '1px solid rgba(197,160,89,0.3)', textAlign: 'center' }} onClick={e => e.stopPropagation()}>
-            <img src="/ikoin.svg" alt="Ikoin" style={{ width: '70px', height: '70px', marginBottom: '1rem', filter: 'drop-shadow(0 0 15px rgba(212,175,55,0.5))' }} />
-            <h3 className="cinzel" style={{ color: 'var(--gold)', fontSize: '1.4rem', marginBottom: '0.5rem' }}>COMPRAR IKOIN</h3>
-            <p style={{ color: 'var(--text-mute)', fontSize: '0.75rem', marginBottom: '1.5rem' }}>1 Ikoin = R$ 1,00 · PIX, Boleto ou Cartão</p>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '0.5rem', marginBottom: '1rem' }}>
-              {PACKS.map(p => (
-                <button key={p} onClick={() => setAmount(p)} style={{
-                  background: amount === p ? 'rgba(197,160,89,0.2)' : 'rgba(255,255,255,0.04)',
-                  border: `1px solid ${amount === p ? 'var(--gold)' : 'rgba(255,255,255,0.1)'}`,
-                  color: amount === p ? 'var(--gold)' : 'rgba(255,255,255,0.6)',
-                  padding: '0.6rem 0', borderRadius: '6px', fontSize: '0.72rem', fontWeight: '700', cursor: 'pointer',
-                }}>{p}</button>
-              ))}
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginBottom: '1.5rem' }}>
-              <input type="number" min="5" value={amount} onChange={e => setAmount(parseInt(e.target.value) || 0)}
-                style={{ flex: 1, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', padding: '0.9rem', color: '#fff', fontSize: '1rem', borderRadius: '6px', outline: 'none', textAlign: 'center', fontWeight: '700' }}
-              />
-              <span style={{ color: 'var(--gold)', fontWeight: '900', fontSize: '1.1rem', minWidth: '90px' }}>= R$ {amount.toFixed(2)}</span>
-            </div>
-            {buyError && <div style={{ background: 'rgba(255,68,68,0.1)', border: '1px solid rgba(255,68,68,0.3)', padding: '0.7rem', marginBottom: '1rem', color: '#ef4444', fontSize: '0.75rem' }}>{buyError}</div>}
-            <button onClick={buyIkoin} disabled={buying || amount < 5} className="btn btn-primary" style={{ width: '100%', padding: '1rem', marginBottom: '0.75rem', opacity: amount < 5 ? 0.5 : 1 }}>
-              {buying ? 'PROCESSANDO...' : `PAGAR R$ ${amount.toFixed(2)}`}
-            </button>
-            <button onClick={() => setBuyOpen(false)} style={{ background: 'none', border: 'none', color: 'var(--text-mute)', fontSize: '0.7rem', cursor: 'pointer', letterSpacing: '2px' }}>CANCELAR</button>
+
+            {!pix && !paid && (<>
+              <img src="/ikoin.svg" alt="Ikoin" style={{ width: '64px', height: '64px', marginBottom: '0.8rem', filter: 'drop-shadow(0 0 15px rgba(212,175,55,0.5))' }} />
+              <h3 className="cinzel" style={{ color: 'var(--gold)', fontSize: '1.4rem', marginBottom: '0.3rem' }}>COMPRAR IKOIN</h3>
+              <p style={{ color: 'var(--text-mute)', fontSize: '0.75rem', marginBottom: '1.25rem' }}>1 Ikoin = R$ 1,00</p>
+
+              <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.25rem' }}>
+                {[['pix', 'PIX'], ['card', 'Cartão']].map(([k, label]) => (
+                  <button key={k} onClick={() => setMethod(k)} style={{
+                    flex: 1, padding: '0.7rem 0', borderRadius: '6px', cursor: 'pointer', fontWeight: '700', fontSize: '0.78rem', letterSpacing: '1px',
+                    background: method === k ? 'rgba(197,160,89,0.2)' : 'rgba(255,255,255,0.04)',
+                    border: `1px solid ${method === k ? 'var(--gold)' : 'rgba(255,255,255,0.1)'}`,
+                    color: method === k ? 'var(--gold)' : 'rgba(255,255,255,0.6)',
+                  }}>{label}</button>
+                ))}
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '0.5rem', marginBottom: '1rem' }}>
+                {PACKS.map(p => (
+                  <button key={p} onClick={() => setAmount(p)} style={{
+                    background: amount === p ? 'rgba(197,160,89,0.2)' : 'rgba(255,255,255,0.04)',
+                    border: `1px solid ${amount === p ? 'var(--gold)' : 'rgba(255,255,255,0.1)'}`,
+                    color: amount === p ? 'var(--gold)' : 'rgba(255,255,255,0.6)',
+                    padding: '0.6rem 0', borderRadius: '6px', fontSize: '0.72rem', fontWeight: '700', cursor: 'pointer',
+                  }}>{p}</button>
+                ))}
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginBottom: '1.5rem' }}>
+                <input type="number" min="1" value={amount} onChange={e => setAmount(parseInt(e.target.value) || 0)}
+                  style={{ flex: 1, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', padding: '0.9rem', color: '#fff', fontSize: '1rem', borderRadius: '6px', outline: 'none', textAlign: 'center', fontWeight: '700' }}
+                />
+                <span style={{ color: 'var(--gold)', fontWeight: '900', fontSize: '1.1rem', minWidth: '90px' }}>= R$ {amount.toFixed(2)}</span>
+              </div>
+              {buyError && <div style={{ background: 'rgba(255,68,68,0.1)', border: '1px solid rgba(255,68,68,0.3)', padding: '0.7rem', marginBottom: '1rem', color: '#ef4444', fontSize: '0.75rem' }}>{buyError}</div>}
+              <button onClick={method === 'pix' ? genPix : buyIkoin} disabled={buying || amount < 1} className="btn btn-primary" style={{ width: '100%', padding: '1rem', marginBottom: '0.75rem', opacity: amount < 1 ? 0.5 : 1 }}>
+                {buying ? 'PROCESSANDO...' : method === 'pix' ? `GERAR QR PIX · R$ ${amount.toFixed(2)}` : `PAGAR NO CARTÃO · R$ ${amount.toFixed(2)}`}
+              </button>
+              <button onClick={closeBuy} style={{ background: 'none', border: 'none', color: 'var(--text-mute)', fontSize: '0.7rem', cursor: 'pointer', letterSpacing: '2px' }}>CANCELAR</button>
+            </>)}
+
+            {pix && !paid && (<>
+              <h3 className="cinzel" style={{ color: 'var(--gold)', fontSize: '1.3rem', marginBottom: '0.2rem' }}>PAGUE COM PIX</h3>
+              <p style={{ color: 'var(--text-mute)', fontSize: '0.72rem', marginBottom: '1rem' }}>{pix.amount} Ikoin · R$ {Number(pix.amount).toFixed(2)}</p>
+              {pix.qrBase64
+                ? <img src={`data:image/png;base64,${pix.qrBase64}`} alt="QR PIX" style={{ width: '220px', height: '220px', background: '#fff', padding: '8px', borderRadius: '10px', margin: '0 auto 1rem', display: 'block' }} />
+                : <p style={{ color: '#ef4444', fontSize: '0.75rem', marginBottom: '1rem' }}>QR indisponível, use o código abaixo.</p>}
+              <p style={{ color: 'var(--text-mute)', fontSize: '0.68rem', marginBottom: '0.5rem', letterSpacing: '1px' }}>Escaneie no app do banco ou copie o código:</p>
+              <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
+                <input readOnly value={pix.qrCode} onClick={e => e.target.select()}
+                  style={{ flex: 1, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', padding: '0.6rem', color: 'rgba(255,255,255,0.7)', fontSize: '0.62rem', borderRadius: '6px', outline: 'none' }} />
+                <button onClick={copyPix} className="btn btn-primary" style={{ padding: '0 1rem', fontSize: '0.7rem', whiteSpace: 'nowrap' }}>{copied ? 'COPIADO' : 'COPIAR'}</button>
+              </div>
+              <p style={{ color: 'var(--gold)', fontSize: '0.74rem', marginBottom: '1rem' }}>⏳ Aguardando pagamento... os Ikoins caem sozinhos.</p>
+              <button onClick={closeBuy} style={{ background: 'none', border: 'none', color: 'var(--text-mute)', fontSize: '0.7rem', cursor: 'pointer', letterSpacing: '2px' }}>FECHAR</button>
+            </>)}
+
+            {paid && (<>
+              <div style={{ fontSize: '3rem', marginBottom: '0.5rem' }}>✅</div>
+              <h3 className="cinzel" style={{ color: '#7BD88F', fontSize: '1.4rem', marginBottom: '0.5rem' }}>PAGAMENTO CONFIRMADO</h3>
+              <p style={{ color: 'var(--text-mute)', fontSize: '0.8rem' }}>+{pix?.amount} Ikoin adicionados! Atualizando...</p>
+            </>)}
+
           </div>
         </div>
       )}

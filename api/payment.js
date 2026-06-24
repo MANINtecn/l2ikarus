@@ -14,11 +14,25 @@ function verifyJWT(token, secret) {
   } catch { return null }
 }
 
+// Token assinado pelo GS (HMAC) pra abrir o pagamento direto da janela do jogo, sem login/cookie.
+function verifyPayToken(t, secret) {
+  try {
+    const [payloadB64, sig] = t.split('.')
+    const expected = crypto.createHmac('sha256', secret).update(payloadB64).digest('base64url')
+    if (sig !== expected) return null
+    const data = JSON.parse(Buffer.from(payloadB64, 'base64url').toString())
+    if (data.exp < Math.floor(Date.now() / 1000)) return null
+    return data
+  } catch { return null }
+}
+
 function getAction(req) {
   const url = req.url || ''
   if (url.includes('/create')) return 'create'
   if (url.includes('/webhook')) return 'webhook'
   if (url.includes('/status')) return 'status'
+  if (url.includes('/pixtoken')) return 'pixtoken'
+  if (url.includes('/pix')) return 'pix'
   return req.query.action || ''
 }
 
@@ -101,6 +115,125 @@ export default async function handler(req, res) {
     }
   }
 
+  // POST /api/payment/pix — cria pagamento PIX e retorna QR (base64) + copia-e-cola
+  if (action === 'pix') {
+    if (req.method !== 'POST') return res.status(405).json({ error: 'Método inválido' })
+    if (!token) return res.status(500).json({ error: 'MP_ACCESS_TOKEN não configurado' })
+
+    const cookies = req.headers.cookie || ''
+    const m = cookies.match(/player_session=([^;]+)/)
+    const player = m ? verifyJWT(m[1], jwtSecret) : null
+    if (!player) return res.status(401).json({ error: 'Faça login para comprar Ikoin.' })
+
+    const { amount } = req.body || {}
+    const qty = parseInt(amount)
+    if (!qty || qty < 1) return res.status(400).json({ error: 'Quantidade mínima: 1 Ikoin.' })
+    if (qty > 100000) return res.status(400).json({ error: 'Quantidade máxima: 100.000 Ikoin.' })
+
+    try {
+      const db = await getConnection()
+      const orderId = crypto.randomUUID()
+      const now = Math.floor(Date.now() / 1000)
+      await db.query(
+        'INSERT INTO ikoin_orders (id, account_name, amount, status, created_at) VALUES (?, ?, ?, ?, ?)',
+        [orderId, player.login, qty, 'pending', now]
+      )
+
+      const payerEmail = (player.email && player.email.includes('@')) ? player.email : `${player.login}@l2ikarus.com`
+      const payRes = await fetch(`${MP_API}/v1/payments`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          'X-Idempotency-Key': orderId,
+        },
+        body: JSON.stringify({
+          transaction_amount: qty,
+          description: `${qty} Ikoin — L2 Ikarus`,
+          payment_method_id: 'pix',
+          external_reference: orderId,
+          notification_url: `${siteUrl}/api/payment/webhook`,
+          payer: { email: payerEmail, first_name: player.login },
+        }),
+      })
+      const pay = await payRes.json()
+      const tx = pay?.point_of_interaction?.transaction_data
+      if (!tx || !tx.qr_code) {
+        console.error('MP pix error:', pay)
+        return res.status(500).json({ error: pay.message || 'Falha ao gerar PIX.' })
+      }
+      await db.query('UPDATE ikoin_orders SET mp_payment_id = ? WHERE id = ?', [String(pay.id), orderId])
+      return res.status(200).json({
+        orderId,
+        qrBase64: tx.qr_code_base64 || '',
+        qrCode: tx.qr_code,
+        ticketUrl: tx.ticket_url || '',
+        amount: qty,
+      })
+    } catch (err) {
+      console.error('Pix create error:', err)
+      return res.status(500).json({ error: err.message })
+    }
+  }
+
+  // POST /api/payment/pixtoken — cria PIX a partir de token assinado pelo GS (janela do jogo)
+  if (action === 'pixtoken') {
+    if (req.method !== 'POST') return res.status(405).json({ error: 'Método inválido' })
+    if (!token) return res.status(500).json({ error: 'MP_ACCESS_TOKEN não configurado' })
+    const paySecret = process.env.PAY_TOKEN_SECRET
+    if (!paySecret) return res.status(500).json({ error: 'PAY_TOKEN_SECRET não configurado' })
+
+    const { t } = req.body || {}
+    const data = t ? verifyPayToken(t, paySecret) : null
+    if (!data || !data.login) return res.status(401).json({ error: 'Link inválido ou expirado. Gere de novo no jogo.' })
+    const qty = parseInt(data.amount)
+    if (!qty || qty < 1 || qty > 100000) return res.status(400).json({ error: 'Valor inválido.' })
+
+    try {
+      const db = await getConnection()
+      const [[acc]] = await db.query('SELECT email FROM accounts WHERE login = ?', [data.login])
+      const orderId = crypto.randomUUID()
+      const now = Math.floor(Date.now() / 1000)
+      await db.query(
+        'INSERT INTO ikoin_orders (id, account_name, amount, status, created_at) VALUES (?, ?, ?, ?, ?)',
+        [orderId, data.login, qty, 'pending', now]
+      )
+      const payerEmail = (acc && acc.email && acc.email.includes('@')) ? acc.email : `${data.login}@l2ikarus.com`
+      const payRes = await fetch(`${MP_API}/v1/payments`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          'X-Idempotency-Key': orderId,
+        },
+        body: JSON.stringify({
+          transaction_amount: qty,
+          description: `${qty} Ikoin — L2 Ikarus`,
+          payment_method_id: 'pix',
+          external_reference: orderId,
+          notification_url: `${siteUrl}/api/payment/webhook`,
+          payer: { email: payerEmail, first_name: data.login },
+        }),
+      })
+      const pay = await payRes.json()
+      const tx = pay?.point_of_interaction?.transaction_data
+      if (!tx || !tx.qr_code) {
+        console.error('MP pixtoken error:', pay)
+        return res.status(500).json({ error: pay.message || 'Falha ao gerar PIX.' })
+      }
+      await db.query('UPDATE ikoin_orders SET mp_payment_id = ? WHERE id = ?', [String(pay.id), orderId])
+      return res.status(200).json({
+        orderId,
+        qrBase64: tx.qr_code_base64 || '',
+        qrCode: tx.qr_code,
+        amount: qty,
+      })
+    } catch (err) {
+      console.error('Pixtoken create error:', err)
+      return res.status(500).json({ error: err.message })
+    }
+  }
+
   // POST /api/payment/webhook — Mercado Pago confirma pagamento
   if (action === 'webhook') {
     if (!token) return res.status(200).send('ok')
@@ -118,12 +251,13 @@ export default async function handler(req, res) {
 
       if (payment.status === 'approved' && orderId) {
         const db = await getConnection()
-        // Garante idempotência: só credita se o pedido ainda está pending
-        const [[order]] = await db.query('SELECT * FROM ikoin_orders WHERE id = ? AND status = ?', [orderId, 'pending'])
-        if (order) {
-          await db.query('UPDATE ikoin_orders SET status = ?, mp_payment_id = ?, paid_at = ? WHERE id = ?',
-            ['paid', String(paymentId), Math.floor(Date.now() / 1000), orderId])
-          await creditIkoin(db, order.account_name, order.amount, 'purchase', `Compra de ${order.amount} Ikoin`, String(paymentId))
+        // Idempotência atômica: só credita se ESTE update mudou o pedido de pending->paid
+        const [r] = await db.query(
+          'UPDATE ikoin_orders SET status = ?, mp_payment_id = ?, paid_at = ? WHERE id = ? AND status = ?',
+          ['paid', String(paymentId), Math.floor(Date.now() / 1000), orderId, 'pending'])
+        if (r && r.affectedRows > 0) {
+          const [[order]] = await db.query('SELECT account_name, amount FROM ikoin_orders WHERE id = ?', [orderId])
+          if (order) await creditIkoin(db, order.account_name, order.amount, 'purchase', `Compra de ${order.amount} Ikoin`, String(paymentId))
         }
       }
       return res.status(200).send('ok')
@@ -139,8 +273,27 @@ export default async function handler(req, res) {
     if (!orderId) return res.status(400).json({ error: 'orderId obrigatório' })
     try {
       const db = await getConnection()
-      const [[order]] = await db.query('SELECT status, amount FROM ikoin_orders WHERE id = ?', [orderId])
-      return res.status(200).json(order || { status: 'not_found' })
+      const [[order]] = await db.query('SELECT status, amount, account_name, mp_payment_id FROM ikoin_orders WHERE id = ?', [orderId])
+      if (!order) return res.status(200).json({ status: 'not_found' })
+      // Se ainda pendente e tem pagamento MP, consulta direto (não depende só do webhook)
+      if (order.status === 'pending' && order.mp_payment_id && token) {
+        try {
+          const payRes = await fetch(`${MP_API}/v1/payments/${order.mp_payment_id}`, {
+            headers: { 'Authorization': `Bearer ${token}` },
+          })
+          const payment = await payRes.json()
+          if (payment.status === 'approved') {
+            const [r] = await db.query(
+              'UPDATE ikoin_orders SET status = ?, paid_at = ? WHERE id = ? AND status = ?',
+              ['paid', Math.floor(Date.now() / 1000), orderId, 'pending'])
+            if (r && r.affectedRows > 0) {
+              await creditIkoin(db, order.account_name, order.amount, 'purchase', `Compra de ${order.amount} Ikoin (PIX)`, String(order.mp_payment_id))
+            }
+            return res.status(200).json({ status: 'paid', amount: order.amount })
+          }
+        } catch { /* ignora, devolve o status do banco */ }
+      }
+      return res.status(200).json({ status: order.status, amount: order.amount })
     } catch (err) {
       return res.status(500).json({ error: err.message })
     }

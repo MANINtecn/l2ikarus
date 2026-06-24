@@ -18,6 +18,8 @@
     { "source": "/api/payment/create", "destination": "/api/payment?action=create" },
     { "source": "/api/payment/webhook", "destination": "/api/payment?action=webhook" },
     { "source": "/api/payment/status", "destination": "/api/payment?action=status" },
+    { "source": "/api/payment/pix", "destination": "/api/payment?action=pix" },
+    { "source": "/api/payment/pixtoken", "destination": "/api/payment?action=pixtoken" },
     { "source": "/api/admin/stats", "destination": "/api/admin?action=stats" },
     { "source": "/api/admin/players", "destination": "/api/admin?action=players" },
     { "source": "/api/admin/accounts", "destination": "/api/admin?action=accounts" },

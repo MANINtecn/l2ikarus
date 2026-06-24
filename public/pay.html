@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>L2 Ikarus - Pagamento</title>
+<style>
+  html,body{margin:0;padding:0;background:#15131a;color:#e9e4d6;font-family:Arial,Helvetica,sans-serif;}
+  .wrap{max-width:420px;margin:0 auto;padding:22px 18px;text-align:center;}
+  h1{color:#c5a059;font-size:20px;letter-spacing:2px;margin:6px 0 2px;}
+  .sub{color:#9a937f;font-size:12px;margin:0 0 16px;}
+  .qr{width:230px;height:230px;background:#fff;padding:8px;border-radius:10px;margin:0 auto 14px;display:block;}
+  .lbl{color:#9a937f;font-size:11px;letter-spacing:1px;margin:0 0 6px;}
+  .code{width:100%;box-sizing:border-box;background:#211e29;border:1px solid #3a3550;color:#cfc8b6;font-size:11px;padding:8px;border-radius:6px;}
+  .btn{display:inline-block;background:#c5a059;color:#1a1620;border:none;font-weight:bold;font-size:13px;letter-spacing:1px;padding:10px 16px;border-radius:6px;cursor:pointer;margin-top:8px;}
+  .wait{color:#c5a059;font-size:13px;margin:14px 0;}
+  .ok{color:#7BD88F;font-size:18px;font-weight:bold;}
+  .err{color:#ef4444;font-size:13px;margin:14px 0;}
+  .amt{color:#c5a059;font-weight:bold;font-size:14px;margin:0 0 12px;}
+</style>
+</head>
+<body>
+<div class="wrap" id="root">
+  <h1>L2 IKARUS</h1>
+  <p class="sub">Carregando pagamento...</p>
+</div>
+
+<script type="text/javascript">
+(function(){
+  function $(id){return document.getElementById(id);}
+  function qs(name){
+    var m = window.location.search.match(new RegExp('[?&]'+name+'=([^&]+)'));
+    return m ? decodeURIComponent(m[1]) : '';
+  }
+  var root = $('root');
+
+  // Modo DEMO: testa se a janela do jogo renderiza imagem + roda JS.
+  if (qs('demo') === '1'){
+    var red = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
+    root.innerHTML =
+      '<h1>TESTE OK</h1>'+
+      '<p class="sub">Se voce esta vendo o quadrado e este texto, a janela renderiza imagem + HTML.</p>'+
+      '<img class="qr" src="data:image/png;base64,'+red+'" alt="img">'+
+      '<p class="ok" id="js">(aguardando JS...)</p>';
+    $('js').innerHTML = 'JS OK - scripting funciona na janela';
+    return;
+  }
+
+  var token = qs('t');
+  if (!token){
+    root.innerHTML = '<h1>L2 IKARUS</h1><p class="err">Link invalido. Volte ao jogo e gere o pagamento novamente.</p>';
+    return;
+  }
+
+  function post(url, body, cb){
+    var x = new XMLHttpRequest();
+    x.open('POST', url, true);
+    x.setRequestHeader('Content-Type','application/json');
+    x.onreadystatechange = function(){
+      if (x.readyState === 4){
+        var data = {};
+        try { data = JSON.parse(x.responseText); } catch(e){}
+        cb(x.status, data);
+      }
+    };
+    x.send(JSON.stringify(body));
+  }
+  function get(url, cb){
+    var x = new XMLHttpRequest();
+    x.open('GET', url, true);
+    x.onreadystatechange = function(){
+      if (x.readyState === 4){
+        var data = {};
+        try { data = JSON.parse(x.responseText); } catch(e){}
+        cb(x.status, data);
+      }
+    };
+    x.send();
+  }
+
+  function showError(msg){
+    root.innerHTML = '<h1>L2 IKARUS</h1><p class="err">'+(msg||'Erro ao gerar pagamento.')+'</p>';
+  }
+
+  function poll(orderId){
+    get('/api/payment/status?orderId='+encodeURIComponent(orderId), function(st, d){
+      if (d && d.status === 'paid'){
+        root.innerHTML =
+          '<h1>L2 IKARUS</h1>'+
+          '<div style="font-size:42px">&#10003;</div>'+
+          '<p class="ok">PAGAMENTO CONFIRMADO</p>'+
+          '<p class="sub">Seus Ikoins ja foram adicionados a sua conta. Pode fechar esta janela.</p>';
+        return;
+      }
+      setTimeout(function(){ poll(orderId); }, 4000);
+    });
+  }
+
+  function render(d){
+    var img = d.qrBase64 ? '<img class="qr" src="data:image/png;base64,'+d.qrBase64+'" alt="QR">' : '';
+    root.innerHTML =
+      '<h1>PAGUE COM PIX</h1>'+
+      '<p class="amt">'+d.amount+' Ikoin &nbsp;|&nbsp; R$ '+Number(d.amount).toFixed(2)+'</p>'+
+      img+
+      '<p class="lbl">Escaneie no app do banco ou copie o codigo:</p>'+
+      '<input class="code" id="cc" readonly value="'+d.qrCode+'">'+
+      '<br><button class="btn" id="cp">COPIAR CODIGO</button>'+
+      '<p class="wait">Aguardando pagamento... os Ikoins caem sozinhos.</p>';
+    var cc = $('cc');
+    $('cp').onclick = function(){
+      cc.focus(); cc.select();
+      try { document.execCommand('copy'); this.innerHTML='COPIADO'; } catch(e){}
+    };
+    poll(d.orderId);
+  }
+
+  post('/api/payment/pixtoken', { t: token }, function(status, d){
+    if (status === 200 && d && d.qrCode){ render(d); }
+    else { showError(d && d.error ? d.error : 'Erro ao gerar PIX.'); }
+  });
+})();
+</script>
+</body>
+</html>
