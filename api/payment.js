@@ -107,6 +107,9 @@ export default async function handler(req, res) {
   // POST /api/payment/create — cria pagamento e retorna link do checkout
   if (action === 'create') {
     if (req.method !== 'POST') return res.status(405).json({ error: 'Método inválido' })
+    // CARTAO (MercadoPago Checkout) DESATIVADO: a conta MP tem divida e o valor que cai
+    // e' usado pra abater a divida. Reativar quando a divida do MP for resolvida.
+    return res.status(503).json({ error: 'Pagamento por cartão temporariamente indisponível. Use o PIX.' })
     if (!token) return res.status(500).json({ error: 'MP_ACCESS_TOKEN não configurado' })
 
     // Autentica o jogador
@@ -190,22 +193,24 @@ export default async function handler(req, res) {
         [orderId, player.login, qty, 'pending', now]
       )
 
-      // ----- PagBank (PRINCIPAL) -----
+      // ----- PagBank (UNICO ativo) -----
+      // Fallback p/ MercadoPago DESATIVADO de proposito: a conta MP tem divida e
+      // todo valor que cai e' usado pra abater a divida. Reativar (provider !== 'mp'
+      // caindo no MP) so depois que a divida do MP for resolvida.
       if (provider !== 'mp') {
         const pbToken = process.env.PAGBANK_TOKEN
-        if (pbToken) {
-          const pb = await createPagbankPix({ pbToken, orderId, account: player.login, email: payerEmail, qty, siteUrl })
-          if (!pb.error) {
-            await db.query('UPDATE ikoin_orders SET mp_payment_id = ? WHERE id = ?', ['PB:' + pb.pbOrderId, orderId])
-            return res.status(200).json({ orderId, qrBase64: pb.qrBase64, qrCode: pb.qrText, amount: qty })
-          }
-          // PagBank indisponivel (ex: whitelist nao liberada) -> cai pro MP automaticamente
-          console.error('PagBank pix indisponivel, fallback p/ MP:', pb.error)
+        if (!pbToken) return res.status(500).json({ error: 'PAGBANK_TOKEN não configurado' })
+        const pb = await createPagbankPix({ pbToken, orderId, account: player.login, email: payerEmail, qty, siteUrl })
+        if (pb.error) {
+          console.error('PagBank pix error (fallback MP desativado):', pb.error)
+          return res.status(503).json({ error: 'PIX temporariamente indisponível. Tente novamente em instantes.' })
         }
+        await db.query('UPDATE ikoin_orders SET mp_payment_id = ? WHERE id = ?', ['PB:' + pb.pbOrderId, orderId])
+        return res.status(200).json({ orderId, qrBase64: pb.qrBase64, qrCode: pb.qrText, amount: qty })
       }
 
-      // ----- MercadoPago (fallback automatico) -----
-      if (!token) return res.status(500).json({ error: 'PIX indisponível no momento. Tente novamente.' })
+      // ----- MercadoPago (somente via provider=mp explicito; nada manda isso hoje) -----
+      if (!token) return res.status(500).json({ error: 'MP_ACCESS_TOKEN não configurado' })
       const payRes = await fetch(`${MP_API}/v1/payments`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json', 'X-Idempotency-Key': orderId },
