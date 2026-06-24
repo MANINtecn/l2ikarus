@@ -68,7 +68,7 @@ export default async function handler(req, res) {
 
     const { amount } = req.body || {}
     const qty = parseInt(amount)
-    if (!qty || qty < 5) return res.status(400).json({ error: 'Quantidade mínima: 5 Ikoin.' })
+    if (!qty || qty < 1) return res.status(400).json({ error: 'Quantidade mínima: 1 Ikoin.' })
     if (qty > 100000) return res.status(400).json({ error: 'Quantidade máxima: 100.000 Ikoin.' })
 
     try {
