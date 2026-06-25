@@ -26,6 +26,7 @@ export default function PlayerPanel({ data, onLogout }) {
   const [redeemCode, setRedeemCode] = useState('')
   const [redeemMsg, setRedeemMsg] = useState(null)
   const [method, setMethod] = useState('pix')
+  const [cpf, setCpf] = useState('')
   const [pix, setPix] = useState(null)
   const [paid, setPaid] = useState(false)
   const [copied, setCopied] = useState(false)
@@ -48,11 +49,13 @@ export default function PlayerPanel({ data, onLogout }) {
   }
 
   const genPix = async () => {
+    const cleanCpf = (cpf || '').replace(/\D/g, '')
+    if (cleanCpf.length !== 11) { setBuyError('Informe um CPF válido (11 dígitos) para o PIX.'); return }
     setBuying(true); setBuyError(''); setPaid(false)
     try {
       const r = await fetch('/api/payment/pix', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount }),
+        body: JSON.stringify({ amount, cpf: cleanCpf }),
       }).then(x => x.json())
       if (r.qrCode) { setPix(r); startPolling(r.orderId) }
       else setBuyError(r.error || 'Erro ao gerar PIX.')
@@ -347,6 +350,11 @@ export default function PlayerPanel({ data, onLogout }) {
                 />
                 <span style={{ color: 'var(--gold)', fontWeight: '900', fontSize: '1.1rem', minWidth: '90px' }}>= R$ {amount.toFixed(2)}</span>
               </div>
+              {method === 'pix' && (
+                <input value={cpf} onChange={e => setCpf(e.target.value)} placeholder="CPF do pagador (obrigatório p/ PIX)" maxLength={14}
+                  style={{ width: '100%', boxSizing: 'border-box', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', padding: '0.8rem', color: '#fff', fontSize: '0.85rem', borderRadius: '6px', outline: 'none', textAlign: 'center', marginBottom: '1.5rem' }}
+                />
+              )}
               {buyError && <div style={{ background: 'rgba(255,68,68,0.1)', border: '1px solid rgba(255,68,68,0.3)', padding: '0.7rem', marginBottom: '1rem', color: '#ef4444', fontSize: '0.75rem' }}>{buyError}</div>}
               <button onClick={method === 'pix' ? genPix : buyIkoin} disabled={buying || amount < 1} className="btn btn-primary" style={{ width: '100%', padding: '1rem', marginBottom: '0.75rem', opacity: amount < 1 ? 0.5 : 1 }}>
                 {buying ? 'PROCESSANDO...' : method === 'pix' ? `GERAR QR PIX · R$ ${amount.toFixed(2)}` : `PAGAR NO CARTÃO · R$ ${amount.toFixed(2)}`}

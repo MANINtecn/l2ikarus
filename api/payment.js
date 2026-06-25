@@ -62,11 +62,11 @@ async function fetchPngBase64(url) {
 
 // Cria cobranca PIX no PagBank (PagSeguro). SEM CPF (doacao anonima).
 // Retorna no mesmo formato do MP: { pbOrderId, qrText, qrBase64 } ou { error }.
-async function createPagbankPix({ pbToken, orderId, account, email, qty, siteUrl }) {
+async function createPagbankPix({ pbToken, orderId, account, email, cpf, qty, siteUrl }) {
   const amountCents = qty * 100
   const body = {
     reference_id: orderId,
-    customer: { name: account, email },
+    customer: { name: account, email, tax_id: cpf },
     items: [{ reference_id: 'ikoin', name: `${qty} Ikoin - L2 Ikarus`, quantity: 1, unit_amount: amountCents }],
     qr_codes: [{ amount: { value: amountCents } }],
     notification_urls: [`${siteUrl}/api/payment/webhook?provider=pagbank`],
@@ -183,6 +183,11 @@ export default async function handler(req, res) {
 
     const provider = (req.body?.provider || 'pagbank').toLowerCase()
     const payerEmail = (player.email && player.email.includes('@')) ? player.email : `${player.login}@l2ikarus.com`
+    const cpf = String(req.body?.cpf || '').replace(/\D/g, '')
+    // PagBank exige CPF do pagador no PIX (tax_id). MP nao exige.
+    if (provider !== 'mp' && cpf.length !== 11) {
+      return res.status(400).json({ error: 'Informe um CPF válido (11 dígitos) para gerar o PIX.' })
+    }
 
     try {
       const db = await getConnection()
@@ -200,7 +205,7 @@ export default async function handler(req, res) {
       if (provider !== 'mp') {
         const pbToken = process.env.PAGBANK_TOKEN
         if (!pbToken) return res.status(500).json({ error: 'PAGBANK_TOKEN não configurado' })
-        const pb = await createPagbankPix({ pbToken, orderId, account: player.login, email: payerEmail, qty, siteUrl })
+        const pb = await createPagbankPix({ pbToken, orderId, account: player.login, email: payerEmail, cpf, qty, siteUrl })
         if (pb.error) {
           console.error('PagBank pix error (fallback MP desativado):', pb.error)
           return res.status(503).json({ error: 'PIX temporariamente indisponível. Tente novamente em instantes.' })
