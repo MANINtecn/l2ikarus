@@ -1,6 +1,7 @@
 {
-  "version": "1.7",
-  "url": "https://firebasestorage.googleapis.com/v0/b/papaleguastoc.firebasestorage.app/o/l2ikarus%2FIkarusGames.exe?alt=media",
-  "hash": "46ade2015cf569896e1b1c0988461251",
-  "notes": "JOGAR abre o jogo na hora (checa so a versao). Botao 'Verificar Arquivos' para reparo. Cancelar o UAC nao mostra mais erro."
+  "version": "1.8",
+  "url": "https://drive.google.com/uc?export=download&id=1SnzynJApVW_AxzyQLsBVuwxVxXz5RX0w",
+  "driveFileId": "1SnzynJApVW_AxzyQLsBVuwxVxXz5RX0w",
+  "hash": "f7d3da03ff2077fc0350cb03c679b7c8",
+  "notes": "Migracao de hospedagem: launcher agora baixa o cliente via Google Drive API (Firebase foi desativado por custo). JOGAR abre o jogo na hora (checa so a versao). Botao 'Verificar Arquivos' para reparo."
 }
