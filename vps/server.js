@@ -260,6 +260,224 @@ http.createServer(async (req, res) => {
     return
   }
 
+  // ===== aCis INTERLUDE BBS — rotas seguras (x-api-key obrigatória, já validada acima) =====
+
+  // GET /acis/ikoin/:account — saldo de Ikoin
+  if (req.method === 'GET' && path.startsWith('/acis/ikoin/')) {
+    const account = decodeURIComponent(path.replace('/acis/ikoin/', '').replace(/[^a-zA-Z0-9_]/g, ''))
+    try {
+      const p = getPool()
+      const [rows] = await p.query('SELECT balance FROM ikoin_balance WHERE account_name=?', [account])
+      const balance = rows.length > 0 ? rows[0].balance : 0
+      res.writeHead(200)
+      return res.end(JSON.stringify({ balance }))
+    } catch (e) {
+      res.writeHead(500); return res.end(JSON.stringify({ error: e.message }))
+    }
+  }
+
+  // GET /acis/premium/:account — status premium Interlude
+  if (req.method === 'GET' && path.startsWith('/acis/premium/')) {
+    const account = decodeURIComponent(path.replace('/acis/premium/', '').replace(/[^a-zA-Z0-9_]/g, ''))
+    try {
+      const p = getPool()
+      const [rows] = await p.query('SELECT premium_expiry FROM account_premium_interlude WHERE account_name=?', [account])
+      const expiry = rows.length > 0 ? rows[0].premium_expiry : 0
+      const active = expiry > Date.now()
+      res.writeHead(200)
+      return res.end(JSON.stringify({ active, expiry }))
+    } catch (e) {
+      res.writeHead(500); return res.end(JSON.stringify({ error: e.message }))
+    }
+  }
+
+  // POST /acis/premium/buy — compra premium Interlude (50 Ikoin = 30 dias)
+  if (req.method === 'POST' && path === '/acis/premium/buy') {
+    const body = await readBody(req)
+    const account = (body.account || '').replace(/[^a-zA-Z0-9_]/g, '')
+    const PRICE = 50
+    const DAYS = 30
+    if (!account) { res.writeHead(400); return res.end(JSON.stringify({ error: 'account obrigatório' })) }
+    try {
+      const p = getPool()
+      const [bal] = await p.query('SELECT balance FROM ikoin_balance WHERE account_name=?', [account])
+      const balance = bal.length > 0 ? bal[0].balance : 0
+      if (balance < PRICE) { res.writeHead(200); return res.end(JSON.stringify({ ok: false, error: 'Saldo insuficiente.' })) }
+      const now = Date.now()
+      const [prem] = await p.query('SELECT premium_expiry FROM account_premium_interlude WHERE account_name=?', [account])
+      const currentExpiry = (prem.length > 0 && prem[0].premium_expiry > now) ? prem[0].premium_expiry : now
+      const newExpiry = currentExpiry + DAYS * 86400000
+      await p.query('INSERT INTO account_premium_interlude (account_name, premium_expiry, updated_at) VALUES (?,?,?) ON DUPLICATE KEY UPDATE premium_expiry=?, updated_at=?', [account, newExpiry, now, newExpiry, now])
+      await p.query('UPDATE ikoin_balance SET balance=balance-?, updated_at=? WHERE account_name=?', [PRICE, now, account])
+      await p.query('INSERT INTO ikoin_transactions (account_name, amount, type, description, created_at) VALUES (?,?,?,?,?)', [account, -PRICE, 'spend', 'Premium 30 dias - Interlude', now])
+      res.writeHead(200)
+      return res.end(JSON.stringify({ ok: true, newExpiry }))
+    } catch (e) {
+      res.writeHead(500); return res.end(JSON.stringify({ error: e.message }))
+    }
+  }
+
+  // POST /acis/classmaster/buy3rd — libera a 3a classe via Ikoin (20 Ikoin, uma vez por classe)
+  if (req.method === 'POST' && path === '/acis/classmaster/buy3rd') {
+    const body = await readBody(req)
+    const account = (body.account || '').replace(/[^a-zA-Z0-9_]/g, '')
+    const PRICE = 20
+    if (!account) { res.writeHead(400); return res.end(JSON.stringify({ error: 'account obrigatório' })) }
+    try {
+      const p = getPool()
+      const [bal] = await p.query('SELECT balance FROM ikoin_balance WHERE account_name=?', [account])
+      const balance = bal.length > 0 ? bal[0].balance : 0
+      if (balance < PRICE) { res.writeHead(200); return res.end(JSON.stringify({ ok: false, error: 'Saldo insuficiente.' })) }
+      const now = Date.now()
+      await p.query('UPDATE ikoin_balance SET balance=balance-?, updated_at=? WHERE account_name=?', [PRICE, now, account])
+      await p.query('INSERT INTO ikoin_transactions (account_name, amount, type, description, created_at) VALUES (?,?,?,?,?)', [account, -PRICE, 'spend', '3a Classe - Interlude', now])
+      res.writeHead(200)
+      return res.end(JSON.stringify({ ok: true }))
+    } catch (e) {
+      res.writeHead(500); return res.end(JSON.stringify({ error: e.message }))
+    }
+  }
+
+  // GET /acis/offers — ofertas ativas do Interlude
+  if (req.method === 'GET' && path === '/acis/offers') {
+    try {
+      const p = getPool()
+      const [rows] = await p.query("SELECT id, item_id, count, price_ikoin, title, icon FROM game_offer WHERE active=1 AND server='interlude' ORDER BY id")
+      res.writeHead(200)
+      return res.end(JSON.stringify({ offers: rows }))
+    } catch (e) {
+      res.writeHead(500); return res.end(JSON.stringify({ error: e.message }))
+    }
+  }
+
+  // POST /acis/offers/buy — comprar oferta com Ikoin
+  if (req.method === 'POST' && path === '/acis/offers/buy') {
+    const body = await readBody(req)
+    const account = (body.account || '').replace(/[^a-zA-Z0-9_]/g, '')
+    const offerId = parseInt(body.offerId) || 0
+    if (!account || !offerId) { res.writeHead(400); return res.end(JSON.stringify({ error: 'Dados inválidos.' })) }
+    try {
+      const p = getPool()
+      const [offers] = await p.query("SELECT * FROM game_offer WHERE id=? AND active=1 AND server='interlude'", [offerId])
+      if (!offers.length) { res.writeHead(200); return res.end(JSON.stringify({ ok: false, error: 'Oferta indisponível.' })) }
+      const offer = offers[0]
+      const [bal] = await p.query('SELECT balance FROM ikoin_balance WHERE account_name=?', [account])
+      const balance = bal.length > 0 ? bal[0].balance : 0
+      if (balance < offer.price_ikoin) { res.writeHead(200); return res.end(JSON.stringify({ ok: false, error: 'Saldo insuficiente.' })) }
+      const now = Date.now()
+      await p.query('UPDATE ikoin_balance SET balance=balance-?, updated_at=? WHERE account_name=?', [offer.price_ikoin, now, account])
+      await p.query('INSERT INTO ikoin_transactions (account_name, amount, type, description, created_at) VALUES (?,?,?,?,?)', [account, -offer.price_ikoin, 'spend', `Oferta: ${offer.title} - Interlude`, now])
+      res.writeHead(200)
+      return res.end(JSON.stringify({ ok: true, itemId: offer.item_id, count: offer.count }))
+    } catch (e) {
+      res.writeHead(500); return res.end(JSON.stringify({ error: e.message }))
+    }
+  }
+
+  // GET /acis/rankings/:type — rankings (pvp, pk, rec)
+  if (req.method === 'GET' && path.startsWith('/acis/rankings/')) {
+    const type = path.replace('/acis/rankings/', '').replace(/[^a-z]/g, '')
+    const orderCol = type === 'pk' ? 'pkkills' : type === 'rec' ? 'recommend' : 'pvpkills'
+    try {
+      const p = getPool()
+      const [rows] = await p.query(`SELECT char_name, level, pvpkills, pkkills, recommend FROM characters WHERE char_name != 'ADMIN' ORDER BY ${orderCol} DESC LIMIT 15`)
+      res.writeHead(200)
+      return res.end(JSON.stringify({ rankings: rows }))
+    } catch (e) {
+      res.writeHead(500); return res.end(JSON.stringify({ error: e.message }))
+    }
+  }
+
+  // POST /acis/changenick — troca de nick (50 Ikoin)
+  if (req.method === 'POST' && path === '/acis/changenick') {
+    const body = await readBody(req)
+    const account = (body.account || '').replace(/[^a-zA-Z0-9_]/g, '')
+    const oldNick = (body.oldNick || '').trim()
+    const newNick = (body.newNick || '').trim()
+    const PRICE = 50
+    if (!account || !oldNick || !newNick) { res.writeHead(400); return res.end(JSON.stringify({ error: 'Dados incompletos.' })) }
+    if (!/^[A-Za-z0-9]{1,16}$/.test(newNick)) { res.writeHead(200); return res.end(JSON.stringify({ ok: false, error: 'Nome inválido (1-16 letras/números).' })) }
+    try {
+      const p = getPool()
+      const [bal] = await p.query('SELECT balance FROM ikoin_balance WHERE account_name=?', [account])
+      const balance = bal.length > 0 ? bal[0].balance : 0
+      if (balance < PRICE) { res.writeHead(200); return res.end(JSON.stringify({ ok: false, error: 'Saldo insuficiente (50 Ikoin).' })) }
+      const [existing] = await p.query('SELECT char_name FROM characters WHERE char_name=?', [newNick])
+      if (existing.length) { res.writeHead(200); return res.end(JSON.stringify({ ok: false, error: 'Nome já está em uso.' })) }
+      const now = Date.now()
+      await p.query('UPDATE characters SET char_name=? WHERE char_name=? AND account_name=?', [newNick, oldNick, account])
+      await p.query('UPDATE ikoin_balance SET balance=balance-?, updated_at=? WHERE account_name=?', [PRICE, now, account])
+      await p.query('INSERT INTO ikoin_transactions (account_name, amount, type, description, created_at) VALUES (?,?,?,?,?)', [account, -PRICE, 'spend', `Troca de nick: ${oldNick} → ${newNick} - Interlude`, now])
+      res.writeHead(200)
+      return res.end(JSON.stringify({ ok: true }))
+    } catch (e) {
+      res.writeHead(500); return res.end(JSON.stringify({ error: e.message }))
+    }
+  }
+
+  // POST /acis/changesex — troca de sexo (30 Ikoin)
+  if (req.method === 'POST' && path === '/acis/changesex') {
+    const body = await readBody(req)
+    const account = (body.account || '').replace(/[^a-zA-Z0-9_]/g, '')
+    const charName = (body.charName || '').trim()
+    const PRICE = 30
+    if (!account || !charName) { res.writeHead(400); return res.end(JSON.stringify({ error: 'Dados incompletos.' })) }
+    try {
+      const p = getPool()
+      const [bal] = await p.query('SELECT balance FROM ikoin_balance WHERE account_name=?', [account])
+      const balance = bal.length > 0 ? bal[0].balance : 0
+      if (balance < PRICE) { res.writeHead(200); return res.end(JSON.stringify({ ok: false, error: 'Saldo insuficiente (30 Ikoin).' })) }
+      const [chars] = await p.query('SELECT sex FROM characters WHERE char_name=? AND account_name=?', [charName, account])
+      if (!chars.length) { res.writeHead(200); return res.end(JSON.stringify({ ok: false, error: 'Personagem não encontrado.' })) }
+      const newSex = chars[0].sex === 0 ? 1 : 0
+      const now = Date.now()
+      await p.query('UPDATE characters SET sex=? WHERE char_name=? AND account_name=?', [newSex, charName, account])
+      await p.query('UPDATE ikoin_balance SET balance=balance-?, updated_at=? WHERE account_name=?', [PRICE, now, account])
+      await p.query('INSERT INTO ikoin_transactions (account_name, amount, type, description, created_at) VALUES (?,?,?,?,?)', [account, -PRICE, 'spend', `Troca de sexo: ${charName} - Interlude`, now])
+      res.writeHead(200)
+      return res.end(JSON.stringify({ ok: true, newSex }))
+    } catch (e) {
+      res.writeHead(500); return res.end(JSON.stringify({ error: e.message }))
+    }
+  }
+
+  // POST /acis/redeem — resgata código promocional no Interlude
+  if (req.method === 'POST' && path === '/acis/redeem') {
+    const body = await readBody(req)
+    const account = (body.account || '').replace(/[^a-zA-Z0-9_]/g, '')
+    const code = (body.code || '').trim().toUpperCase()
+    if (!account || !code) { res.writeHead(400); return res.end(JSON.stringify({ error: 'Dados inválidos.' })) }
+    try {
+      const p = getPool()
+      const [rows] = await p.query('SELECT items, ikoin, active, max_uses, uses FROM promo_codes WHERE code=?', [code])
+      if (!rows.length) { res.writeHead(200); return res.end(JSON.stringify({ ok: false, error: 'Código inválido.' })) }
+      const promo = rows[0]
+      if (!promo.active) { res.writeHead(200); return res.end(JSON.stringify({ ok: false, error: 'Código inativo.' })) }
+      if (promo.max_uses > 0 && promo.uses >= promo.max_uses) { res.writeHead(200); return res.end(JSON.stringify({ ok: false, error: 'Código atingiu o limite de usos.' })) }
+      const [dup] = await p.query('SELECT 1 FROM promo_redeemed WHERE code=? AND account_name=?', [code, account])
+      if (dup.length) { res.writeHead(200); return res.end(JSON.stringify({ ok: false, error: 'Você já resgatou este código.' })) }
+      // Monta lista de itens pra entregar no Java
+      const items = []
+      if (promo.items) {
+        for (const pair of promo.items.split(';')) {
+          const parts = pair.trim().split(':')
+          if (parts.length === 2) items.push({ itemId: parseInt(parts[0]), count: parseInt(parts[1]) })
+        }
+      }
+      const now = Date.now()
+      await p.query('INSERT INTO promo_redeemed (code, account_name, redeemed_at) VALUES (?,?,?)', [code, account, now])
+      await p.query('UPDATE promo_codes SET uses=uses+1 WHERE code=?', [code])
+      if (promo.ikoin > 0) {
+        await p.query('INSERT INTO ikoin_balance (account_name, balance, updated_at) VALUES (?,?,?) ON DUPLICATE KEY UPDATE balance=balance+?, updated_at=?', [account, promo.ikoin, now, promo.ikoin, now])
+        await p.query('INSERT INTO ikoin_transactions (account_name, amount, type, description, created_at) VALUES (?,?,?,?,?)', [account, promo.ikoin, 'promo', `Código resgatado: ${code}`, now])
+      }
+      res.writeHead(200)
+      return res.end(JSON.stringify({ ok: true, items, ikoin: promo.ikoin || 0 }))
+    } catch (e) {
+      res.writeHead(500); return res.end(JSON.stringify({ error: e.message }))
+    }
+  }
+
   res.writeHead(404)
   res.end(JSON.stringify({ error: 'not found' }))
 }).listen(config.port, () => {

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import sectionImg from '../section-1.jpg.jpg'
+import ServerCards from './ServerCards'
 
 export default function Hero3D({ onRegisterClick }) {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 1024)
@@ -196,6 +197,9 @@ export default function Hero3D({ onRegisterClick }) {
           </div>
         )}
       </div>
+
+      {/* CARDS DE SERVIDOR — 1 por servidor (Interlude/Essence/futuros), hover/click = zoom + info */}
+      <ServerCards isMobile={isMobile} />
 
       <div className="scanline-overlay" style={{ opacity: 0.08 }} />
     </section>
