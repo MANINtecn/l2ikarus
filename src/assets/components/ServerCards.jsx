@@ -154,6 +154,7 @@ export default function ServerCards({ isMobile, onRegisterClick }) {
 
   return (
     <div style={{
+      position: 'relative',
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'flex-end',
@@ -164,6 +165,26 @@ export default function ServerCards({ isMobile, onRegisterClick }) {
       marginTop: isMobile ? '-12px' : '-34px',
       paddingBottom: isMobile ? '10px' : '26px',
     }}>
+      {/* SLOGAN — absoluto (fora do fluxo, nao empurra nada) entre a logo e as imagens */}
+      <div style={{
+        position: 'absolute',
+        top: isMobile ? '-16px' : '-24px',
+        left: 0, right: 0,
+        textAlign: 'center',
+        zIndex: 5,
+        pointerEvents: 'none',
+      }}>
+        <span className="cinzel" style={{
+          fontSize: isMobile ? '0.6rem' : '0.78rem',
+          fontWeight: 700,
+          letterSpacing: isMobile ? '3px' : '5px',
+          color: 'var(--gold)',
+          textShadow: '0 2px 12px rgba(0,0,0,0.8)',
+        }}>
+          UMA CONTA · VÁRIOS SERVIDORES
+        </span>
+      </div>
+
       {SERVERS.map((server, idx) => {
         const isActive = activeId === server.id
         const status = getStatusDisplay(server)
@@ -247,8 +268,8 @@ export default function ServerCards({ isMobile, onRegisterClick }) {
                 )}
 
                 {/* "Criar conta" vale mesmo antes da estreia (conta e da rede, serve pra
-                    qualquer jogo). "Baixar" so aparece quando o servidor de fato tiver
-                    algo pra baixar: Essence sempre, Interlude so apos o countdown zerar. */}
+                    qualquer jogo). "Baixar" aparece sempre que o servidor tiver actionLabel
+                    (Interlude liberado antes da estreia 2026-07-16 — cliente subindo jaja). */}
                 <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                   <button
                     onClick={(e) => { e.stopPropagation(); onRegisterClick && onRegisterClick() }}
@@ -257,7 +278,7 @@ export default function ServerCards({ isMobile, onRegisterClick }) {
                   >
                     CRIAR CONTA
                   </button>
-                  {server.actionLabel && (server.id !== 'interlude' || isInterludeLive()) && (
+                  {server.actionLabel && (
                     <a
                       href={server.downloadHref}
                       onClick={(e) => e.stopPropagation()}
