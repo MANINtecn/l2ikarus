@@ -21,7 +21,9 @@ function App() {
   const [isRegisterOpen, setIsRegisterOpen] = useState(false)
   const [isLoginOpen, setIsLoginOpen] = useState(false)
   const [loading, setLoading] = useState(true)
-  const [bannerVisible, setBannerVisible] = useState(true)
+  // IKARUS 2026-07-15: banner "BETA TESTE ABERTO" desativado a pedido do usuario
+  // (topo do site poluido). Trocar pra useState(true) pra reativar.
+  const [bannerVisible, setBannerVisible] = useState(false)
   const [adminUser, setAdminUser] = useState(null)
   const [playerData, setPlayerData] = useState(null)
   const [googleData, setGoogleData] = useState(null)
@@ -140,7 +142,8 @@ function App() {
           <div style={{ height: '100vh', pointerEvents: 'none', position: 'relative', zIndex: 0 }} />
 
           <div ref={containerRef} className="scroll-content-container" style={{ position: 'relative', zIndex: 5, background: 'transparent' }}>
-            <div className="section-divider" />
+            {/* IKARUS 2026-07-16: divider removido daqui — como o hero e fixed, essa linha
+                rolava POR CIMA das imagens dos ServerCards durante a transicao de scroll */}
             <DonateTerminal />
             <FeaturesTerminal />
             <DownloadTerminal />
@@ -223,8 +226,9 @@ function App() {
             />
           )}
 
-          {/* VOTAÇÃO L2JBrasil */}
-          <div style={{
+          {/* VOTAÇÃO L2JBrasil — REMOVIDO 2026-07-15 a pedido do usuário (vai reativar
+              depois em outro lugar do layout). NAO apagar, so comentado. */}
+          {/* <div style={{
             position: 'fixed', bottom: '1.5rem', left: '1.5rem',
             zIndex: 9999, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px',
           }}>
@@ -242,7 +246,7 @@ function App() {
             >
               <img src="https://top.l2jbrasil.com/button_l.php?u=ikaruslineagell&m=left" alt="Top L2JBrasil" referrerPolicy="no-referrer" style={{ width: '100%', display: 'block', borderRadius: '6px' }} />
             </a>
-          </div>
+          </div> */}
         </>
       )}
     </main>

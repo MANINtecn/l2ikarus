@@ -15,7 +15,9 @@ function checkPort(host, port, timeoutMs = 3000) {
   })
 }
 
-// Pool de conexão reaproveitado (MySQL local da VPS)
+// Pool de conexão reaproveitado (MySQL local da VPS). Essence = pool padrao (compat
+// com /status sem parametro, usado ha tempos). Interlude = pool separado, banco l2jacis
+// (mesma instancia MySQL, banco proprio do aCis). Ver config.js.
 let pool
 function getPool() {
   if (!pool) {
@@ -30,17 +32,35 @@ function getPool() {
   return pool
 }
 
-async function getStats() {
+let poolInterlude
+function getPoolInterlude() {
+  if (!poolInterlude) {
+    poolInterlude = mysql.createPool({
+      ...config.dbInterlude,
+      waitForConnections: true,
+      connectionLimit: 3,
+      queueLimit: 0,
+      connectTimeout: 5000,
+    })
+  }
+  return poolInterlude
+}
+
+// IKARUS 2026-07-15: getStats agora aceita qual servidor consultar. server=undefined
+// ou 'essence' = comportamento ORIGINAL (nao mudar, o card do Essence ja depende disso
+// em producao). server='interlude' = mesma logica, banco l2jacis. Estrutura da tabela
+// characters e identica nos dois (coluna online), confirmado 2026-07-15.
+async function getStats(server) {
+  const p = server === 'interlude' ? getPoolInterlude() : getPool()
   // "Online" baseado no MySQL local (confiavel). O check de porta 7777 nao funciona aqui
   // porque a 7777 publica e um proxy DDoS do host (nao escuta na VPS). Se o banco responde
   // e a query roda, o servidor esta operacional; players vem do characters online=1 (dado real).
   try {
-    const p = getPool()
     const [[{ players }]] = await p.query('SELECT COUNT(*) AS players FROM characters WHERE online = 1')
     const [[{ accounts }]] = await p.query('SELECT COUNT(*) AS accounts FROM accounts')
     return { online: true, players, accounts }
   } catch (e) {
-    console.error('DB error (status):', e.message)
+    console.error(`DB error (status, server=${server || 'essence'}):`, e.message)
     return { online: false, players: 0, accounts: 0 }
   }
 }
@@ -115,11 +135,13 @@ http.createServer(async (req, res) => {
   }
 
   const path = (req.url || '').split('?')[0]
+  const query = new URLSearchParams((req.url || '').split('?')[1] || '')
 
-  // /status é PÚBLICO
+  // /status é PÚBLICO. ?server=interlude consulta o banco do aCis; sem parametro
+  // (ou server=essence) mantem o comportamento ORIGINAL de sempre.
   if (req.method === 'GET' && path === '/status') {
     res.writeHead(200)
-    return res.end(JSON.stringify(await getStats()))
+    return res.end(JSON.stringify(await getStats(query.get('server'))))
   }
 
   // QR Code PIX — PÚBLICO (cliente do jogo carrega a imagem sem api-key)

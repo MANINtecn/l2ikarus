@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import sectionImg from '../section-1.jpg.jpg'
 import ServerCards from './ServerCards'
 
 export default function Hero3D({ onRegisterClick }) {
@@ -45,161 +44,109 @@ export default function Hero3D({ onRegisterClick }) {
       position: 'fixed', top: 0, left: 0,
       zIndex: 1, overflow: 'hidden',
     }}>
-      {/* VIDEO BACKGROUND */}
-      <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
-        <video autoPlay muted loop playsInline poster={sectionImg}
-          style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 15%', filter: 'brightness(1.15) saturate(1.2)' }}
-        >
-          <source src="/assets/video-bg.mp4" type="video/mp4" />
-        </video>
+      {/* BACKGROUND — gradiente estatico (video + poster antigo REMOVIDOS 2026-07-15:
+          era o mesmo frame congelado do vídeo, por isso "ainda parecia ter o video").
+          Sem arte de fundo nova ainda — gradiente neutro nao compete com os personagens
+          dos ServerCards. Trocar por imagem quando o usuario trouxer uma arte de fundo. */}
+      <div style={{
+        position: 'absolute', inset: 0, zIndex: 0,
+        background: 'radial-gradient(ellipse at 50% 0%, #16161f 0%, #0a0a10 45%, #050508 100%)',
+      }} />
 
-        {/* Vinheta mínima apenas para legibilidade do texto */}
-        <div style={{
-          position: 'absolute', inset: 0,
-          background: 'linear-gradient(to right, rgba(2,2,8,0.55) 0%, transparent 50%)',
-          zIndex: 1,
-        }} />
-      </div>
+      {/* PARTICULAS — bem sutis, so pra dar vida ao fundo sem chamar atencao
+          (pedido do usuario 2026-07-15: "bem disfarçados"). CSS puro, leve. */}
+      <div className="hero-particles" aria-hidden="true" />
 
-      {/* CONTENT — 3 colunas: texto | logo+botões | cards */}
+      {/* CONTENT — empilhado: topo (titulo + status) e cards logo abaixo, tudo no
+          fluxo normal (sem paddingBottom forcado) pra nao colidir com o resto da pagina
+          no scroll — o fade/translate abaixo cuida de sumir o hero inteiro ao rolar. */}
       <div className="container" style={{
         height: '100%', position: 'relative', zIndex: 10,
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        gap: '2rem',
-        paddingTop: isMobile ? '80px' : '100px',
+        display: 'flex', flexDirection: 'column', justifyContent: 'center',
+        gap: isMobile ? '1.5rem' : '1.6rem',
+        paddingTop: isMobile ? '70px' : '55px',
         opacity: 1 - scrollProgress,
         transform: `translateY(${scrollProgress * -40}px)`,
         transition: 'opacity 0.1s linear',
+        pointerEvents: scrollProgress > 0.5 ? 'none' : 'auto',
       }}>
 
-        {/* COLUNA ESQUERDA — título e descrição */}
+        {/* TOPO — logo centralizada (substitui o texto "IKARUS SERVERS" 2026-07-15),
+            status fica ancorado a direita (desktop); empilhado no mobile */}
         <div style={{
-          flex: '0 0 auto', maxWidth: isMobile ? '100%' : '360px',
-          display: 'flex', flexDirection: 'column',
-          alignItems: isMobile ? 'center' : 'flex-start',
-          textAlign: isMobile ? 'center' : 'left',
+          display: 'flex',
+          flexDirection: isMobile ? 'column' : 'row',
+          alignItems: 'center',
+          justifyContent: isMobile ? 'center' : 'space-between',
+          gap: '2rem',
         }}>
-          <h1 className="cinzel" style={{
-            fontSize: isMobile ? '2.2rem' : 'clamp(2rem, 4.5vw, 3.5rem)',
-            lineHeight: 1.05, marginBottom: '1.2rem',
-            textShadow: '0 8px 30px rgba(0,0,0,0.7)', color: '#fff',
-          }}>
-            L2 IKARUS
-          </h1>
-          <p style={{
-            fontSize: isMobile ? '0.9rem' : '0.95rem',
-            marginBottom: 0,
-            color: 'rgba(255,255,255,0.7)', lineHeight: 1.7,
-            textShadow: '0 2px 8px rgba(0,0,0,0.6)',
-          }}>
-            Você lembra do primeiro siege. Da aliança que traiu. Do PvP que fez o coração acelerar. O reino não esqueceu de você.
-          </p>
+          {/* espaçador simetrico a coluna de status, pra logo ficar centralizada de verdade */}
+          {!isMobile && <div style={{ width: '230px', flexShrink: 0 }} />}
+
+          <img
+            src="/logo-white.png"
+            alt="IKARUS Servers"
+            style={{
+              width: isMobile ? '260px' : '420px', height: 'auto', maxWidth: '90%',
+              marginTop: isMobile ? '-30px' : '-55px',
+              filter: 'drop-shadow(0 8px 30px rgba(0,0,0,0.7)) drop-shadow(0 0 40px rgba(212,175,55,0.15))',
+            }}
+          />
+
+          {/* STATUS CARDS — apenas desktop */}
+          {!isMobile && (
+            <div style={{
+              display: 'flex', flexDirection: 'column', gap: '1rem',
+              width: '230px', flexShrink: 0,
+            }}>
+              {/* STATUS SERVIDOR */}
+              <div className="glass-panel hero-status-card" style={{
+                borderLeft: `3px solid ${serverStatus.online ? '#4ade80' : '#ef4444'}`,
+                padding: '1.2rem',
+              }}>
+                <div className="status-header">
+                  <span className="status-label">STATUS</span>
+                  <div className="status-dot" style={{
+                    background: serverStatus.online ? '#4ade80' : '#ef4444',
+                    boxShadow: `0 0 12px ${serverStatus.online ? '#4ade80' : '#ef4444'}`,
+                  }} />
+                </div>
+                <div className="status-value" style={{ fontSize: '1.3rem' }}>
+                  {serverStatus.online ? 'ON-LINE' : 'OFFLINE'}
+                </div>
+              </div>
+
+              {/* ADMIN IKARUS */}
+              <div className="glass-panel hero-status-card" style={{
+                borderLeft: `3px solid ${adminOnline ? '#4ade80' : '#ef4444'}`,
+                padding: '1.2rem',
+              }}>
+                <div className="status-header">
+                  <span className="status-label">ADMIN</span>
+                  <div className="status-dot" style={{
+                    background: adminOnline ? '#4ade80' : '#ef4444',
+                    boxShadow: `0 0 12px ${adminOnline ? '#4ade80' : '#ef4444'}`,
+                  }} />
+                </div>
+                <div className="status-value" style={{
+                  fontSize: '1rem',
+                  color: adminOnline ? '#4ade80' : '#ef4444',
+                  letterSpacing: '2px',
+                }}>
+                  IKARUS
+                </div>
+                <p className="status-meta" style={{ marginTop: '0.3rem' }}>
+                  {adminOnline ? 'Online no Discord' : 'Offline no Discord'}
+                </p>
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* COLUNA CENTRAL — logo + botões (só desktop) */}
-        {!isMobile && (
-          <div style={{
-            flex: '1 1 auto',
-            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2rem',
-          }}>
-            <img
-              src="/logo.png"
-              alt="L2 Ikarus"
-              style={{
-                height: '240px', width: 'auto',
-                filter: 'brightness(0) invert(1) drop-shadow(0 0 45px rgba(255,255,255,0.35)) drop-shadow(0 0 110px rgba(255,255,255,0.12))',
-                animation: 'logoPulse 4s ease-in-out infinite',
-              }}
-            />
-            <div style={{ display: 'flex', gap: '1.2rem' }}>
-              <button onClick={onRegisterClick} className="btn btn-primary"
-                style={{ padding: '1rem 2rem', fontSize: '0.75rem', letterSpacing: '2px' }}
-              >
-                CRIAR CONTA
-              </button>
-              <a href="#download" className="btn btn-ghost"
-                style={{ padding: '1rem 2rem', fontSize: '0.75rem', letterSpacing: '2px' }}
-              >
-                BAIXAR JOGO
-              </a>
-            </div>
-          </div>
-        )}
-
-        {/* MOBILE — logo + botões abaixo do texto */}
-        {isMobile && (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem', marginTop: '1.5rem' }}>
-            <img src="/logo.png" alt="L2 Ikarus" style={{ height: '130px', width: 'auto', filter: 'brightness(0) invert(1) drop-shadow(0 0 30px rgba(255,255,255,0.3))', animation: 'logoPulse 4s ease-in-out infinite' }} />
-            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', justifyContent: 'center' }}>
-              <button onClick={onRegisterClick} className="btn btn-primary" style={{ padding: '0.85rem 1.8rem', fontSize: '0.75rem' }}>CRIAR CONTA</button>
-              <a href="#download" className="btn btn-ghost" style={{ padding: '0.85rem 1.8rem', fontSize: '0.75rem' }}>BAIXAR JOGO</a>
-            </div>
-          </div>
-        )}
-
-
-        {/* RIGHT: Status cards — apenas desktop */}
-        {!isMobile && (
-          <div style={{
-            display: 'flex', flexDirection: 'column', gap: '1.2rem',
-            width: '230px', flexShrink: 0,
-          }}>
-            {/* STATUS SERVIDOR */}
-            <div className="glass-panel hero-status-card" style={{
-              borderLeft: `3px solid ${serverStatus.online ? '#4ade80' : '#ef4444'}`,
-              padding: '1.4rem',
-            }}>
-              <div className="status-header">
-                <span className="status-label">STATUS</span>
-                <div className="status-dot" style={{
-                  background: serverStatus.online ? '#4ade80' : '#ef4444',
-                  boxShadow: `0 0 12px ${serverStatus.online ? '#4ade80' : '#ef4444'}`,
-                }} />
-              </div>
-              <div className="status-value" style={{ fontSize: '1.4rem' }}>
-                {serverStatus.online ? 'ON-LINE' : 'OFFLINE'}
-              </div>
-            </div>
-
-            {/* ADMIN IKARUS */}
-            <div className="glass-panel hero-status-card" style={{
-              borderLeft: `3px solid ${adminOnline ? '#4ade80' : '#ef4444'}`,
-              padding: '1.4rem',
-            }}>
-              <div className="status-header">
-                <span className="status-label">ADMIN</span>
-                <div className="status-dot" style={{
-                  background: adminOnline ? '#4ade80' : '#ef4444',
-                  boxShadow: `0 0 12px ${adminOnline ? '#4ade80' : '#ef4444'}`,
-                }} />
-              </div>
-              <div className="status-value" style={{
-                fontSize: '1.1rem',
-                color: adminOnline ? '#4ade80' : '#ef4444',
-                letterSpacing: '2px',
-              }}>
-                IKARUS
-              </div>
-              <p className="status-meta" style={{ marginTop: '0.3rem' }}>
-                {adminOnline ? 'Online no Discord' : 'Offline no Discord'}
-              </p>
-            </div>
-
-            {/* RATES */}
-            <div className="glass-panel hero-status-card" style={{ borderLeft: '3px solid var(--gold)', padding: '1.4rem' }}>
-              <span className="status-label" style={{ marginBottom: '1rem', display: 'block' }}>RATES TÉCNICOS</span>
-              <div className="rates-list">
-                <div className="rate-item"><span>XP</span><span className="rate-value">x3</span></div>
-                <div className="rate-item"><span>SP</span><span className="rate-value">x3</span></div>
-                <div className="rate-item"><span>ADENA</span><span className="rate-value">x2</span></div>
-              </div>
-            </div>
-          </div>
-        )}
+        {/* CARDS DE SERVIDOR — 1 por servidor (Interlude/Essence/MU), hover = destaque,
+            click = expande info com botoes de acao. Fica no fluxo normal do hero. */}
+        <ServerCards isMobile={isMobile} onRegisterClick={onRegisterClick} />
       </div>
-
-      {/* CARDS DE SERVIDOR — 1 por servidor (Interlude/Essence/futuros), hover/click = zoom + info */}
-      <ServerCards isMobile={isMobile} />
 
       <div className="scanline-overlay" style={{ opacity: 0.08 }} />
     </section>

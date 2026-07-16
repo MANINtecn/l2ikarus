@@ -13,3 +13,10 @@ push_error.txt
 vps/config.js
 vps/node_modules/
 vps/package-lock.json
+
+# artes-fonte brutas (25MB+) — o site usa os webp derivados + public/logo-white.png
+LOGOINTERLUD.png
+Splash Essence.png
+ikarusdragonic.png
+mu online.png
+newlogobranca.png
