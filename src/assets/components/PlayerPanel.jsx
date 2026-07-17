@@ -225,22 +225,8 @@ export default function PlayerPanel({ data, onLogout }) {
             ))}
           </div>
 
-          {/* INDICAÇÕES */}
-          <div style={{ background: 'linear-gradient(135deg, rgba(124,184,232,0.08), rgba(124,184,232,0.02))', border: '1px solid rgba(124,184,232,0.25)', borderRadius: '12px', padding: '1.2rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.8rem' }}>
-              <p style={{ fontSize: '0.55rem', color: 'rgba(124,184,232,0.8)', letterSpacing: '4px', margin: 0 }}>INDICAÇÕES</p>
-              <span style={{ color: 'rgba(255,255,255,0.25)', fontSize: '0.6rem', letterSpacing: '1px', fontStyle: 'italic' }}>EM BREVE</span>
-            </div>
-            <p style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.55)', margin: '0 0 0.8rem', lineHeight: 1.5 }}>
-              Compartilhe seu código com amigos. Quando eles gastarem no servidor, você ganha uma recompensa!
-            </p>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-              <div style={{ flex: 1, background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(124,184,232,0.2)', borderRadius: '8px', padding: '0.7rem 1rem', fontFamily: 'monospace', color: '#7cb8e8', letterSpacing: '2px', fontSize: '0.9rem', fontWeight: '700' }}>
-                {(data.login || 'PLAYER').toUpperCase()}-IK
-              </div>
-              <button onClick={() => navigator.clipboard?.writeText(`${(data.login || 'PLAYER').toUpperCase()}-IK`)} style={{ background: 'rgba(124,184,232,0.12)', border: '1px solid rgba(124,184,232,0.3)', color: '#7cb8e8', padding: '0.7rem 1rem', borderRadius: '8px', fontSize: '0.68rem', fontWeight: '700', cursor: 'pointer' }}>COPIAR</button>
-            </div>
-          </div>
+          {/* INDICAÇÕES (jogador) removido 2026-07-17: a indicacao e via streamer/afiliado
+              (link /r/slug), gerenciada no painel admin. Sem programa de indicacao por jogador. */}
         </div>
 
         {/* COLUNA DIREITA — PERSONAGENS */}
