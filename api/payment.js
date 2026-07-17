@@ -104,13 +104,14 @@ export default async function handler(req, res) {
   const jwtSecret = process.env.JWT_SECRET
   const siteUrl = process.env.SITE_URL || 'https://l2ikarus.com'
 
-  // POST /api/payment/create — cria pagamento e retorna link do checkout
+  // POST /api/payment/create — cartao via PagBank Checkout (hospedado). O MP foi
+  // trocado pelo PagBank (a conta MP tem divida que engole os pagamentos). O checkout
+  // hospedado nao passa dado de cartao pelo nosso site (sem PCI) e o webhook que ja
+  // credita Ikoin (PagBank PAID) vale igual pro cartao.
   if (action === 'create') {
     if (req.method !== 'POST') return res.status(405).json({ error: 'Método inválido' })
-    // CARTAO (MercadoPago Checkout) DESATIVADO: a conta MP tem divida e o valor que cai
-    // e' usado pra abater a divida. Reativar quando a divida do MP for resolvida.
-    return res.status(503).json({ error: 'Pagamento por cartão temporariamente indisponível. Use o PIX.' })
-    if (!token) return res.status(500).json({ error: 'MP_ACCESS_TOKEN não configurado' })
+    const pbToken = process.env.PAGBANK_TOKEN
+    if (!pbToken) return res.status(500).json({ error: 'PAGBANK_TOKEN não configurado' })
 
     // Autentica o jogador
     const cookies = req.headers.cookie || ''
@@ -127,40 +128,36 @@ export default async function handler(req, res) {
       const db = await getConnection()
       const orderId = crypto.randomUUID()
       const now = Math.floor(Date.now() / 1000)
+      const amountCents = qty * 100
 
       await db.query(
         'INSERT INTO ikoin_orders (id, account_name, amount, status, created_at) VALUES (?, ?, ?, ?, ?)',
         [orderId, player.login, qty, 'pending', now]
       )
 
-      // Cria preferência no Mercado Pago (1 Ikoin = R$ 1,00)
-      const prefRes = await fetch(`${MP_API}/checkout/preferences`, {
+      // Checkout hospedado do PagBank (1 Ikoin = R$ 1,00). O reference_id casa com a
+      // order local; o webhook credita quando o PagBank marcar PAID.
+      const chkRes = await fetch(`${PAGBANK_API}/checkouts`, {
         method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+        headers: { 'Authorization': `Bearer ${pbToken}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          items: [{
-            title: `${qty} Ikoin — L2 Ikarus`,
-            quantity: 1,
-            unit_price: qty,
-            currency_id: 'BRL',
-          }],
-          external_reference: orderId,
-          notification_url: `${siteUrl}/api/payment/webhook`,
-          back_urls: {
-            success: `${siteUrl}/?ikoin=success`,
-            failure: `${siteUrl}/?ikoin=failure`,
-            pending: `${siteUrl}/?ikoin=pending`,
-          },
-          auto_return: 'approved',
+          reference_id: orderId,
+          items: [{ reference_id: 'ikoin', name: `${qty} Ikoin - L2 Ikarus`, quantity: 1, unit_amount: amountCents }],
+          payment_methods: [{ type: 'CREDIT_CARD' }, { type: 'DEBIT_CARD' }, { type: 'PIX' }],
+          redirect_url: `${siteUrl}/?ikoin=success`,
+          notification_urls: [`${siteUrl}/api/payment/webhook?provider=pagbank`],
         }),
       })
-      const pref = await prefRes.json()
-      if (!pref.init_point) {
-        console.error('MP preference error:', pref)
-        return res.status(500).json({ error: 'Falha ao criar pagamento.' })
+      const chk = await chkRes.json()
+      // o link de pagamento vem em links[] com rel PAY
+      const payLink = (chk.links || []).find(l => /PAY/i.test(l.rel || '') || /pagar|checkout/i.test(l.href || ''))
+      if (!payLink) {
+        console.error('PagBank checkout error:', JSON.stringify(chk).slice(0, 400))
+        return res.status(500).json({ error: chk?.error_messages?.[0]?.description || 'Falha ao criar checkout de cartão.' })
       }
 
-      return res.status(200).json({ checkoutUrl: pref.init_point, orderId })
+      await db.query('UPDATE ikoin_orders SET mp_payment_id = ? WHERE id = ?', ['PBCHK:' + (chk.id || orderId), orderId])
+      return res.status(200).json({ checkoutUrl: payLink.href, orderId })
     } catch (err) {
       console.error('Payment create error:', err)
       return res.status(500).json({ error: err.message })
@@ -315,7 +312,7 @@ export default async function handler(req, res) {
             ['paid', Math.floor(Date.now() / 1000), orderId, 'pending'])
           if (r && r.affectedRows > 0) {
             const [[ord]] = await db.query('SELECT account_name, amount FROM ikoin_orders WHERE id = ?', [orderId])
-            if (ord) await creditIkoin(db, ord.account_name, ord.amount, 'purchase', `Compra de ${ord.amount} Ikoin (PIX PagBank)`, String(order.id || orderId))
+            if (ord) await creditIkoin(db, ord.account_name, ord.amount, 'purchase', `Compra de ${ord.amount} Ikoin (PagBank)`, String(order.id || orderId))
           }
         }
         return res.status(200).send('ok')
