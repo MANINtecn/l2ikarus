@@ -1,4 +1,5 @@
 import crypto from 'crypto'
+import { hashpw as bcryptHash } from './_bcrypt.js'
 
 const LOGIN_RE = /^[a-zA-Z0-9_]{4,16}$/
 const PASS_RE  = /^[^\s]{6,64}$/
@@ -70,14 +71,16 @@ export default async function handler(req, res) {
   if (email && !EMAIL_RE.test(email)) return res.status(400).json({ message: 'E-mail inválido' })
 
   try {
-    // Hasheia a senha AQUI (texto puro nunca trafega) e manda só o hash pra VPS.
+    // Hasheia a senha AQUI (texto puro nunca trafega) e manda só os hashes pra VPS.
+    // Dois formatos porque os engines diferem: Essence = SHA1-base64; Interlude (aCis) = BCrypt.
     const hashedPassword = crypto.createHash('sha1').update(password).digest('base64')
+    const bcryptPassword = bcryptHash(password, 10)
     const base = process.env.VPS_API_URL || (process.env.VPS_STATUS_URL || '').replace(/\/status$/, '')
     if (!base) return res.status(500).json({ message: 'Servidor de cadastro não configurado (VPS_API_URL).' })
     const vpsRes = await fetch(base + '/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-api-key': process.env.VPS_STATUS_TOKEN },
-      body: JSON.stringify({ login, passwordHash: hashedPassword, email: email ?? '', referredBy: refSlug }),
+      body: JSON.stringify({ login, passwordHash: hashedPassword, passwordBcrypt: bcryptPassword, email: email ?? '', referredBy: refSlug }),
     })
     const data = await vpsRes.json().catch(() => ({}))
     return res.status(vpsRes.status).json(data)

@@ -71,7 +71,8 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 async function registerAccount(body) {
   const login = (body.login || '').trim()
-  const passwordHash = body.passwordHash || ''
+  const passwordHash = body.passwordHash || ''       // SHA1-base64 (Essence)
+  const passwordBcrypt = body.passwordBcrypt || ''   // BCrypt $2a$ (Interlude/aCis)
   const email = (body.email || '').trim()
   const referredBy = (body.referredBy || '').trim().toLowerCase()
 
@@ -95,14 +96,16 @@ async function registerAccount(body) {
       'INSERT INTO accounts (login, password, email, created_time) VALUES (?, ?, ?, ?)',
       [login, passwordHash, email, createdTime]
     )
-    // IKARUS 2026-07-16: 1 conta = TODOS os jogos da rede. Espelha a conta no banco do
-    // Interlude (aCis: mesmas colunas login/password, mesmo hash Base64-SHA1).
-    // Falha aqui NAO derruba o cadastro — o banco do Essence e a conta-mae; se o
-    // Interlude estiver fora, sincroniza depois com o SQL de espelhamento (ver CLAUDE.md).
-    try {
-      await getPoolInterlude().query('INSERT IGNORE INTO accounts (login, password) VALUES (?, ?)', [login, passwordHash])
-    } catch (e) {
-      console.error('interlude account mirror error:', e.message)
+    // IKARUS 2026-07-17: 1 conta = TODOS os jogos, mas cada engine tem seu formato de
+    // senha. Interlude (aCis) usa BCrypt ($2a$) — SEM o hash bcrypt a conta grava lixo e
+    // o login do aCis quebra ("Invalid salt version"). So espelha se o bcrypt veio.
+    // Falha aqui NAO derruba o cadastro (banco do Essence e a conta-mae).
+    if (passwordBcrypt) {
+      try {
+        await getPoolInterlude().query('INSERT IGNORE INTO accounts (login, password) VALUES (?, ?)', [login, passwordBcrypt])
+      } catch (e) {
+        console.error('interlude account mirror error:', e.message)
+      }
     }
     // Atribuicao de streamer/afiliado (first-touch): so grava se o slug existir e estiver ativo.
     if (referredBy && /^[a-z0-9_-]{2,32}$/.test(referredBy)) {
