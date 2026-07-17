@@ -418,7 +418,8 @@ http.createServer(async (req, res) => {
     const type = path.replace('/acis/rankings/', '').replace(/[^a-z]/g, '')
     const orderCol = type === 'pk' ? 'pkkills' : type === 'rec' ? 'recommend' : 'pvpkills'
     try {
-      const p = getPool()
+      // rankings do Interlude vem do banco do Interlude (l2jacis), nao do Essence
+      const p = getPoolInterlude()
       const [rows] = await p.query(`SELECT char_name, level, pvpkills, pkkills, recommend FROM characters WHERE char_name != 'ADMIN' ORDER BY ${orderCol} DESC LIMIT 15`)
       res.writeHead(200)
       return res.end(JSON.stringify({ rankings: rows }))
@@ -437,14 +438,18 @@ http.createServer(async (req, res) => {
     if (!account || !oldNick || !newNick) { res.writeHead(400); return res.end(JSON.stringify({ error: 'Dados incompletos.' })) }
     if (!/^[A-Za-z0-9]{1,16}$/.test(newNick)) { res.writeHead(200); return res.end(JSON.stringify({ ok: false, error: 'Nome inválido (1-16 letras/números).' })) }
     try {
+      // Ikoin = banco do Essence (carteira compartilhada); characters = banco do Interlude (l2jacis).
       const p = getPool()
+      const pi = getPoolInterlude()
       const [bal] = await p.query('SELECT balance FROM ikoin_balance WHERE account_name=?', [account])
       const balance = bal.length > 0 ? bal[0].balance : 0
       if (balance < PRICE) { res.writeHead(200); return res.end(JSON.stringify({ ok: false, error: 'Saldo insuficiente (50 Ikoin).' })) }
-      const [existing] = await p.query('SELECT char_name FROM characters WHERE char_name=?', [newNick])
+      const [existing] = await pi.query('SELECT char_name FROM characters WHERE char_name=?', [newNick])
       if (existing.length) { res.writeHead(200); return res.end(JSON.stringify({ ok: false, error: 'Nome já está em uso.' })) }
+      const [target] = await pi.query('SELECT char_name FROM characters WHERE char_name=? AND account_name=?', [oldNick, account])
+      if (!target.length) { res.writeHead(200); return res.end(JSON.stringify({ ok: false, error: 'Personagem não encontrado.' })) }
       const now = Date.now()
-      await p.query('UPDATE characters SET char_name=? WHERE char_name=? AND account_name=?', [newNick, oldNick, account])
+      await pi.query('UPDATE characters SET char_name=? WHERE char_name=? AND account_name=?', [newNick, oldNick, account])
       await p.query('UPDATE ikoin_balance SET balance=balance-?, updated_at=? WHERE account_name=?', [PRICE, now, account])
       await p.query('INSERT INTO ikoin_transactions (account_name, amount, type, description, created_at) VALUES (?,?,?,?,?)', [account, -PRICE, 'spend', `Troca de nick: ${oldNick} → ${newNick} - Interlude`, now])
       res.writeHead(200)
@@ -462,15 +467,17 @@ http.createServer(async (req, res) => {
     const PRICE = 30
     if (!account || !charName) { res.writeHead(400); return res.end(JSON.stringify({ error: 'Dados incompletos.' })) }
     try {
+      // Ikoin = banco do Essence (compartilhado); characters = banco do Interlude (l2jacis).
       const p = getPool()
+      const pi = getPoolInterlude()
       const [bal] = await p.query('SELECT balance FROM ikoin_balance WHERE account_name=?', [account])
       const balance = bal.length > 0 ? bal[0].balance : 0
       if (balance < PRICE) { res.writeHead(200); return res.end(JSON.stringify({ ok: false, error: 'Saldo insuficiente (30 Ikoin).' })) }
-      const [chars] = await p.query('SELECT sex FROM characters WHERE char_name=? AND account_name=?', [charName, account])
+      const [chars] = await pi.query('SELECT sex FROM characters WHERE char_name=? AND account_name=?', [charName, account])
       if (!chars.length) { res.writeHead(200); return res.end(JSON.stringify({ ok: false, error: 'Personagem não encontrado.' })) }
       const newSex = chars[0].sex === 0 ? 1 : 0
       const now = Date.now()
-      await p.query('UPDATE characters SET sex=? WHERE char_name=? AND account_name=?', [newSex, charName, account])
+      await pi.query('UPDATE characters SET sex=? WHERE char_name=? AND account_name=?', [newSex, charName, account])
       await p.query('UPDATE ikoin_balance SET balance=balance-?, updated_at=? WHERE account_name=?', [PRICE, now, account])
       await p.query('INSERT INTO ikoin_transactions (account_name, amount, type, description, created_at) VALUES (?,?,?,?,?)', [account, -PRICE, 'spend', `Troca de sexo: ${charName} - Interlude`, now])
       res.writeHead(200)

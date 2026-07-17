@@ -324,13 +324,20 @@ export default function PlayerPanel({ data, onLogout }) {
               <p style={{ color: 'var(--text-mute)', fontSize: '0.75rem', marginBottom: '1.25rem' }}>1 Ikoin = R$ 1,00</p>
 
               <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.25rem' }}>
-                {[['pix', 'PIX'], ['card', 'Cartão']].map(([k, label]) => (
-                  <button key={k} onClick={() => setMethod(k)} style={{
-                    flex: 1, padding: '0.7rem 0', borderRadius: '6px', cursor: 'pointer', fontWeight: '700', fontSize: '0.78rem', letterSpacing: '1px',
+                {/* Cartao EM BREVE: PagBank aguardando allowlist. O checkout ja funciona
+                    (api/payment.js), so falta o PagBank liberar cartao na conta. Quando
+                    liberar, trocar cardEnabled pra true. */}
+                {[['pix', 'PIX', true], ['card', 'Cartão', false]].map(([k, label, enabled]) => (
+                  <button key={k} onClick={() => enabled && setMethod(k)} disabled={!enabled} style={{
+                    flex: 1, padding: '0.7rem 0', borderRadius: '6px', cursor: enabled ? 'pointer' : 'not-allowed', fontWeight: '700', fontSize: '0.78rem', letterSpacing: '1px',
                     background: method === k ? 'rgba(197,160,89,0.2)' : 'rgba(255,255,255,0.04)',
                     border: `1px solid ${method === k ? 'var(--gold)' : 'rgba(255,255,255,0.1)'}`,
-                    color: method === k ? 'var(--gold)' : 'rgba(255,255,255,0.6)',
-                  }}>{label}</button>
+                    color: enabled ? (method === k ? 'var(--gold)' : 'rgba(255,255,255,0.6)') : 'rgba(255,255,255,0.3)',
+                    position: 'relative',
+                  }}>
+                    {label}
+                    {!enabled && <span style={{ display: 'block', fontSize: '0.5rem', letterSpacing: '0.5px', color: 'rgba(255,255,255,0.4)', marginTop: '2px' }}>EM BREVE</span>}
+                  </button>
                 ))}
               </div>
 
