@@ -635,7 +635,7 @@ export default async function handler(req, res) {
       let { slug, name, commission_pct, payout_info } = req.body || {}
       slug = (slug || '').trim().toLowerCase()
       if (!/^[a-z0-9_-]{2,32}$/.test(slug)) return res.status(400).json({ error: 'Slug invalido (2-32: letras, numeros, _ , -)' })
-      const pct = Math.max(0, Math.min(100, parseInt(commission_pct) || 30))
+      const pct = Math.max(0, Math.min(100, parseInt(commission_pct) || 25))
       await db.query(
         `INSERT INTO streamers (slug, name, commission_pct, active, payout_info, created_at) VALUES (?, ?, ?, 1, ?, ?)
          ON DUPLICATE KEY UPDATE name = VALUES(name), commission_pct = VALUES(commission_pct), payout_info = VALUES(payout_info)`,

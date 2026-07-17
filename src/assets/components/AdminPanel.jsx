@@ -231,7 +231,7 @@ export default function AdminPanel({ user, onLogout }) {
   const [charTab, setCharTab] = useState('dados')
   const [codes, setCodes] = useState([])
   const [streamers, setStreamers] = useState([])
-  const [strForm, setStrForm] = useState({ slug: '', name: '', commission_pct: 30, payout_info: '' })
+  const [strForm, setStrForm] = useState({ slug: '', name: '', commission_pct: 25, payout_info: '' })
   const [strMsg, setStrMsg] = useState('')
   const [newCode, setNewCode] = useState({ code: '', items: '', ikoin: '', description: '', maxUses: '' })
   const [codeMsg, setCodeMsg] = useState('')
@@ -469,7 +469,7 @@ export default function AdminPanel({ user, onLogout }) {
     }).then(x => x.json())
     if (r.success) {
       setStrMsg(`✓ Salvo! Link: ${r.link}`)
-      setStrForm({ slug: '', name: '', commission_pct: 30, payout_info: '' })
+      setStrForm({ slug: '', name: '', commission_pct: 25, payout_info: '' })
       fetchTab('streamers')
     } else setStrMsg(r.error || 'Erro ao salvar')
   }
@@ -880,7 +880,8 @@ export default function AdminPanel({ user, onLogout }) {
         {!loading && tab === 'streamers' && (
           <div style={{ maxWidth: '860px' }}>
             <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.8rem', marginBottom: '0.8rem' }}>
-              Cada streamer ganha o link <b style={{ color: 'var(--gold)' }}>l2ikarus.com/r/&lt;slug&gt;</b>. Quem se cadastra por ele fica vinculado (30 dias, first-touch). Comissão = % sobre Ikoin comprado pelos indicados.
+              Cada streamer ganha o link <b style={{ color: 'var(--gold)' }}>l2ikarus.com/r/&lt;slug&gt;</b>. Quem se cadastra por ele fica vinculado (30 dias, first-touch).
+              Comissão em <b style={{ color: 'var(--gold)' }}>R$</b> = % do que os indicados gastaram (1 Ikoin = R$ 1,00). Pagamento por PIX (não em Ikoin).
             </p>
             {/* Form criar/editar */}
             <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'flex-end', marginBottom: '0.6rem', background: 'rgba(255,255,255,0.03)', padding: '0.8rem', borderRadius: '8px' }}>
@@ -897,9 +898,9 @@ export default function AdminPanel({ user, onLogout }) {
             {strMsg && <p style={{ color: strMsg.startsWith('✓') ? '#6c6' : '#e66', fontSize: '0.8rem', marginBottom: '0.6rem' }}>{strMsg}</p>}
             {/* Tabela relatorio */}
             <Table
-              cols={['Slug', 'Nome', 'Contas', 'Ikoin comprado', 'Comissão (R$)', '%', 'Status', 'Ação']}
+              cols={['Slug', 'Nome', 'Contas', 'Gasto (R$)', 'Você paga (R$)', '%', 'Status', 'Ação']}
               rows={streamers.map(s => [
-                s.slug, s.name, s.accounts, s.ikoin_bought, s.commission, s.commission_pct + '%',
+                s.slug, s.name, s.accounts, `R$ ${(s.ikoin_bought || 0).toFixed(2)}`, `R$ ${(s.commission || 0).toFixed(2)}`, s.commission_pct + '%',
                 s.active ? 'Ativo' : 'Inativo',
                 <button key={s.slug} onClick={() => toggleStreamer(s.slug, !s.active)} style={{ background: 'none', border: '1px solid #555', color: '#aaa', fontSize: '0.65rem', padding: '0.2rem 0.5rem', borderRadius: '4px', cursor: 'pointer' }}>{s.active ? 'Desativar' : 'Ativar'}</button>
               ])}
