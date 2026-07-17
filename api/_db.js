@@ -5,14 +5,15 @@
 const BASE = process.env.VPS_API_URL || (process.env.VPS_STATUS_URL || '').replace(/\/status$/, '')
 const KEY = process.env.VPS_STATUS_TOKEN
 
-async function vpsQuery(sql, params = []) {
+async function vpsQuery(sql, params = [], db) {
   if (!BASE || !KEY) {
     throw new Error('VPS_API_URL/VPS_STATUS_TOKEN não configurados no Vercel')
   }
   const r = await fetch(BASE + '/query', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'x-api-key': KEY },
-    body: JSON.stringify({ sql, params }),
+    // db='interlude' roteia pro banco l2jacis na VPS; omitido = banco do Essence.
+    body: JSON.stringify({ sql, params, db }),
   })
   let data
   try { data = await r.json() } catch { data = {} }
@@ -24,8 +25,9 @@ async function vpsQuery(sql, params = []) {
 }
 
 // Mantém a mesma assinatura que as APIs já usam: const db = await getConnection(); await db.query(...)
-export async function getConnection() {
-  return { query: vpsQuery }
+// getConnection('interlude') devolve um handle preso ao banco do Interlude (l2jacis).
+export async function getConnection(db) {
+  return { query: (sql, params) => vpsQuery(sql, params, db) }
 }
 
 export const dbConfig = { proxied: true }

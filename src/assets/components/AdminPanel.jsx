@@ -243,6 +243,10 @@ export default function AdminPanel({ user, onLogout }) {
   const [offersData, setOffersData] = useState({ 1: null, 2: null })
   const [offer, setOffer] = useState({ item_id: '', count: 1, price_ikoin: 100, title: 'Oferta Limitada', active: 0 })
   const [offerMsg, setOfferMsg] = useState('')
+  // IKARUS 2026-07-16: CODIGOS e OFERTAS sao POR JOGO (banco proprio de cada servidor).
+  // Ikoin/contas continuam compartilhados. 'essence' = comportamento original.
+  const [gameServer, setGameServer] = useState('essence')
+  const srvQS = gameServer === 'interlude' ? '?server=interlude' : ''
   const [charQuery, setCharQuery] = useState('')
   const [charResults, setCharResults] = useState([])
   const [selChar, setSelChar] = useState(null)
@@ -273,15 +277,16 @@ export default function AdminPanel({ user, onLogout }) {
     }
   }
 
-  const blankOffer = { item_id: '', count: 1, price_ikoin: 100, title: 'Oferta Limitada', active: 0 }
+  const blankOffer = { item_id: '', count: 1, price_ikoin: 100, title: 'Oferta Limitada', active: 0, enchant: 0 }
   const loadOfferSlot = (slot, data) => {
     const d = (data || offersData)[slot]
-    setOffer(d ? { item_id: d.item_id, count: d.count, price_ikoin: d.price_ikoin, title: d.title, active: d.active } : { ...blankOffer })
+    setOffer(d ? { item_id: d.item_id, count: d.count, price_ikoin: d.price_ikoin, title: d.title, active: d.active, enchant: d.enchant || 0 } : { ...blankOffer })
     setOfferSlot(slot)
     setOfferMsg('')
   }
 
   useEffect(() => { fetchTab(tab) }, [tab])
+  useEffect(() => { if (tab === 'codes' || tab === 'offer') fetchTab(tab) }, [gameServer])
 
   const fetchTab = async (t) => {
     setLoading(true)
@@ -303,10 +308,10 @@ export default function AdminPanel({ user, onLogout }) {
         const r = await fetch('/api/admin/ranking').then(x => x.json())
         setRanking(r)
       } else if (t === 'codes') {
-        const r = await fetch('/api/admin/codes').then(x => x.json())
+        const r = await fetch('/api/admin/codes' + srvQS).then(x => x.json())
         setCodes(r.codes || [])
       } else if (t === 'offer') {
-        const r = await fetch('/api/admin/offer').then(x => x.json())
+        const r = await fetch('/api/admin/offer' + srvQS).then(x => x.json())
         const data = r.offers || { 1: null, 2: null }
         setOffersData(data)
         loadOfferSlot(offerSlot, data)
@@ -326,6 +331,7 @@ export default function AdminPanel({ user, onLogout }) {
         body: JSON.stringify({
           offerId: offerSlot, itemId: offer.item_id, count: offer.count,
           price: offer.price_ikoin, title: offer.title, active: offer.active,
+          server: gameServer, enchant: offer.enchant,
         }),
       }).then(x => x.json())
       setOfferMsg(r.success ? '✓ ' + r.message : '✗ ' + (r.error || 'Erro ao salvar'))
@@ -424,7 +430,7 @@ export default function AdminPanel({ user, onLogout }) {
     setCodeMsg('')
     const r = await fetch('/api/admin/code-create', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newCode),
+      body: JSON.stringify({ ...newCode, server: gameServer }),
     }).then(x => x.json())
     if (r.success) {
       setCodeMsg('✓ ' + r.message)
@@ -439,7 +445,7 @@ export default function AdminPanel({ user, onLogout }) {
   const toggleCode = async (code, active) => {
     await fetch('/api/admin/code-toggle', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ code, active }),
+      body: JSON.stringify({ code, active, server: gameServer }),
     })
     fetchTab('codes')
   }
@@ -449,7 +455,7 @@ export default function AdminPanel({ user, onLogout }) {
     if (!password) return
     const r = await fetch('/api/admin/code-delete', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ code, password }),
+      body: JSON.stringify({ code, password, server: gameServer }),
     }).then(x => x.json())
     if (r.success) fetchTab('codes')
     else alert(r.error)
@@ -711,6 +717,20 @@ export default function AdminPanel({ user, onLogout }) {
         {/* CÓDIGOS PROMOCIONAIS */}
         {!loading && tab === 'codes' && (
           <div>
+            {/* SELETOR DE SERVIDOR — codigos/ofertas sao por jogo */}
+            <div style={{ display: 'flex', gap: '0.6rem', marginBottom: '1.2rem' }}>
+              {['essence', 'interlude'].map(s => (
+                <button key={s} onClick={() => setGameServer(s)} style={{
+                  flex: 1, padding: '0.6rem', borderRadius: '8px', cursor: 'pointer',
+                  background: gameServer === s ? 'rgba(197,160,89,0.15)' : 'rgba(255,255,255,0.03)',
+                  border: `1px solid ${gameServer === s ? 'var(--gold)' : 'rgba(255,255,255,0.1)'}`,
+                  color: gameServer === s ? 'var(--gold)' : 'rgba(255,255,255,0.5)',
+                  fontSize: '0.72rem', fontWeight: '700', letterSpacing: '2px', textTransform: 'uppercase',
+                }}>
+                  {s === 'essence' ? 'ESSENCE' : 'INTERLUDE'}
+                </button>
+              ))}
+            </div>
             {/* Criar novo código */}
             <div className="glass-panel" style={{ padding: '1.5rem', marginBottom: '1.5rem' }}>
               <p style={{ fontSize: '0.58rem', color: 'var(--gold)', letterSpacing: '3px', marginBottom: '1rem' }}>CRIAR NOVO CÓDIGO</p>
@@ -767,6 +787,20 @@ export default function AdminPanel({ user, onLogout }) {
         {/* ABA OFERTA LIMITADA */}
         {!loading && tab === 'offer' && (
           <div style={{ maxWidth: '560px' }}>
+            {/* SELETOR DE SERVIDOR — codigos/ofertas sao por jogo */}
+            <div style={{ display: 'flex', gap: '0.6rem', marginBottom: '1.2rem' }}>
+              {['essence', 'interlude'].map(s => (
+                <button key={s} onClick={() => setGameServer(s)} style={{
+                  flex: 1, padding: '0.6rem', borderRadius: '8px', cursor: 'pointer',
+                  background: gameServer === s ? 'rgba(197,160,89,0.15)' : 'rgba(255,255,255,0.03)',
+                  border: `1px solid ${gameServer === s ? 'var(--gold)' : 'rgba(255,255,255,0.1)'}`,
+                  color: gameServer === s ? 'var(--gold)' : 'rgba(255,255,255,0.5)',
+                  fontSize: '0.72rem', fontWeight: '700', letterSpacing: '2px', textTransform: 'uppercase',
+                }}>
+                  {s === 'essence' ? 'ESSENCE' : 'INTERLUDE'}
+                </button>
+              ))}
+            </div>
             <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.8rem', marginBottom: '1rem' }}>
               Configure as <b style={{ color: 'var(--gold)' }}>2 Ofertas Limitadas</b> do Community Board. O ícone e o nome são puxados automaticamente do item pelo ID.
             </p>
@@ -786,6 +820,12 @@ export default function AdminPanel({ user, onLogout }) {
             </div>
             <div className="glass-panel" style={{ padding: '1.8rem', border: '1px solid rgba(197,160,89,0.3)' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                {gameServer === 'interlude' && (
+                  <div>
+                    <label style={{ fontSize: '0.6rem', color: 'var(--text-mute)', letterSpacing: '2px', display: 'block', marginBottom: '0.4rem' }}>ENCHANT (0 = normal, ex: 20 = +20)</label>
+                    <input type="number" value={offer.enchant} onChange={e => setOffer({ ...offer, enchant: e.target.value })} style={{ ...inputStyleAdmin, width: '100%' }} />
+                  </div>
+                )}
                 <div>
                   <label style={{ fontSize: '0.6rem', color: 'var(--text-mute)', letterSpacing: '2px', display: 'block', marginBottom: '0.4rem' }}>ID DO ITEM</label>
                   <input value={offer.item_id} onChange={e => setOffer({ ...offer, item_id: e.target.value })} placeholder="ex: 22078" style={{ ...inputStyleAdmin, width: '100%' }} />

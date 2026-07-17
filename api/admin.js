@@ -198,6 +198,11 @@ export default async function handler(req, res) {
   if (!admin) return
   const action = getAction(req)
   const db = await getConnection()
+  // IKARUS 2026-07-16: server=interlude (query ou body) roteia CODIGOS e OFERTAS pro
+  // banco proprio do Interlude (l2jacis). Ikoin/contas/stats continuam no banco do
+  // Essence (compartilhados pela rede). Sem o parametro = Essence (original).
+  const isInterlude = (req.query?.server || req.body?.server) === 'interlude'
+  const gameDb = isInterlude ? await getConnection('interlude') : db
 
   try {
     // GET /api/admin/stats — métricas gerais
@@ -480,7 +485,7 @@ export default async function handler(req, res) {
 
     // GET /api/admin/codes — lista códigos promocionais
     if (action === 'codes') {
-      const [rows] = await db.query('SELECT * FROM promo_codes ORDER BY created_at DESC LIMIT 100')
+      const [rows] = await gameDb.query('SELECT * FROM promo_codes ORDER BY created_at DESC LIMIT 100')
       return res.status(200).json({ codes: rows })
     }
 
@@ -495,7 +500,7 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'Formato de itens inválido. Use: itemId:quantidade;itemId:quantidade' })
       }
       try {
-        await db.query(
+        await gameDb.query(
           'INSERT INTO promo_codes (code, items, ikoin, description, active, max_uses, uses, created_by, created_at) VALUES (?, ?, ?, ?, 1, ?, 0, ?, ?)',
           [code.trim(), itemsClean || null, ikoinAmt, description || null, parseInt(maxUses) || 0, admin.email || 'admin', Math.floor(Date.now() / 1000)]
         )
@@ -509,7 +514,7 @@ export default async function handler(req, res) {
     // POST /api/admin/code-toggle — ativa/desativa código
     if (action === 'code-toggle' && req.method === 'POST') {
       const { code, active } = req.body || {}
-      await db.query('UPDATE promo_codes SET active = ? WHERE code = ?', [active ? 1 : 0, code])
+      await gameDb.query('UPDATE promo_codes SET active = ? WHERE code = ?', [active ? 1 : 0, code])
       return res.status(200).json({ success: true, message: active ? 'Código ativado.' : 'Código desativado.' })
     }
 
@@ -518,8 +523,8 @@ export default async function handler(req, res) {
       const { code, password } = req.body || {}
       const adminPass = process.env.ADMIN_ACTION_PASSWORD
       if (!adminPass || password !== adminPass) return res.status(403).json({ error: 'Senha incorreta' })
-      await db.query('DELETE FROM promo_codes WHERE code = ?', [code])
-      await db.query('DELETE FROM promo_redeemed WHERE code = ?', [code])
+      await gameDb.query('DELETE FROM promo_codes WHERE code = ?', [code])
+      await gameDb.query('DELETE FROM promo_redeemed WHERE code = ?', [code])
       return res.status(200).json({ success: true, message: 'Código removido.' })
     }
 
@@ -544,7 +549,7 @@ export default async function handler(req, res) {
 
     // GET /api/admin/offer — lê as 2 ofertas limitadas
     if (action === 'offer') {
-      const [rows] = await db.query('SELECT * FROM game_offer WHERE id IN (1,2)')
+      const [rows] = await gameDb.query('SELECT * FROM game_offer WHERE id IN (1,2)')
       const offers = { 1: null, 2: null }
       for (const r of rows) offers[r.id] = r
       return res.status(200).json({ offers })
@@ -559,13 +564,25 @@ export default async function handler(req, res) {
       const prc = parseInt(price) || 100
       if (!iid) return res.status(400).json({ error: 'ID do item obrigatório' })
       const now = Date.now()
-      await db.query(
-        `INSERT INTO game_offer (id, item_id, count, price_ikoin, title, active, updated_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?)
-         ON DUPLICATE KEY UPDATE item_id=?, count=?, price_ikoin=?, title=?, active=?, updated_at=?`,
-        [oid, iid, cnt, prc, title || 'Oferta Limitada', active ? 1 : 0, now,
-         iid, cnt, prc, title || 'Oferta Limitada', active ? 1 : 0, now]
-      )
+      if (isInterlude) {
+        // Interlude: tabela propria (l2jacis) tem coluna enchant (vender ex: arma +20)
+        const enc = parseInt(req.body?.enchant) || 0
+        await gameDb.query(
+          `INSERT INTO game_offer (id, item_id, count, price_ikoin, title, enchant, active, updated_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+           ON DUPLICATE KEY UPDATE item_id=?, count=?, price_ikoin=?, title=?, enchant=?, active=?, updated_at=?`,
+          [oid, iid, cnt, prc, title || 'Oferta Limitada', enc, active ? 1 : 0, now,
+           iid, cnt, prc, title || 'Oferta Limitada', enc, active ? 1 : 0, now]
+        )
+      } else {
+        await db.query(
+          `INSERT INTO game_offer (id, item_id, count, price_ikoin, title, active, updated_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?)
+           ON DUPLICATE KEY UPDATE item_id=?, count=?, price_ikoin=?, title=?, active=?, updated_at=?`,
+          [oid, iid, cnt, prc, title || 'Oferta Limitada', active ? 1 : 0, now,
+           iid, cnt, prc, title || 'Oferta Limitada', active ? 1 : 0, now]
+        )
+      }
       return res.status(200).json({ success: true, message: `Oferta ${oid} salva com sucesso.` })
     }
 

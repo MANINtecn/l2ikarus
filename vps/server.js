@@ -95,6 +95,15 @@ async function registerAccount(body) {
       'INSERT INTO accounts (login, password, email, created_time) VALUES (?, ?, ?, ?)',
       [login, passwordHash, email, createdTime]
     )
+    // IKARUS 2026-07-16: 1 conta = TODOS os jogos da rede. Espelha a conta no banco do
+    // Interlude (aCis: mesmas colunas login/password, mesmo hash Base64-SHA1).
+    // Falha aqui NAO derruba o cadastro — o banco do Essence e a conta-mae; se o
+    // Interlude estiver fora, sincroniza depois com o SQL de espelhamento (ver CLAUDE.md).
+    try {
+      await getPoolInterlude().query('INSERT IGNORE INTO accounts (login, password) VALUES (?, ?)', [login, passwordHash])
+    } catch (e) {
+      console.error('interlude account mirror error:', e.message)
+    }
     // Atribuicao de streamer/afiliado (first-touch): so grava se o slug existir e estiver ativo.
     if (referredBy && /^[a-z0-9_-]{2,32}$/.test(referredBy)) {
       try {
@@ -205,7 +214,10 @@ http.createServer(async (req, res) => {
   if (req.method === 'POST' && path === '/query') {
     const body = await readBody(req)
     try {
-      const p = getPool()
+      // IKARUS 2026-07-16: body.db='interlude' roteia pro banco do aCis (l2jacis).
+      // Sem body.db = banco do Essence (comportamento original). Compartilhados
+      // (ikoin, contas do site) SEMPRE ficam no banco do Essence.
+      const p = body.db === 'interlude' ? getPoolInterlude() : getPool()
       const [result] = await p.query(body.sql, body.params || [])
       res.writeHead(200)
       return res.end(JSON.stringify({ result }))
@@ -363,8 +375,8 @@ http.createServer(async (req, res) => {
   // GET /acis/offers — ofertas ativas do Interlude
   if (req.method === 'GET' && path === '/acis/offers') {
     try {
-      const p = getPool()
-      const [rows] = await p.query("SELECT id, item_id, count, price_ikoin, title, icon FROM game_offer WHERE active=1 AND server='interlude' ORDER BY id")
+      // 2026-07-16: ofertas do Interlude agora vivem no PROPRIO banco dele (l2jacis).
+      const [rows] = await getPoolInterlude().query("SELECT id, item_id, count, price_ikoin, title, icon, enchant FROM game_offer WHERE active=1 ORDER BY id")
       res.writeHead(200)
       return res.end(JSON.stringify({ offers: rows }))
     } catch (e) {
@@ -379,8 +391,9 @@ http.createServer(async (req, res) => {
     const offerId = parseInt(body.offerId) || 0
     if (!account || !offerId) { res.writeHead(400); return res.end(JSON.stringify({ error: 'Dados inválidos.' })) }
     try {
+      // Oferta = banco do Interlude; Ikoin = banco do Essence (carteira COMPARTILHADA da rede).
       const p = getPool()
-      const [offers] = await p.query("SELECT * FROM game_offer WHERE id=? AND active=1 AND server='interlude'", [offerId])
+      const [offers] = await getPoolInterlude().query('SELECT * FROM game_offer WHERE id=? AND active=1', [offerId])
       if (!offers.length) { res.writeHead(200); return res.end(JSON.stringify({ ok: false, error: 'Oferta indisponível.' })) }
       const offer = offers[0]
       const [bal] = await p.query('SELECT balance FROM ikoin_balance WHERE account_name=?', [account])
@@ -390,7 +403,8 @@ http.createServer(async (req, res) => {
       await p.query('UPDATE ikoin_balance SET balance=balance-?, updated_at=? WHERE account_name=?', [offer.price_ikoin, now, account])
       await p.query('INSERT INTO ikoin_transactions (account_name, amount, type, description, created_at) VALUES (?,?,?,?,?)', [account, -offer.price_ikoin, 'spend', `Oferta: ${offer.title} - Interlude`, now])
       res.writeHead(200)
-      return res.end(JSON.stringify({ ok: true, itemId: offer.item_id, count: offer.count }))
+      // enchant: permite vender item ja encantado (ex: arma +20). 0 = normal.
+      return res.end(JSON.stringify({ ok: true, itemId: offer.item_id, count: offer.count, enchant: offer.enchant || 0 }))
     } catch (e) {
       res.writeHead(500); return res.end(JSON.stringify({ error: e.message }))
     }
@@ -470,13 +484,15 @@ http.createServer(async (req, res) => {
     const code = (body.code || '').trim().toUpperCase()
     if (!account || !code) { res.writeHead(400); return res.end(JSON.stringify({ error: 'Dados inválidos.' })) }
     try {
+      // Codigos do Interlude = banco do Interlude; Ikoin = banco do Essence (compartilhado).
       const p = getPool()
-      const [rows] = await p.query('SELECT items, ikoin, active, max_uses, uses FROM promo_codes WHERE code=?', [code])
+      const pi = getPoolInterlude()
+      const [rows] = await pi.query('SELECT items, ikoin, active, max_uses, uses FROM promo_codes WHERE code=?', [code])
       if (!rows.length) { res.writeHead(200); return res.end(JSON.stringify({ ok: false, error: 'Código inválido.' })) }
       const promo = rows[0]
       if (!promo.active) { res.writeHead(200); return res.end(JSON.stringify({ ok: false, error: 'Código inativo.' })) }
       if (promo.max_uses > 0 && promo.uses >= promo.max_uses) { res.writeHead(200); return res.end(JSON.stringify({ ok: false, error: 'Código atingiu o limite de usos.' })) }
-      const [dup] = await p.query('SELECT 1 FROM promo_redeemed WHERE code=? AND account_name=?', [code, account])
+      const [dup] = await pi.query('SELECT 1 FROM promo_redeemed WHERE code=? AND account_name=?', [code, account])
       if (dup.length) { res.writeHead(200); return res.end(JSON.stringify({ ok: false, error: 'Você já resgatou este código.' })) }
       // Monta lista de itens pra entregar no Java
       const items = []
@@ -487,8 +503,8 @@ http.createServer(async (req, res) => {
         }
       }
       const now = Date.now()
-      await p.query('INSERT INTO promo_redeemed (code, account_name, redeemed_at) VALUES (?,?,?)', [code, account, now])
-      await p.query('UPDATE promo_codes SET uses=uses+1 WHERE code=?', [code])
+      await pi.query('INSERT INTO promo_redeemed (code, account_name, redeemed_at) VALUES (?,?,?)', [code, account, now])
+      await pi.query('UPDATE promo_codes SET uses=uses+1 WHERE code=?', [code])
       if (promo.ikoin > 0) {
         await p.query('INSERT INTO ikoin_balance (account_name, balance, updated_at) VALUES (?,?,?) ON DUPLICATE KEY UPDATE balance=balance+?, updated_at=?', [account, promo.ikoin, now, promo.ikoin, now])
         await p.query('INSERT INTO ikoin_transactions (account_name, amount, type, description, created_at) VALUES (?,?,?,?,?)', [account, promo.ikoin, 'promo', `Código resgatado: ${code}`, now])

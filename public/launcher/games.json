@@ -12,9 +12,12 @@
     },
     {
       "id": "l2nexus",
-      "name": "L2 Nexus Interlude",
-      "status": "soon",
-      "image": "https://www.l2ikarus.com/launcher/cards/l2nexus.jpg"
+      "name": "L2 Ikarus Interlude",
+      "status": "available",
+      "image": "https://www.l2ikarus.com/launcher/cards/l2nexus.jpg",
+      "manifestUrl": "https://www.l2ikarus.com/launcher/manifest-interlude.json",
+      "installDir": "L2 Ikarus Interlude",
+      "exe": "Interlud\\system\\l2.exe"
     },
     {
       "id": "mu",
