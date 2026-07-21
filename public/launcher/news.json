@@ -1,20 +1,26 @@
 [
   {
-    "tag": "LANÇAMENTO",
-    "date": "15/06/2026",
-    "title": "IKARUS GAMES no ar!",
-    "body": "Baixe, instale e jogue o L2 Ikarus Essence direto pelo launcher. Atualizações automáticas do jogo e do launcher."
+    "tag": "INTERLUDE",
+    "date": "21/07/2026",
+    "title": "L2 Ikarus Interlude no ar!",
+    "body": "Rates XP x30 / SP x30 / Drop x10 / Spoil x15. Sistema exclusivo Base + 1 Sub acumulativa: jogue com as skills da sua classe base MAIS as da sua sub, tudo junto. Baixe agora e comece sua jornada."
   },
   {
-    "tag": "PREMIUM",
-    "date": "15/06/2026",
-    "title": "Premium Account no Community Board",
-    "body": "Compre 30 dias de Premium (XP e Drop x2) por 50 Ikoin direto no Alt+B dentro do jogo."
+    "tag": "DOAÇÃO",
+    "date": "21/07/2026",
+    "title": "NPC Donate: turbine seu personagem",
+    "body": "No NPC Ikarus/Donate você compra Build por Classe, Nobless instantâneo, Premium 30 dias, sets Dynasty, armas Icarus, escudos e enchantes exclusivos Blessed Ikarus. Cada Ikoin investido acelera sua evolução — e ajuda a manter o servidor no ar."
   },
   {
     "tag": "ECONOMIA",
-    "date": "15/06/2026",
-    "title": "L-Coin dropando mais",
-    "body": "L-Coin agora dropa a partir do nível 20 com chance aumentada. Junte e use na loja do servidor."
+    "date": "21/07/2026",
+    "title": "1 conta, 1 saldo Ikoin, todos os jogos",
+    "body": "Seu Ikoin é compartilhado entre Essence e Interlude. Compre uma vez, use onde quiser. PIX cai na hora e o Ikoin já entra na sua conta pra gastar direto no Donate."
+  },
+  {
+    "tag": "PREMIUM",
+    "date": "21/07/2026",
+    "title": "Premium Account também no Interlude",
+    "body": "30 dias de XP e Drop x2 por apenas 35 Ikoin, comprável direto no NPC Donate ou pelo Community Board (Alt+B)."
   }
 ]
