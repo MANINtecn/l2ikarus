@@ -29,7 +29,8 @@ const SERVERS = [
     color: '#4ade80',
     img: interludeImg,
     desc: 'A era dourada do PvP. Classes balanceadas, siege de castelo, o L2 que você lembra.',
-    rates: { XP: 'x15', SP: 'x15', ADENA: 'x5' },
+    rates: { XP: 'x30', SP: 'x30', DROP: 'x10', SPOIL: 'x15', ADENA: 'x5' },
+    highlight: 'Base + 1 Sub acumulativa',
     statusMode: 'countdown',
     downloadHref: '#download',
     actionLabel: 'BAIXAR INTERLUDE',
@@ -254,6 +255,16 @@ export default function ServerCards({ isMobile, onRegisterClick }) {
                   <p style={{ fontSize: '0.72rem', color: 'var(--text-mute)', lineHeight: 1.5, marginBottom: '0.7rem' }}>
                     {server.desc}
                   </p>
+                )}
+
+                {server.highlight && (
+                  <div style={{
+                    display: 'inline-block', marginBottom: '0.6rem', padding: '0.25rem 0.6rem',
+                    borderRadius: '4px', fontSize: '0.6rem', fontWeight: 700, letterSpacing: '0.5px',
+                    color: server.color, border: `1px solid ${server.color}66`, background: `${server.color}18`,
+                  }}>
+                    ⚔ {server.highlight}
+                  </div>
                 )}
 
                 {server.rates && (

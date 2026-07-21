@@ -328,6 +328,50 @@ http.createServer(async (req, res) => {
     }
   }
 
+  // POST /acis/ikoin/spend — gasto GENERICO de Ikoin (NPC Donate: build por classe,
+  // nobless, etc). Debita amount validando saldo. { account, amount, description }
+  if (req.method === 'POST' && path === '/acis/ikoin/spend') {
+    const body = await readBody(req)
+    const account = (body.account || '').replace(/[^a-zA-Z0-9_]/g, '')
+    const amount = Math.max(0, parseInt(body.amount) || 0)
+    const desc = String(body.description || 'Gasto Ikoin').slice(0, 120)
+    if (!account || amount <= 0) { res.writeHead(400); return res.end(JSON.stringify({ error: 'dados incompletos' })) }
+    try {
+      const p = getPool()
+      const [bal] = await p.query('SELECT balance FROM ikoin_balance WHERE account_name=?', [account])
+      const balance = bal.length > 0 ? bal[0].balance : 0
+      if (balance < amount) { res.writeHead(200); return res.end(JSON.stringify({ ok: false, error: 'Saldo insuficiente.' })) }
+      const now = Date.now()
+      await p.query('UPDATE ikoin_balance SET balance=balance-?, updated_at=? WHERE account_name=?', [amount, now, account])
+      await p.query('INSERT INTO ikoin_transactions (account_name, amount, type, description, created_at) VALUES (?,?,?,?,?)', [account, -amount, 'spend', desc, now])
+      res.writeHead(200)
+      return res.end(JSON.stringify({ ok: true }))
+    } catch (e) {
+      res.writeHead(500); return res.end(JSON.stringify({ error: e.message }))
+    }
+  }
+
+  // POST /acis/premium/grant — registra dias de premium SEM debitar Ikoin (o debito ja
+  // foi feito antes via /acis/ikoin/spend pelo NPC Donate). { account, days }
+  if (req.method === 'POST' && path === '/acis/premium/grant') {
+    const body = await readBody(req)
+    const account = (body.account || '').replace(/[^a-zA-Z0-9_]/g, '')
+    const days = Math.max(1, parseInt(body.days) || 30)
+    if (!account) { res.writeHead(400); return res.end(JSON.stringify({ error: 'account obrigatório' })) }
+    try {
+      const p = getPool()
+      const now = Date.now()
+      const [prem] = await p.query('SELECT premium_expiry FROM account_premium_interlude WHERE account_name=?', [account])
+      const currentExpiry = (prem.length > 0 && prem[0].premium_expiry > now) ? prem[0].premium_expiry : now
+      const newExpiry = currentExpiry + days * 86400000
+      await p.query('INSERT INTO account_premium_interlude (account_name, premium_expiry, updated_at) VALUES (?,?,?) ON DUPLICATE KEY UPDATE premium_expiry=?, updated_at=?', [account, newExpiry, now, newExpiry, now])
+      res.writeHead(200)
+      return res.end(JSON.stringify({ ok: true, newExpiry }))
+    } catch (e) {
+      res.writeHead(500); return res.end(JSON.stringify({ error: e.message }))
+    }
+  }
+
   // POST /acis/premium/buy — compra premium Interlude (50 Ikoin = 30 dias)
   if (req.method === 'POST' && path === '/acis/premium/buy') {
     const body = await readBody(req)
@@ -452,6 +496,33 @@ http.createServer(async (req, res) => {
       await pi.query('UPDATE characters SET char_name=? WHERE char_name=? AND account_name=?', [newNick, oldNick, account])
       await p.query('UPDATE ikoin_balance SET balance=balance-?, updated_at=? WHERE account_name=?', [PRICE, now, account])
       await p.query('INSERT INTO ikoin_transactions (account_name, amount, type, description, created_at) VALUES (?,?,?,?,?)', [account, -PRICE, 'spend', `Troca de nick: ${oldNick} → ${newNick} - Interlude`, now])
+      res.writeHead(200)
+      return res.end(JSON.stringify({ ok: true }))
+    } catch (e) {
+      res.writeHead(500); return res.end(JSON.stringify({ error: e.message }))
+    }
+  }
+
+  // POST /acis/nobless/buy — compra status Nobless (100 Ikoin). O flag nobless em si
+  // e gravado pelo GS (setNoble persiste em l2jacis.characters); aqui so debita a carteira.
+  if (req.method === 'POST' && path === '/acis/nobless/buy') {
+    const body = await readBody(req)
+    const account = (body.account || '').replace(/[^a-zA-Z0-9_]/g, '')
+    const charName = (body.charName || '').trim()
+    const PRICE = 100
+    if (!account || !charName) { res.writeHead(400); return res.end(JSON.stringify({ error: 'Dados incompletos.' })) }
+    try {
+      const p = getPool()
+      const pi = getPoolInterlude()
+      const [chars] = await pi.query('SELECT nobless FROM characters WHERE char_name=? AND account_name=?', [charName, account])
+      if (!chars.length) { res.writeHead(200); return res.end(JSON.stringify({ ok: false, error: 'Personagem não encontrado.' })) }
+      if (chars[0].nobless === 1) { res.writeHead(200); return res.end(JSON.stringify({ ok: false, error: 'Personagem já é Nobless.' })) }
+      const [bal] = await p.query('SELECT balance FROM ikoin_balance WHERE account_name=?', [account])
+      const balance = bal.length > 0 ? bal[0].balance : 0
+      if (balance < PRICE) { res.writeHead(200); return res.end(JSON.stringify({ ok: false, error: 'Saldo insuficiente (100 Ikoin).' })) }
+      const now = Date.now()
+      await p.query('UPDATE ikoin_balance SET balance=balance-?, updated_at=? WHERE account_name=?', [PRICE, now, account])
+      await p.query('INSERT INTO ikoin_transactions (account_name, amount, type, description, created_at) VALUES (?,?,?,?,?)', [account, -PRICE, 'spend', `Nobless: ${charName} - Interlude`, now])
       res.writeHead(200)
       return res.end(JSON.stringify({ ok: true }))
     } catch (e) {
