@@ -65,6 +65,20 @@ async function getStats(server) {
   }
 }
 
+// IKARUS 2026-07-23: status AGREGADO da rede. Soma os online de TODOS os servidores
+// que estiverem no ar (banco respondendo). Servidor caido conta 0 e nao derruba o total.
+// AO CRIAR UM SERVIDOR NOVO: adicionar o id aqui (getStats ja roteia o pool pelo id).
+const NETWORK_SERVERS = ['essence', 'interlude']
+
+async function getStatsAll() {
+  const servers = await Promise.all(
+    NETWORK_SERVERS.map(async (id) => ({ id, ...(await getStats(id)) }))
+  )
+  const players = servers.reduce((sum, s) => sum + (s.online ? s.players : 0), 0)
+  const accounts = servers.reduce((sum, s) => sum + (s.online ? s.accounts : 0), 0)
+  return { online: servers.some((s) => s.online), players, accounts, servers }
+}
+
 // ===== Cadastro de conta (a senha JA chega hasheada do Vercel — texto puro nunca trafega) =====
 const LOGIN_RE = /^[a-zA-Z0-9_]{4,16}$/
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -96,13 +110,17 @@ async function registerAccount(body) {
       'INSERT INTO accounts (login, password, email, created_time) VALUES (?, ?, ?, ?)',
       [login, passwordHash, email, createdTime]
     )
-    // IKARUS 2026-07-17: 1 conta = TODOS os jogos, mas cada engine tem seu formato de
-    // senha. Interlude (aCis) usa BCrypt ($2a$) — SEM o hash bcrypt a conta grava lixo e
-    // o login do aCis quebra ("Invalid salt version"). So espelha se o bcrypt veio.
-    // Falha aqui NAO derruba o cadastro (banco do Essence e a conta-mae).
+    // IKARUS 2026-07-21: Gravacao instantanea no Interlude (aCis) com autocommit
     if (passwordBcrypt) {
       try {
-        await getPoolInterlude().query('INSERT IGNORE INTO accounts (login, password) VALUES (?, ?)', [login, passwordBcrypt])
+        const poolInt = getPoolInterlude()
+        const connInt = await poolInt.getConnection()
+        try {
+          await connInt.query('INSERT IGNORE INTO accounts (login, password) VALUES (?, ?)', [login, passwordBcrypt])
+          await connInt.query('COMMIT')
+        } finally {
+          connInt.release()
+        }
       } catch (e) {
         console.error('interlude account mirror error:', e.message)
       }
@@ -154,6 +172,12 @@ http.createServer(async (req, res) => {
   if (req.method === 'GET' && path === '/status') {
     res.writeHead(200)
     return res.end(JSON.stringify(await getStats(query.get('server'))))
+  }
+
+  // /status/all é PÚBLICO. Soma o online de TODOS os servidores no ar (rede inteira).
+  if (req.method === 'GET' && path === '/status/all') {
+    res.writeHead(200)
+    return res.end(JSON.stringify(await getStatsAll()))
   }
 
   // QR Code PIX — PÚBLICO (cliente do jogo carrega a imagem sem api-key)

@@ -14,7 +14,12 @@ export default async function handler(_req, res) {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 5000); // 5s timeout
 
-    const response = await fetch(VPS_STATUS_URL, {
+    // IKARUS 2026-07-23: consulta o status AGREGADO (/status/all) = soma o online de
+    // TODOS os servidores da rede que estiverem no ar. O launcher le "players" e passa
+    // a mostrar o total. VPS_STATUS_URL termina em /status -> vira /status/all.
+    const allUrl = VPS_STATUS_URL.replace(/\/status(\/all)?$/, '/status/all');
+
+    const response = await fetch(allUrl, {
       headers: { 'x-api-key': VPS_API_KEY },
       signal: controller.signal,
     });
@@ -28,6 +33,7 @@ export default async function handler(_req, res) {
       online: data.online ?? false,
       players: data.players ?? 0,
       accounts: data.accounts ?? 0,
+      servers: data.servers ?? [],
       status_login: data.online ? 'ONLINE' : 'OFFLINE',
       status_game:  data.online ? 'ONLINE' : 'OFFLINE',
     });
