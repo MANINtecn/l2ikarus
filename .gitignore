@@ -14,6 +14,10 @@ vps/config.js
 vps/node_modules/
 vps/package-lock.json
 
+# listagem intermediaria do rclone (fileIds do Drive) — regenerada a cada publish
+launcher/drive_listing.json
+public/launcher/drive_listing.json
+
 # artes-fonte brutas (25MB+) — o site usa os webp derivados + public/logo-white.png
 LOGOINTERLUD.png
 Splash Essence.png
