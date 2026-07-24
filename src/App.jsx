@@ -9,6 +9,7 @@ import RegisterModal from './assets/components/RegisterModal'
 import Hero3D from './assets/components/Hero3D'
 import FeaturesTerminal from './assets/components/FeaturesTerminal'
 import DownloadTerminal from './assets/components/DownloadTerminal'
+import InterludeInfo from './assets/components/InterludeInfo'
 import DonateTerminal from './assets/components/DonateTerminal'
 import DiscordCommunity from './assets/components/DiscordCommunity'
 import Preloader from './assets/components/Preloader'
@@ -21,6 +22,8 @@ function App() {
   const [isRegisterOpen, setIsRegisterOpen] = useState(false)
   const [isLoginOpen, setIsLoginOpen] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [essenceOpen, setEssenceOpen] = useState(false)
+  const [infoOpen, setInfoOpen] = useState(false)
   // IKARUS 2026-07-15: banner "BETA TESTE ABERTO" desativado a pedido do usuario
   // (topo do site poluido). Trocar pra useState(true) pra reativar.
   const [bannerVisible, setBannerVisible] = useState(false)
@@ -137,15 +140,51 @@ function App() {
             onRegisterClick={() => setIsRegisterOpen(true)}
             onLoginClick={() => setIsLoginOpen(true)}
           />
-          <Hero3D onRegisterClick={() => setIsRegisterOpen(true)} />
+          <Hero3D
+            onRegisterClick={() => setIsRegisterOpen(true)}
+            onEssenceClick={() => {
+              setEssenceOpen(true)
+              setTimeout(() => document.getElementById('essence-content')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60)
+            }}
+            onInfoClick={() => {
+              setInfoOpen(true)
+              setTimeout(() => document.getElementById('interlude-info')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60)
+            }}
+          />
 
           <div style={{ height: '100vh', pointerEvents: 'none', position: 'relative', zIndex: 0 }} />
 
           <div ref={containerRef} className="scroll-content-container" style={{ position: 'relative', zIndex: 5, background: 'transparent' }}>
             {/* IKARUS 2026-07-16: divider removido daqui — como o hero e fixed, essa linha
                 rolava POR CIMA das imagens dos ServerCards durante a transicao de scroll */}
-            <DonateTerminal />
-            <FeaturesTerminal />
+            {/* IKARUS 2026: INFO do Interlude (rates, enchant por ancora, farm rotativo,
+                bosses solo, nobless/3o job retail, base+sub+simulador). Aparece ao clicar
+                "INFO" no card do Interlude. */}
+            {infoOpen && <InterludeInfo onClose={() => setInfoOpen(false)} />}
+
+            {/* IKARUS 2026: conteudo do ESSENCE (loja/start packs/download) so aparece ao
+                clicar "VER CONTEUDO" no card do Essence — antes poluia/atravessava a tela. */}
+            {essenceOpen && (
+              <div id="essence-content" style={{ scrollMarginTop: '80px' }}>
+                <div style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  maxWidth: 1200, margin: '0 auto', padding: '1.2rem 1.5rem 0',
+                }}>
+                  <span className="cinzel" style={{ color: '#60a5fa', fontSize: '0.85rem', letterSpacing: '2px' }}>
+                    CONTEÚDO · ESSENCE
+                  </span>
+                  <button
+                    onClick={() => setEssenceOpen(false)}
+                    className="btn btn-ghost"
+                    style={{ padding: '0.4rem 0.9rem', fontSize: '0.6rem', letterSpacing: '1px' }}
+                  >
+                    FECHAR ×
+                  </button>
+                </div>
+                <DonateTerminal />
+                <FeaturesTerminal />
+              </div>
+            )}
             <DownloadTerminal />
             <DiscordCommunity />
             <div className="section-divider" style={{ opacity: 0.1 }} />

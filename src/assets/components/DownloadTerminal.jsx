@@ -1,5 +1,59 @@
 const DISCORD_INVITE = 'https://discord.gg/BGs8mkUrmE'
-const DRIVE_DOWNLOAD = 'https://drive.google.com/file/d/1mevVcw8FLb8lEWelBwYCbbqTH7M_0taP/view?usp=sharing'
+
+// =============================================================================
+// ESPELHOS DE DOWNLOAD
+// Basta preencher a url. Espelho com url vazia NAO aparece no site.
+// =============================================================================
+
+const LAUNCHER_MIRRORS = [
+  {
+    label: 'GOOGLE DRIVE',
+    url: 'https://drive.google.com/file/d/1mevVcw8FLb8lEWelBwYCbbqTH7M_0taP/view?usp=sharing',
+    color: 'var(--gold)',
+    nota: 'O Drive avisa que nao verificou virus por causa do tamanho. E normal, pode baixar.',
+  },
+  {
+    label: 'MEGA',
+    url: '',
+    color: '#D9272E',
+    nota: '',
+  },
+  {
+    label: 'ESPELHO 3',
+    url: '',
+    color: '#4CAF50',
+    nota: '',
+  },
+]
+
+const PATCH_MIRRORS = [
+  {
+    label: 'GOOGLE DRIVE',
+    url: '',
+    color: 'var(--gold)',
+    nota: '',
+  },
+  {
+    label: 'MEGA',
+    url: '',
+    color: '#D9272E',
+    nota: '',
+  },
+  {
+    label: 'ESPELHO 3',
+    url: '',
+    color: '#4CAF50',
+    nota: '',
+  },
+]
+
+// Tamanho/versao mostrados no card do patch.
+const PATCH_INFO = {
+  tamanho: '~1.3 GB',
+  versao: 'IKARUS_PATCH_20260722',
+}
+
+const temLink = (m) => m.url && m.url.trim() !== ''
 
 const STEPS = [
   {
@@ -131,18 +185,52 @@ export default function DownloadTerminal() {
               </p>
             </div>
 
-            {/* Botão de download */}
+            {/* Botões de download — um por espelho preenchido */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', width: '100%' }}>
-              <a
-                href={DRIVE_DOWNLOAD || DISCORD_INVITE}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-primary"
-                style={{ padding: '0.9rem 2rem', fontSize: '0.85rem', letterSpacing: '3px', width: '100%' }}
-              >
-                ⬇ BAIXAR · GOOGLE DRIVE
-              </a>
+              {LAUNCHER_MIRRORS.filter(temLink).map((m, i) => (
+                <a
+                  key={m.label}
+                  href={m.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={i === 0 ? 'btn btn-primary' : 'btn'}
+                  style={{
+                    padding: '0.9rem 2rem', fontSize: '0.85rem',
+                    letterSpacing: '3px', width: '100%',
+                    ...(i === 0 ? {} : {
+                      border: `1px solid ${m.color}`,
+                      color: m.color,
+                      background: 'transparent',
+                    }),
+                  }}
+                >
+                  ⬇ BAIXAR · {m.label}
+                </a>
+              ))}
+
+              {LAUNCHER_MIRRORS.filter(temLink).length === 0 && (
+                <a
+                  href={DISCORD_INVITE}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-primary"
+                  style={{ padding: '0.9rem 2rem', fontSize: '0.85rem', letterSpacing: '3px', width: '100%' }}
+                >
+                  ⬇ LINK NO DISCORD
+                </a>
+              )}
             </div>
+
+            {/* Aviso do espelho principal (ex.: o alerta de virus do Drive) */}
+            {LAUNCHER_MIRRORS.filter(temLink).some((m) => m.nota) && (
+              <p style={{
+                color: 'var(--text-mute)', fontSize: '0.7rem',
+                letterSpacing: '1px', lineHeight: '1.6',
+                margin: 0, maxWidth: '380px', textAlign: 'center',
+              }}>
+                {LAUNCHER_MIRRORS.filter(temLink).find((m) => m.nota).nota}
+              </p>
+            )}
 
             {/* Suporte no Discord */}
             <a
@@ -169,6 +257,64 @@ export default function DownloadTerminal() {
             </p>
           </div>
         </div>
+
+        {/* PATCH / ATUALIZAÇÃO MANUAL */}
+        {PATCH_MIRRORS.filter(temLink).length > 0 && (
+          <div style={{ textAlign: 'center', marginTop: '2.5rem' }}>
+            <div className="glass-panel" style={{
+              display: 'inline-flex', flexDirection: 'column',
+              alignItems: 'center', gap: '1.5rem',
+              padding: 'clamp(1.75rem, 5vw, 2.5rem) clamp(1.5rem, 8vw, 4rem)',
+              background: 'rgba(88,101,242,0.04)',
+              border: '1px solid rgba(88,101,242,0.22)',
+              maxWidth: '520px', width: '100%',
+            }}>
+              <div>
+                <h3 className="cinzel" style={{
+                  fontSize: '1rem', letterSpacing: '4px',
+                  color: '#fff', marginBottom: '0.5rem',
+                }}>PATCH DO CLIENTE</h3>
+                <p style={{
+                  color: 'var(--text-mute)', fontSize: '0.75rem',
+                  letterSpacing: '2px', lineHeight: '1.7',
+                }}>
+                  {PATCH_INFO.versao} · {PATCH_INFO.tamanho}
+                </p>
+              </div>
+
+              <p style={{
+                color: 'rgba(255,255,255,0.75)', fontSize: '0.78rem',
+                lineHeight: '1.8', margin: 0, maxWidth: '400px',
+              }}>
+                O launcher já atualiza o jogo sozinho. Use este patch só se a atualização
+                falhar ou se você instalou o cliente por fora: extraia o zip
+                <strong style={{ color: 'var(--gold)' }}> dentro da pasta do jogo</strong>,
+                substituindo os arquivos. Feche o jogo antes.
+              </p>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', width: '100%' }}>
+                {PATCH_MIRRORS.filter(temLink).map((m) => (
+                  <a
+                    key={m.label}
+                    href={m.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn"
+                    style={{
+                      padding: '0.8rem 2rem', fontSize: '0.8rem',
+                      letterSpacing: '3px', width: '100%',
+                      border: `1px solid ${m.color}`,
+                      color: m.color,
+                      background: 'transparent',
+                    }}
+                  >
+                    ⬇ PATCH · {m.label}
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Aviso antivírus */}
         <div style={{ marginTop: '4rem', textAlign: 'center' }}>

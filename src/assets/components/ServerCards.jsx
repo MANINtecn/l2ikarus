@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import BuildSimulator from './BuildSimulator'
 import interludeImg from '../server-interlude.webp'
 import essenceImg from '../server-essence.webp'
 import muImg from '../server-mu.webp'
@@ -73,9 +74,10 @@ function formatCountdown(ms) {
   return `ESTREIA EM ${pad(hours)}H ${pad(minutes)}M ${pad(seconds)}S`
 }
 
-export default function ServerCards({ isMobile, onRegisterClick }) {
+export default function ServerCards({ isMobile, onRegisterClick, onEssenceClick, onInfoClick }) {
   const [hovered, setHovered] = useState(null)
   const [pinned, setPinned] = useState(null)
+  const [simOpen, setSimOpen] = useState(false)
   const [essenceStatus, setEssenceStatus] = useState({ online: false, players: 0 })
   const [interludeStatus, setInterludeStatus] = useState({ online: false, players: 0 })
   const [now, setNow] = useState(() => Date.now())
@@ -154,6 +156,7 @@ export default function ServerCards({ isMobile, onRegisterClick }) {
   const panelW = isMobile ? 220 : 300
 
   return (
+    <>
     <div style={{
       position: 'relative',
       display: 'flex',
@@ -299,6 +302,33 @@ export default function ServerCards({ isMobile, onRegisterClick }) {
                       {server.actionLabel}
                     </a>
                   )}
+                  {server.id === 'interlude' && (
+                    <>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); onInfoClick && onInfoClick() }}
+                        className="btn btn-ghost"
+                        style={{ padding: '0.5rem 1rem', fontSize: '0.6rem', letterSpacing: '1px', borderColor: `${server.color}88`, color: server.color }}
+                      >
+                        INFO
+                      </button>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setSimOpen(true) }}
+                        className="btn btn-ghost"
+                        style={{ padding: '0.5rem 1rem', fontSize: '0.6rem', letterSpacing: '1px', borderColor: `${server.color}88`, color: server.color }}
+                      >
+                        SIMULADOR DE BUILD
+                      </button>
+                    </>
+                  )}
+                  {server.id === 'essence' && (
+                    <button
+                      onClick={(e) => { e.stopPropagation(); onEssenceClick && onEssenceClick() }}
+                      className="btn btn-ghost"
+                      style={{ padding: '0.5rem 1rem', fontSize: '0.6rem', letterSpacing: '1px', borderColor: `${server.color}88`, color: server.color }}
+                    >
+                      VER CONTEÚDO
+                    </button>
+                  )}
                 </div>
 
                 {/* X pra fechar — so aparece quando FIXADO por click (hover fecha sozinho
@@ -325,5 +355,8 @@ export default function ServerCards({ isMobile, onRegisterClick }) {
         )
       })}
     </div>
+
+    {simOpen && <BuildSimulator onClose={() => setSimOpen(false)} />}
+    </>
   )
 }

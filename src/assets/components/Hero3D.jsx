@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import ServerCards from './ServerCards'
 
-export default function Hero3D({ onRegisterClick }) {
+export default function Hero3D({ onRegisterClick, onEssenceClick, onInfoClick }) {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 1024)
   const [scrollProgress, setScrollProgress] = useState(0)
   const [serverStatus, setServerStatus] = useState({ online: false, players: 0 })
@@ -145,7 +145,7 @@ export default function Hero3D({ onRegisterClick }) {
 
         {/* CARDS DE SERVIDOR — 1 por servidor (Interlude/Essence/MU), hover = destaque,
             click = expande info com botoes de acao. Fica no fluxo normal do hero. */}
-        <ServerCards isMobile={isMobile} onRegisterClick={onRegisterClick} />
+        <ServerCards isMobile={isMobile} onRegisterClick={onRegisterClick} onEssenceClick={onEssenceClick} onInfoClick={onInfoClick} />
       </div>
 
       <div className="scanline-overlay" style={{ opacity: 0.08 }} />
