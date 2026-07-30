@@ -76,26 +76,25 @@ export default function InterludeInfo({ onClose }) {
           <div style={{ marginTop: 6 }}>Curva pensada pra progredir rápido sem trivializar o end-game.</div>
         </Card>
 
-        <Card title="Enchant com âncora" tag="seguro">
+        <Card title="Enchant com âncora (blessed)" tag="não quebra">
           <div style={{ marginBottom: 6 }}>
-            Cap atual: <b style={{ color: '#fff' }}>safe +3</b> · máximo <b style={{ color: '#fff' }}>+10 arma</b> / <b style={{ color: '#fff' }}>+8 armadura</b>.
+            <b style={{ color: '#fff' }}>Safe +3</b> · âncoras <b style={{ color: GOLD }}>+4 / +6 / +9</b> · máximo <b style={{ color: '#fff' }}>+10</b> (por enquanto).
           </div>
-          O <b style={{ color: '#fff' }}>Blessed nunca quebra</b> seu item. Se falhar, ele cai pro
-          <b style={{ color: GOLD }}> ponto de âncora</b> já conquistado (a cada 3 níveis: <b style={{ color: '#fff' }}>+6 / +9</b>…).
+          O <b style={{ color: '#fff' }}>Blessed nunca quebra</b> seu item. Se falhar, ele cai pra <b style={{ color: GOLD }}>âncora conquistada</b> mais próxima — e nunca abaixo do <b style={{ color: '#fff' }}>+3</b>.
           <div style={{ marginTop: 6 }}>
-            Ex.: sua arma <b style={{ color: '#fff' }}>+8</b> falhou → volta pra <b style={{ color: GOLD }}>+6</b>, sem zerar e sem destruir.
+            Ex.: sua arma <b style={{ color: '#fff' }}>+8</b> falhou → volta pra <b style={{ color: GOLD }}>+6</b>. Chegou no <b style={{ color: GOLD }}>+9</b>? Uma falha te devolve pro +9, não pro zero.
           </div>
           <div style={{ marginTop: 6 }}>
             O <b style={{ color: '#fff' }}>scroll normal</b> é mais barato, mas arriscado: falha destrói o item.
           </div>
           <div style={{ marginTop: 6, fontSize: '0.7rem', opacity: 0.85 }}>
-            A escada de âncoras já está pronta pra quando o cap subir (+20 arma / +18 armadura).
+            Config votada pelos players. O cap sobe pra +20/+18 mais pra frente (com novas âncoras).
           </div>
         </Card>
 
         <Card title="Base + 1 sub acumulativa" tag="exclusivo">
           Mantenha sua classe base e <b style={{ color: '#fff' }}>some as skills de 1 sub</b> à sua escolha (cura, ressurreição e mana não entram).
-          Monte e teste a combinação <b style={{ color: '#fff' }}>antes de comprar</b> no simulador.
+          É <b style={{ color: GOLD }}>grátis</b>, no NPC de Serviços. Monte e teste a combinação no simulador antes de escolher.
           <button
             onClick={() => setSimOpen(true)}
             className="btn btn-primary"
@@ -105,9 +104,9 @@ export default function InterludeInfo({ onClose }) {
           </button>
         </Card>
 
-        <Card title="Nobless & 3ª profissão" tag="retail">
-          Conquistadas do <b style={{ color: '#fff' }}>jeito clássico</b>, via quest retail — Caradine, o caçador de Barakiel e a jornada completa.
-          Sem atalho automático: o título tem valor porque foi merecido.
+        <Card title="Nobless & 3ª profissão" tag="sem enrolação">
+          A <b style={{ color: GOLD }}>3ª profissão é grátis</b> no NPC — ninguém perde o fim de semana em quest pra começar a jogar de verdade.
+          A <b style={{ color: '#fff' }}>Nobless</b> continua do jeito clássico, via quest retail: Caradine, o caçador de Barakiel e a jornada completa.
         </Card>
 
         <Card title="Farm com rotação" tag="sempre ativo" span>
