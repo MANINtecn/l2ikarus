@@ -1,7 +1,7 @@
 {
-  "version": "1.8",
+  "version": "1.9",
   "url": "https://drive.google.com/uc?export=download&id=1SnzynJApVW_AxzyQLsBVuwxVxXz5RX0w",
   "driveFileId": "1SnzynJApVW_AxzyQLsBVuwxVxXz5RX0w",
-  "hash": "f7d3da03ff2077fc0350cb03c679b7c8",
-  "notes": "Migracao de hospedagem: launcher agora baixa o cliente via Google Drive API (Firebase foi desativado por custo). JOGAR abre o jogo na hora (checa so a versao). Botao 'Verificar Arquivos' para reparo."
+  "hash": "F059D4A437707DA17C3D1AE0B5574C9F",
+  "notes": "Launcher resiliente: cache local do catalogo e das noticias, 3 tentativas e timeout de 15s. Acaba com o card preto e o 'carregando noticias' eterno em rede instavel."
 }
