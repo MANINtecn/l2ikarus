@@ -126,6 +126,12 @@ export default function PlayerPanel({ data, onLogout }) {
             <p style={{ color: '#fff', fontSize: '0.85rem', margin: 0, fontWeight: '600' }}>{data.login}</p>
             {data.email && <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.65rem', margin: 0 }}>{data.email}</p>}
           </div>
+          {/* IKARUS: antes so' existia SAIR, entao quem entrava no painel so' conseguia
+              voltar pro site deslogando. Este botao leva de volta a home mantendo a sessao.
+              Usa a mesma classe do "COMPRAR IKOIN" (btn btn-primary = dourado do tema). */}
+          <button onClick={() => { window.location.href = '/' }} className="btn btn-primary" style={{
+            padding: '0.5rem 1.2rem', fontSize: '0.65rem', letterSpacing: '2px',
+          }}>VOLTAR AO SITE</button>
           <button onClick={onLogout} style={{
             background: 'rgba(255,68,68,0.1)', border: '1px solid rgba(255,68,68,0.3)',
             color: '#ff4444', padding: '0.5rem 1.2rem', borderRadius: '6px',
