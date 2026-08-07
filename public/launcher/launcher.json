@@ -1,7 +1,7 @@
 {
-  "version": "1.9",
+  "version": "2.0",
   "url": "https://drive.google.com/uc?export=download&id=1SnzynJApVW_AxzyQLsBVuwxVxXz5RX0w",
   "driveFileId": "1SnzynJApVW_AxzyQLsBVuwxVxXz5RX0w",
-  "hash": "F059D4A437707DA17C3D1AE0B5574C9F",
-  "notes": "Launcher resiliente: cache local do catalogo e das noticias, 3 tentativas e timeout de 15s. Acaba com o card preto e o 'carregando noticias' eterno em rede instavel."
+  "hash": "A343EBE067B5D72B782BAB643EE494A9",
+  "notes": "Login automatico: clique numa conta salva na tela de login e o launcher digita e entra sozinho, incluindo o aviso de licenca e a selecao de servidor. Fechar o launcher agora recolhe pra bandeja, entao o login automatico funciona ate abrindo o jogo direto pelo L2.exe."
 }
