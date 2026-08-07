@@ -64,11 +64,34 @@ SKIP_DIR_PREFIXES = ("system_BACKUP", "BACKUP")
 SKIP_FILES = {
     "user.ini", "option.ini", "windowsinfo.ini", "running.ini",
     "autouse.ini", "l2.log", "chatlog.txt",
+    # IKARUS 2026-08-07 - NUNCA publicar: sao arquivos DA MAQUINA, gerados pelos nossos
+    # mods. O IkarusAccounts.ini guarda LOGIN E SENHA em texto puro (janela de contas da
+    # tela de login) - se entrar no manifest, todo jogador baixa as credenciais do dono.
+    # O IkarusFarmSlots.ini guarda os slots do autofarm por personagem.
+    "ikarusaccounts.ini", "ikarusfarmslots.ini", "ikaruslogin.txt",
+    "chatfilter.ini", "s_info.ini",
+    # l2.ini NAO VAI MAIS (2026-08-07). Ele so' tem config da instalacao (ServerAddr,
+    # porta, resolucao, viewport) - nada que uma atualizacao de conteudo precise mudar.
+    # Mandando ele: (1) sobrescrevia a RESOLUCAO/GRAFICOS do jogador toda vez;
+    # (2) bastava um teste local pra publicar ServerAddr=127.0.0.1 e derrubar o login de
+    # todo mundo - aconteceu em 23/07 e quase de novo em 07/08 (o master estava em
+    # 127.0.0.1). Quem instala do zero recebe o l2.ini pelo .rar completo.
+    # Se um dia o IP/porta mudar, tirar daqui DE PROPOSITO e publicar uma vez.
+    "l2.ini",
 }
 
 SKIP_EXTS = (".bak", ".bak2", ".new", ".log", ".tmp")
 
-SKIP_SUBSTRINGS = ("bak_retail", "backup_orig", "bak_pre_")
+# 2026-08-07: alinhado com as exclusoes do rclone sync. Se um arquivo e' excluido do
+# sync mas continua entrando aqui, o gerador reclama de "sem fileId no Drive" e o
+# manifest pode sair apontando pra um arquivo que nao existe la'.
+SKIP_SUBSTRINGS = ("bak_retail", "backup_orig", "bak_pre_", ".bak", "bak_", "_bak",
+                   ".sem_rodape", ".orig", ".old")
+
+
+def eh_screenshot(nome):
+    baixo = nome.lower()
+    return baixo.startswith("shot") and baixo.endswith((".jpg", ".png", ".bmp"))
 
 
 def deve_pular_dir(nome):
@@ -82,6 +105,8 @@ def deve_pular_arquivo(nome):
     if baixo in SKIP_FILES:
         return True
     if baixo.endswith(SKIP_EXTS):
+        return True
+    if eh_screenshot(baixo):
         return True
     return any(s in baixo for s in SKIP_SUBSTRINGS)
 
