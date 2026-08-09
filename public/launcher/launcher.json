@@ -1,7 +1,7 @@
-{
-  "version": "2.0",
+﻿{
+  "version": "2.1",
   "url": "https://drive.google.com/uc?export=download&id=1SnzynJApVW_AxzyQLsBVuwxVxXz5RX0w",
   "driveFileId": "1SnzynJApVW_AxzyQLsBVuwxVxXz5RX0w",
-  "hash": "A343EBE067B5D72B782BAB643EE494A9",
-  "notes": "Login automatico: clique numa conta salva na tela de login e o launcher digita e entra sozinho, incluindo o aviso de licenca e a selecao de servidor. Fechar o launcher agora recolhe pra bandeja, entao o login automatico funciona ate abrindo o jogo direto pelo L2.exe."
+  "hash": "3B9778502C6E0263ED9A0DF6F3A28F9E",
+  "notes": "Corrige vazamento de senha: com dois clientes abertos o auto-login podia digitar usuario e senha no chat do jogo. Agora o launcher roda em instancia unica e o vigia de login e' criado uma vez so."
 }
