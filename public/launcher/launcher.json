@@ -1,7 +1,7 @@
 {
-  "version": "2.1",
+  "version": "2.2",
   "url": "https://drive.google.com/uc?export=download&id=1SnzynJApVW_AxzyQLsBVuwxVxXz5RX0w",
   "driveFileId": "1SnzynJApVW_AxzyQLsBVuwxVxXz5RX0w",
-  "hash": "3B9778502C6E0263ED9A0DF6F3A28F9E",
-  "notes": "Corrige vazamento de senha: com dois clientes abertos o auto-login podia digitar usuario e senha no chat do jogo. Agora o launcher roda em instancia unica e o vigia de login e' criado uma vez so."
+  "hash": "A20CBA14E13513804010B052D953C203",
+  "notes": "Fim do 'sem conexao' que obrigava a reinstalar o jogo. O manifest agora tem cache e novas tentativas; se ainda assim falhar, o jogo abre do mesmo jeito. O launcher nunca mais oferece INSTALAR por engano quando esta sem catalogo."
 }
