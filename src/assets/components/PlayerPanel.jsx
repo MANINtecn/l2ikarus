@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+import ReferralProgram from './ReferralProgram'
 
 const PACKS = [50, 100, 250, 500, 1000]
 
@@ -231,8 +232,11 @@ export default function PlayerPanel({ data, onLogout }) {
             ))}
           </div>
 
-          {/* INDICAÇÕES (jogador) removido 2026-07-17: a indicacao e via streamer/afiliado
-              (link /r/slug), gerenciada no painel admin. Sem programa de indicacao por jogador. */}
+          {/* PROGRAMA DE INDICAÇÃO (17/08/2026): reaberto pro jogador. Antes o cadastro era
+              só manual no admin (streamers); agora qualquer um se inscreve por aqui e o
+              admin aprova. O componente se vira sozinho com os 3 estados (não inscrito /
+              pendente / aprovado) e some se a API falhar. */}
+          <ReferralProgram />
         </div>
 
         {/* COLUNA DIREITA — PERSONAGENS */}

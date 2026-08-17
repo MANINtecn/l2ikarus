@@ -144,6 +144,52 @@ async function registerAccount(body) {
   }
 }
 
+// Dias que a comissao do Programa de Indicacao fica "em validacao" antes de virar
+// sacavel. 30 dias cobre o MED do PIX (fraude) e boa parte do prazo de chargeback de
+// cartao. Se o estorno vier DEPOIS, a comissao e' revertida e compensada no saldo
+// futuro (regulamento, secao 7) — por isso cada comissao e' uma LINHA, nao um SUM.
+//
+// TEMPORARIAMENTE 0 PARA TESTE (17/08/2026) — VOLTAR PARA 30 depois de validar o
+// fluxo de saque. O regulamento publicado diz 30 dias.
+const REFERRAL_HOLD_DAYS = 0
+
+/**
+ * Gera a comissao de indicacao de uma compra recem-paga.
+ * Espelho da funcao de mesmo nome em api/payment.js — os dois caminhos de pagamento
+ * (Vercel e VPS) precisam gerar comissao igual.
+ * NUNCA lanca: falha aqui nao pode afetar o pagamento do jogador.
+ * A UNIQUE em order_id garante idempotencia (webhook repetido nao duplica).
+ */
+async function createReferralCommission(p, orderId, buyerAccount, orderAmount) {
+  try {
+    const [ref] = await p.query('SELECT streamer_slug FROM account_referrals WHERE account_name=?', [buyerAccount])
+    if (!ref.length) return
+
+    const [st] = await p.query(
+      "SELECT slug, commission_pct FROM streamers WHERE slug=? AND active=1 AND status='approved'",
+      [ref[0].streamer_slug])
+    if (!st.length) return
+
+    // regulamento, secao 7: autoindicacao nao gera comissao
+    if (st[0].slug === buyerAccount) return
+
+    const now = Date.now()
+    const value = Math.floor(orderAmount * (st[0].commission_pct / 100) * 100) / 100
+    if (value <= 0) return
+
+    await p.query(
+      `INSERT IGNORE INTO referral_commissions
+       (order_id, streamer_slug, buyer_account, order_amount, commission_pct,
+        commission_value, status, created_at, available_at)
+       VALUES (?,?,?,?,?,?,'pending',?,?)`,
+      [orderId, st[0].slug, buyerAccount, orderAmount, st[0].commission_pct, value,
+       now, now + REFERRAL_HOLD_DAYS * 86400000]
+    )
+  } catch (e) {
+    console.error('createReferralCommission error:', e.message)
+  }
+}
+
 function readBody(req) {
   return new Promise((resolve) => {
     let data = ''
@@ -217,6 +263,7 @@ http.createServer(async (req, res) => {
           'INSERT INTO ikoin_transactions (account_name, amount, type, description, reference, created_at) VALUES (?,?,?,?,?,?)',
           [order.account_name, order.amount, 'purchase', `PIX aprovado - ${order.amount} Ikoins`, mpgPaymentId, Date.now()]
         )
+        await createReferralCommission(p, order.id, order.account_name, order.amount)
         console.log(`✅ PIX pago: ${order.account_name} +${order.amount} Ikoins (mpg_id=${mpgPaymentId})`)
       } catch (e) { console.error('webhook error:', e.message) }
     }).catch(() => {})
@@ -368,6 +415,47 @@ http.createServer(async (req, res) => {
       const now = Date.now()
       await p.query('UPDATE ikoin_balance SET balance=balance-?, updated_at=? WHERE account_name=?', [amount, now, account])
       await p.query('INSERT INTO ikoin_transactions (account_name, amount, type, description, created_at) VALUES (?,?,?,?,?)', [account, -amount, 'spend', desc, now])
+      res.writeHead(200)
+      return res.end(JSON.stringify({ ok: true }))
+    } catch (e) {
+      res.writeHead(500); return res.end(JSON.stringify({ error: e.message }))
+    }
+  }
+
+  // POST /acis/ikoin/credit — CREDITA Ikoin (troca TKT -> credito na Larissa 50014).
+  // O game server SO' chama isto DEPOIS de ja' ter destruido a TKT do inventario; se
+  // a ordem se inverter o jogador ganha credito de graca.
+  // { account, amount, description, txId }
+  //
+  // IDEMPOTENTE por `txId`: a gravacao da transacao vem PRIMEIRO e o indice unico da
+  // coluna `tx_id` faz o MySQL recusar um txId repetido. Se recusar, quer dizer que essa
+  // troca ja' foi processada antes (retry apos timeout) — responde ok:true SEM creditar
+  // de novo. Sem isso, um timeout fazia o game server estornar a TKT enquanto o credito
+  // ja' tinha entrado: jogador ficava com item e saldo.
+  // A ORDEM importa: transacao primeiro (e' ela que carrega a trava), saldo depois.
+  // (Coluna propria, e nao a `reference`: aquela aceita repeticao legitima — os codigos
+  // promo gravavam o codigo ali, entao o mesmo codigo aparece uma vez por jogador.)
+  if (req.method === 'POST' && path === '/acis/ikoin/credit') {
+    const body = await readBody(req)
+    const account = (body.account || '').replace(/[^a-zA-Z0-9_]/g, '')
+    const amount = Math.max(0, parseInt(body.amount) || 0)
+    const desc = String(body.description || 'Credito Ikoin').slice(0, 120)
+    const txId = String(body.txId || '').replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 64)
+    if (!account || amount <= 0 || !txId) { res.writeHead(400); return res.end(JSON.stringify({ error: 'dados incompletos' })) }
+    try {
+      const p = getPool()
+      const now = Date.now()
+      try {
+        await p.query('INSERT INTO ikoin_transactions (account_name, amount, type, description, tx_id, created_at) VALUES (?,?,?,?,?,?)', [account, amount, 'tkt', desc, txId, now])
+      } catch (e) {
+        if (e.code === 'ER_DUP_ENTRY') {
+          console.log(`↩️  TKT credit repetido ignorado (txId=${txId}, ${account})`)
+          res.writeHead(200)
+          return res.end(JSON.stringify({ ok: true, duplicate: true }))
+        }
+        throw e
+      }
+      await p.query('INSERT INTO ikoin_balance (account_name, balance, updated_at) VALUES (?,?,?) ON DUPLICATE KEY UPDATE balance=balance+?, updated_at=?', [account, amount, now, amount, now])
       res.writeHead(200)
       return res.end(JSON.stringify({ ok: true }))
     } catch (e) {

@@ -15,6 +15,9 @@
     { "source": "/api/player/logout", "destination": "/api/player?action=logout" },
     { "source": "/api/player/wallet", "destination": "/api/player?action=wallet" },
     { "source": "/api/player/redeem", "destination": "/api/player?action=redeem" },
+    { "source": "/api/player/referral", "destination": "/api/player?action=referral" },
+    { "source": "/api/player/referral-join", "destination": "/api/player?action=referral-join" },
+    { "source": "/api/player/referral-payout", "destination": "/api/player?action=referral-payout" },
     { "source": "/api/payment/create", "destination": "/api/payment?action=create" },
     { "source": "/api/payment/webhook", "destination": "/api/payment?action=webhook" },
     { "source": "/api/payment/status", "destination": "/api/payment?action=status" },
@@ -42,6 +45,11 @@
     { "source": "/api/admin/char-teleport", "destination": "/api/admin?action=char-teleport" },
     { "source": "/api/admin/streamers", "destination": "/api/admin?action=streamers" },
     { "source": "/api/admin/streamer-save", "destination": "/api/admin?action=streamer-save" },
-    { "source": "/api/admin/streamer-toggle", "destination": "/api/admin?action=streamer-toggle" }
+    { "source": "/api/admin/streamer-toggle", "destination": "/api/admin?action=streamer-toggle" },
+    { "source": "/api/admin/referral-admin", "destination": "/api/admin?action=referral-admin" },
+    { "source": "/api/admin/referral-review", "destination": "/api/admin?action=referral-review" },
+    { "source": "/api/admin/referral-payout-review", "destination": "/api/admin?action=referral-payout-review" },
+    { "source": "/api/admin/referral-reverse", "destination": "/api/admin?action=referral-reverse" },
+    { "source": "/regulamento-indicacao", "destination": "/regulamento-indicacao.html" }
   ]
 }

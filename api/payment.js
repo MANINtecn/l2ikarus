@@ -49,6 +49,60 @@ async function creditIkoin(db, account, amount, type, description, reference) {
   )
 }
 
+// Dias que a comissão fica "em validação" antes de virar sacável.
+// 30 dias cobre o MED do PIX (fraude) e boa parte do prazo de chargeback de cartão.
+// Regulamento, seção 7: se o estorno vier DEPOIS do pagamento, a comissão é revertida
+// e compensada no saldo futuro — por isso cada comissão é uma linha, não um SUM.
+//
+// ⚠️ TEMPORARIAMENTE 0 PARA TESTE (17/08/2026) — VOLTAR PARA 30 depois de validar o
+// fluxo de saque. Com 0, a comissão nasce sacável na hora. O regulamento publicado
+// diz 30 dias, então isto NÃO pode ficar assim em produção com jogadores reais.
+const REFERRAL_HOLD_DAYS = 0
+
+/**
+ * Gera a comissão do Programa de Indicação para uma compra recém-paga.
+ *
+ * Chamada de dentro do fluxo de confirmação de pagamento (junto do creditIkoin), que é
+ * o único ponto por onde toda compra passa — há 5 caminhos de confirmação diferentes
+ * (PagBank webhook, MP webhook, polling, etc) e espalhar essa lógica por todos seria
+ * frágil: bastaria alguém criar um 6º caminho para a comissão sumir em silêncio.
+ *
+ * NUNCA lança: se algo falhar aqui, o pagamento do jogador não pode ser afetado.
+ * A UNIQUE em order_id garante idempotência (webhook repetido não duplica comissão).
+ */
+async function createReferralCommission(db, orderId, buyerAccount, orderAmount) {
+  try {
+    // quem indicou este comprador?
+    const [[ref]] = await db.query(
+      'SELECT streamer_slug FROM account_referrals WHERE account_name = ?', [buyerAccount])
+    if (!ref) return
+
+    // o parceiro precisa estar ativo e aprovado
+    const [[st]] = await db.query(
+      "SELECT slug, commission_pct FROM streamers WHERE slug = ? AND active = 1 AND status = 'approved'",
+      [ref.streamer_slug])
+    if (!st) return
+
+    // regulamento, seção 7: autoindicação não gera comissão
+    if (st.slug === buyerAccount) return
+
+    const now = Date.now()
+    const value = Math.floor(orderAmount * (st.commission_pct / 100) * 100) / 100
+    if (value <= 0) return
+
+    await db.query(
+      `INSERT IGNORE INTO referral_commissions
+       (order_id, streamer_slug, buyer_account, order_amount, commission_pct,
+        commission_value, status, created_at, available_at)
+       VALUES (?, ?, ?, ?, ?, ?, 'pending', ?, ?)`,
+      [orderId, st.slug, buyerAccount, orderAmount, st.commission_pct, value,
+       now, now + REFERRAL_HOLD_DAYS * 86400000]
+    )
+  } catch (e) {
+    console.error('createReferralCommission error:', e.message)
+  }
+}
+
 const PAGBANK_API = process.env.PAGBANK_BASE || 'https://api.pagseguro.com'
 
 async function fetchPngBase64(url) {
@@ -312,7 +366,10 @@ export default async function handler(req, res) {
             ['paid', Math.floor(Date.now() / 1000), orderId, 'pending'])
           if (r && r.affectedRows > 0) {
             const [[ord]] = await db.query('SELECT account_name, amount FROM ikoin_orders WHERE id = ?', [orderId])
-            if (ord) await creditIkoin(db, ord.account_name, ord.amount, 'purchase', `Compra de ${ord.amount} Ikoin (PagBank)`, String(order.id || orderId))
+            if (ord) {
+              await creditIkoin(db, ord.account_name, ord.amount, 'purchase', `Compra de ${ord.amount} Ikoin (PagBank)`, String(order.id || orderId))
+              await createReferralCommission(db, orderId, ord.account_name, ord.amount)
+            }
           }
         }
         return res.status(200).send('ok')
@@ -342,7 +399,10 @@ export default async function handler(req, res) {
           ['paid', String(paymentId), Math.floor(Date.now() / 1000), orderId, 'pending'])
         if (r && r.affectedRows > 0) {
           const [[order]] = await db.query('SELECT account_name, amount FROM ikoin_orders WHERE id = ?', [orderId])
-          if (order) await creditIkoin(db, order.account_name, order.amount, 'purchase', `Compra de ${order.amount} Ikoin`, String(paymentId))
+          if (order) {
+            await creditIkoin(db, order.account_name, order.amount, 'purchase', `Compra de ${order.amount} Ikoin`, String(paymentId))
+            await createReferralCommission(db, orderId, order.account_name, order.amount)
+          }
         }
       }
       return res.status(200).send('ok')
@@ -370,6 +430,7 @@ export default async function handler(req, res) {
             ['paid', Math.floor(Date.now() / 1000), orderId, 'pending'])
           if (r && r.affectedRows > 0) {
             await creditIkoin(db, order.account_name, order.amount, 'purchase', `Compra de ${order.amount} Ikoin (PIX PagBank)`, order.mp_payment_id)
+            await createReferralCommission(db, orderId, order.account_name, order.amount)
           }
           return res.status(200).json({ status: 'paid', amount: order.amount })
         }
@@ -389,6 +450,7 @@ export default async function handler(req, res) {
               ['paid', Math.floor(Date.now() / 1000), orderId, 'pending'])
             if (r && r.affectedRows > 0) {
               await creditIkoin(db, order.account_name, order.amount, 'purchase', `Compra de ${order.amount} Ikoin (PIX)`, String(order.mp_payment_id))
+              await createReferralCommission(db, orderId, order.account_name, order.amount)
             }
             return res.status(200).json({ status: 'paid', amount: order.amount })
           }

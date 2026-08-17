@@ -650,6 +650,95 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true })
     }
 
+    // ==================== PROGRAMA DE INDICAÇÃO ====================
+
+    // Fila de aprovação + saques pendentes + números por parceiro.
+    // Uma chamada só: a tela de admin precisa dos três blocos juntos.
+    if (action === 'referral-admin' && req.method !== 'POST') {
+      const now = Date.now()
+
+      // matura o que passou dos 30 dias antes de somar (mantém os números honestos
+      // mesmo sem um job rodando)
+      await db.query(
+        "UPDATE referral_commissions SET status = 'available' WHERE status = 'pending' AND available_at <= ?",
+        [now])
+
+      const [pendentes] = await db.query(
+        `SELECT slug, name, account_name, applied_at, commission_pct
+         FROM streamers WHERE status = 'pending' ORDER BY applied_at ASC`)
+
+      const [parceiros] = await db.query(
+        `SELECT s.slug, s.name, s.account_name, s.commission_pct, s.active, s.status,
+                (SELECT COUNT(*) FROM account_referrals ar WHERE ar.streamer_slug = s.slug) AS indicados,
+                COALESCE((SELECT SUM(c.commission_value) FROM referral_commissions c
+                          WHERE c.streamer_slug = s.slug AND c.status = 'available'),0) AS disponivel,
+                COALESCE((SELECT SUM(c.commission_value) FROM referral_commissions c
+                          WHERE c.streamer_slug = s.slug AND c.status = 'pending'),0) AS em_validacao,
+                COALESCE((SELECT SUM(c.commission_value) FROM referral_commissions c
+                          WHERE c.streamer_slug = s.slug AND c.status = 'paid'),0) AS pago
+         FROM streamers s WHERE s.status = 'approved' ORDER BY disponivel DESC`)
+
+      const [saques] = await db.query(
+        `SELECT p.id, p.streamer_slug, p.amount, p.status, p.pix_key, p.requested_at,
+                s.account_name
+         FROM referral_payouts p
+         LEFT JOIN streamers s ON s.slug = p.streamer_slug
+         WHERE p.status IN ('requested','processing') ORDER BY p.requested_at ASC`)
+
+      return res.status(200).json({ pendentes, parceiros, saques })
+    }
+
+    // Aprovar / rejeitar inscrição
+    if (action === 'referral-review' && req.method === 'POST') {
+      const { slug, approve, reason } = req.body || {}
+      const s = (slug || '').toLowerCase()
+      if (!s) return res.status(400).json({ error: 'Slug obrigatório.' })
+
+      await db.query(
+        `UPDATE streamers SET status = ?, reviewed_at = ?, reject_reason = ? WHERE slug = ?`,
+        [approve ? 'approved' : 'rejected', Date.now(), approve ? null : (reason || null), s])
+
+      return res.status(200).json({ success: true })
+    }
+
+    // Marcar saque como pago (ou rejeitar).
+    // Ao REJEITAR, as comissões daquele saque voltam pra 'available' — senão o
+    // parceiro perderia o saldo por um saque que nunca foi pago.
+    if (action === 'referral-payout-review' && req.method === 'POST') {
+      const { id, paid, note } = req.body || {}
+      if (!id) return res.status(400).json({ error: 'ID obrigatório.' })
+
+      const now = Date.now()
+      if (paid) {
+        await db.query(
+          "UPDATE referral_payouts SET status = 'paid', processed_at = ?, note = ? WHERE id = ?",
+          [now, note || null, id])
+      } else {
+        await db.query(
+          "UPDATE referral_payouts SET status = 'rejected', processed_at = ?, note = ? WHERE id = ?",
+          [now, note || null, id])
+        await db.query(
+          "UPDATE referral_commissions SET status = 'available', payout_id = NULL, paid_at = NULL WHERE payout_id = ?",
+          [id])
+      }
+      return res.status(200).json({ success: true })
+    }
+
+    // Reverter comissão de uma compra estornada (regulamento, seção 7).
+    // Se a comissão já foi PAGA, ela vira dívida: o valor sai do saldo futuro —
+    // por isso o status vira 'reversed' e não some do histórico.
+    if (action === 'referral-reverse' && req.method === 'POST') {
+      const { order_id, reason } = req.body || {}
+      if (!order_id) return res.status(400).json({ error: 'order_id obrigatório.' })
+
+      await db.query(
+        `UPDATE referral_commissions SET status = 'reversed', reversed_at = ?, reverse_reason = ?
+         WHERE order_id = ?`,
+        [Date.now(), reason || 'Compra estornada/cancelada', order_id])
+
+      return res.status(200).json({ success: true })
+    }
+
     res.status(400).json({ error: 'Ação inválida' })
   } catch (err) {
     console.error('Admin error:', err)

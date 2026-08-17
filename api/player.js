@@ -141,6 +141,221 @@ export default async function handler(req, res) {
     }
   }
 
+  // ==================== PROGRAMA DE INDICAÇÃO ====================
+  // Valor mínimo e teto de saque por dia. O teto existe como trava anti-fraude:
+  // se alguém achar um furo, o estrago fica limitado a R$ 100/dia até percebermos.
+  //
+  // ⚠️ PAYOUT_MIN TEMPORARIAMENTE 1 PARA TESTE (17/08/2026) — VOLTAR PARA 50.
+  // Com 50, seria preciso gerar R$ 500 em compras indicadas só pra testar o saque.
+  // O regulamento publicado (seção 12) diz R$ 50,00.
+  const PAYOUT_MIN = 1
+  const PAYOUT_MAX_DAY = 100
+
+  // GET /api/player/referral — painel do parceiro (status, números, histórico)
+  if (action === 'referral') {
+    const cookies = req.headers.cookie || ''
+    const match = cookies.match(/player_session=([^;]+)/)
+    if (!match) return res.status(401).json({ authenticated: false })
+    const payload = verifyJWT(match[1], jwtSecret)
+    if (!payload) return res.status(401).json({ authenticated: false })
+
+    try {
+      const db = await getConnection()
+      const [[st]] = await db.query(
+        'SELECT slug, name, commission_pct, status, active, reject_reason FROM streamers WHERE account_name = ?',
+        [payload.login])
+
+      // não participa ainda: o site mostra o convite pra se inscrever
+      if (!st) return res.status(200).json({ enrolled: false })
+
+      // inscrito mas ainda não aprovado: mostra só o status
+      if (st.status !== 'approved') {
+        return res.status(200).json({
+          enrolled: true, status: st.status, reject_reason: st.reject_reason || null,
+        })
+      }
+
+      const now = Date.now()
+
+      // Números do topo do painel. Uma consulta só, agrupando por status —
+      // 'pending' vira "em validação" e 'available' vira "disponível".
+      const [rows] = await db.query(
+        `SELECT status, COUNT(*) AS qtd, COALESCE(SUM(commission_value),0) AS total,
+                COALESCE(SUM(order_amount),0) AS vendas
+         FROM referral_commissions WHERE streamer_slug = ? GROUP BY status`,
+        [st.slug])
+      const by = Object.fromEntries(rows.map(r => [r.status, r]))
+
+      // 'pending' que já passou dos 30 dias conta como disponível na hora de exibir,
+      // mesmo antes do job de maturação rodar — assim o painel nunca "atrasa".
+      const [[maduro]] = await db.query(
+        `SELECT COALESCE(SUM(commission_value),0) AS total FROM referral_commissions
+         WHERE streamer_slug = ? AND status = 'pending' AND available_at <= ?`,
+        [st.slug, now])
+      const [[verde]] = await db.query(
+        `SELECT COALESCE(SUM(commission_value),0) AS total FROM referral_commissions
+         WHERE streamer_slug = ? AND status = 'pending' AND available_at > ?`,
+        [st.slug, now])
+
+      const [[indicados]] = await db.query(
+        'SELECT COUNT(*) AS qtd FROM account_referrals WHERE streamer_slug = ?', [st.slug])
+
+      const disponivel = Number(by.available?.total || 0) + Number(maduro.total || 0)
+      const emValidacao = Number(verde.total || 0)
+      const pago = Number(by.paid?.total || 0)
+
+      // já sacou hoje? (para o teto diário)
+      const [[hoje]] = await db.query(
+        `SELECT COALESCE(SUM(amount),0) AS total FROM referral_payouts
+         WHERE streamer_slug = ? AND status <> 'rejected' AND requested_at > ?`,
+        [st.slug, now - 86400000])
+
+      const [historico] = await db.query(
+        `SELECT created_at, buyer_account, order_amount, commission_value, status, available_at
+         FROM referral_commissions WHERE streamer_slug = ? ORDER BY id DESC LIMIT 50`,
+        [st.slug])
+
+      const [saques] = await db.query(
+        `SELECT amount, status, requested_at, processed_at FROM referral_payouts
+         WHERE streamer_slug = ? ORDER BY id DESC LIMIT 20`, [st.slug])
+
+      return res.status(200).json({
+        enrolled: true,
+        status: 'approved',
+        slug: st.slug,
+        name: st.name,
+        commission_pct: st.commission_pct,
+        link: `https://l2ikarus.com/r/${st.slug}`,
+        indicados: indicados.qtd || 0,
+        compras: (by.pending?.qtd || 0) + (by.available?.qtd || 0) + (by.paid?.qtd || 0),
+        vendas: Number(by.pending?.vendas || 0) + Number(by.available?.vendas || 0) + Number(by.paid?.vendas || 0),
+        comissao_total: disponivel + emValidacao + pago,
+        disponivel,
+        em_validacao: emValidacao,
+        ja_pago: pago,
+        payout_min: PAYOUT_MIN,
+        payout_max_day: PAYOUT_MAX_DAY,
+        sacado_hoje: Number(hoje.total || 0),
+        historico,
+        saques,
+      })
+    } catch (err) {
+      return res.status(500).json({ error: err.message })
+    }
+  }
+
+  // POST /api/player/referral-join — inscrição no programa (entra como 'pending')
+  if (action === 'referral-join') {
+    const cookies = req.headers.cookie || ''
+    const match = cookies.match(/player_session=([^;]+)/)
+    if (!match) return res.status(401).json({ authenticated: false })
+    const payload = verifyJWT(match[1], jwtSecret)
+    if (!payload) return res.status(401).json({ authenticated: false })
+
+    const { slug, accept } = req.body || {}
+
+    // aceite explícito do regulamento — é o registro de que ele leu e concordou
+    if (!accept) return res.status(400).json({ error: 'É preciso aceitar o regulamento.' })
+
+    const s = (slug || '').trim().toLowerCase()
+    if (!/^[a-z0-9_-]{3,32}$/.test(s))
+      return res.status(400).json({ error: 'Link inválido. Use 3 a 32 caracteres: letras, números, _ ou -' })
+
+    try {
+      const db = await getConnection()
+
+      // uma conta = um cadastro (regulamento, seção 3)
+      const [[ja]] = await db.query('SELECT slug, status FROM streamers WHERE account_name = ?', [payload.login])
+      if (ja) return res.status(400).json({ error: 'Você já possui uma inscrição.', status: ja.status })
+
+      const [[ocupado]] = await db.query('SELECT slug FROM streamers WHERE slug = ?', [s])
+      if (ocupado) return res.status(400).json({ error: 'Esse link já está em uso. Escolha outro.' })
+
+      await db.query(
+        `INSERT INTO streamers (slug, name, commission_pct, active, account_name, status, applied_at, created_at)
+         VALUES (?, ?, 10, 1, ?, 'pending', ?, ?)`,
+        [s, payload.login, payload.login, Date.now(), Date.now()])
+
+      return res.status(200).json({ success: true, status: 'pending', slug: s })
+    } catch (err) {
+      return res.status(500).json({ error: err.message })
+    }
+  }
+
+  // POST /api/player/referral-payout — solicita saque
+  if (action === 'referral-payout') {
+    const cookies = req.headers.cookie || ''
+    const match = cookies.match(/player_session=([^;]+)/)
+    if (!match) return res.status(401).json({ authenticated: false })
+    const payload = verifyJWT(match[1], jwtSecret)
+    if (!payload) return res.status(401).json({ authenticated: false })
+
+    const { amount, pix_key } = req.body || {}
+    const valor = Math.floor(Number(amount) * 100) / 100
+
+    // A chave PIX só é pedida AQUI, no momento do saque — não no cadastro.
+    // LGPD, princípio da necessidade: não se coleta dado de pagamento de quem
+    // talvez nunca chegue a sacar.
+    if (!pix_key || String(pix_key).trim().length < 5)
+      return res.status(400).json({ error: 'Informe uma chave PIX válida.' })
+
+    try {
+      const db = await getConnection()
+      const [[st]] = await db.query(
+        "SELECT slug FROM streamers WHERE account_name = ? AND status = 'approved' AND active = 1",
+        [payload.login])
+      if (!st) return res.status(403).json({ error: 'Você não participa do programa.' })
+
+      const now = Date.now()
+
+      // matura o que já passou dos 30 dias antes de calcular o disponível
+      await db.query(
+        `UPDATE referral_commissions SET status = 'available'
+         WHERE streamer_slug = ? AND status = 'pending' AND available_at <= ?`,
+        [st.slug, now])
+
+      const [[disp]] = await db.query(
+        `SELECT COALESCE(SUM(commission_value),0) AS total FROM referral_commissions
+         WHERE streamer_slug = ? AND status = 'available'`, [st.slug])
+      const disponivel = Number(disp.total || 0)
+
+      if (valor < PAYOUT_MIN)
+        return res.status(400).json({ error: `Valor mínimo para saque: R$ ${PAYOUT_MIN},00` })
+      if (valor > disponivel)
+        return res.status(400).json({ error: `Saldo disponível: R$ ${disponivel.toFixed(2)}` })
+
+      const [[hoje]] = await db.query(
+        `SELECT COALESCE(SUM(amount),0) AS total FROM referral_payouts
+         WHERE streamer_slug = ? AND status <> 'rejected' AND requested_at > ?`,
+        [st.slug, now - 86400000])
+      if (Number(hoje.total || 0) + valor > PAYOUT_MAX_DAY)
+        return res.status(400).json({ error: `Limite de R$ ${PAYOUT_MAX_DAY},00 por dia. Já solicitado hoje: R$ ${Number(hoje.total).toFixed(2)}` })
+
+      const [r] = await db.query(
+        `INSERT INTO referral_payouts (streamer_slug, amount, status, pix_key, requested_at)
+         VALUES (?, ?, 'requested', ?, ?)`,
+        [st.slug, valor, String(pix_key).trim(), now])
+
+      // marca as comissões que compõem este saque, das mais antigas pras mais novas
+      let restante = valor
+      const [comissoes] = await db.query(
+        `SELECT id, commission_value FROM referral_commissions
+         WHERE streamer_slug = ? AND status = 'available' ORDER BY created_at ASC`,
+        [st.slug])
+      for (const c of comissoes) {
+        if (restante <= 0) break
+        await db.query(
+          "UPDATE referral_commissions SET status = 'paid', payout_id = ?, paid_at = ? WHERE id = ?",
+          [r.insertId, now, c.id])
+        restante -= Number(c.commission_value)
+      }
+
+      return res.status(200).json({ success: true, amount: valor, payout_id: r.insertId })
+    } catch (err) {
+      return res.status(500).json({ error: err.message })
+    }
+  }
+
   // POST /api/player/redeem — resgata código (credita Ikoin no site)
   if (action === 'redeem') {
     if (req.method !== 'POST') return res.status(405).json({ error: 'Método inválido' })

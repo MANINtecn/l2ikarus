@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import ReferralAdmin from './ReferralAdmin'
 
 const TABS = [
   { id: 'overview', label: 'VISÃO GERAL' },
@@ -8,6 +9,7 @@ const TABS = [
   { id: 'codes', label: 'CÓDIGOS' },
   { id: 'offer', label: 'OFERTA' },
   { id: 'streamers', label: 'STREAMERS' },
+  { id: 'indicacao', label: 'INDICAÇÃO' },
   { id: 'charmgmt', label: 'PERSONAGENS' },
 ]
 
@@ -908,6 +910,10 @@ export default function AdminPanel({ user, onLogout }) {
             />
           </div>
         )}
+
+        {/* ABA PROGRAMA DE INDICAÇÃO — aprovar inscrições, pagar saques, ver parceiros.
+            Componente próprio: este arquivo já passa de 900 linhas. */}
+        {tab === 'indicacao' && <ReferralAdmin />}
 
         {/* ABA PERSONAGENS (edição offline) */}
         {tab === 'charmgmt' && (
