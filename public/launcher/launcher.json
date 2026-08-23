@@ -1,7 +1,7 @@
 {
-  "version": "2.3",
-  "url": "https://drive.google.com/uc?export=download&id=1mevVcw8FLb8lEWelBwYCbbqTH7M_0taP",
-  "driveFileId": "1mevVcw8FLb8lEWelBwYCbbqTH7M_0taP",
-  "hash": "05C4188A7012B618EF0226B31980B008",
-  "notes": "Nao precisa mais instalar o .NET. Quem recebia 'You must install .NET Desktop Runtime to run this application' agora abre o launcher normalmente — o runtime vem dentro do proprio executavel."
+  "version": "2.4",
+  "url": "https://drive.google.com/uc?export=download&id=1MfiUQsSY8mgJFdFu3ttk_3X6CtQoVa0D",
+  "driveFileId": "1MfiUQsSY8mgJFdFu3ttk_3X6CtQoVa0D",
+  "hash": "B3BA59A4CF842BF817834F010D1D6C69",
+  "notes": "Corrige o launcher travado em cache antigo. Quando a Vercel liga a protecao anti-bot (dura alguns minutos e dispara sozinha em pico de trafego), o launcher passava a usar um manifest guardado em disco - e ficava servindo essa copia velha mesmo depois da rede voltar, sem atualizar o cliente. Agora toda requisicao vai com User-Agent de navegador (nao leva mais 403) e o cache com mais de 6h so' e' aceito depois de insistir na rede."
 }
