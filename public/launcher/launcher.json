@@ -1,7 +1,7 @@
 {
-  "version": "2.4",
-  "url": "https://drive.google.com/uc?export=download&id=1MfiUQsSY8mgJFdFu3ttk_3X6CtQoVa0D",
-  "driveFileId": "1MfiUQsSY8mgJFdFu3ttk_3X6CtQoVa0D",
-  "hash": "B3BA59A4CF842BF817834F010D1D6C69",
-  "notes": "Corrige o launcher travado em cache antigo. Quando a Vercel liga a protecao anti-bot (dura alguns minutos e dispara sozinha em pico de trafego), o launcher passava a usar um manifest guardado em disco - e ficava servindo essa copia velha mesmo depois da rede voltar, sem atualizar o cliente. Agora toda requisicao vai com User-Agent de navegador (nao leva mais 403) e o cache com mais de 6h so' e' aceito depois de insistir na rede."
+  "version": "2.5",
+  "url": "https://drive.google.com/uc?export=download&id=14u7kXfPZ7rRKDCpH9z58f2JC6IwoWqy8",
+  "driveFileId": "14u7kXfPZ7rRKDCpH9z58f2JC6IwoWqy8",
+  "hash": "E1A11FE9DEBB89559885D7F3F46DB785",
+  "notes": "Corrige o cliente que nao atualizava e o login automatico que nao preenchia. O launcher deixou de travar num manifest guardado em disco quando a rede falha por alguns minutos, e o auto-login passou a encontrar o cliente certo mesmo com mais de um jogo aberto."
 }
