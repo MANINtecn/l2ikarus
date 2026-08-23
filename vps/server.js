@@ -1,8 +1,16 @@
 import http from 'http'
 import net from 'net'
 import crypto from 'crypto'
+import fs from 'fs'
+import pathMod from 'path'
+import { fileURLToPath } from 'url'
 import mysql from 'mysql2/promise'
 import { config } from './config.js'
+
+// Onde ficam os manifests do launcher NA VPS. O auto_sync nao traz esta pasta (ele so'
+// copia data/xml e data/html do gameserver), entao os arquivos sao colocados aqui na mao
+// — ou por um copy do repo, quando o manifest mudar.
+const LAUNCHER_DIR = pathMod.join(pathMod.dirname(fileURLToPath(import.meta.url)), 'launcher')
 
 function checkPort(host, port, timeoutMs = 3000) {
   return new Promise((resolve) => {
@@ -224,6 +232,45 @@ http.createServer(async (req, res) => {
   if (req.method === 'GET' && path === '/status/all') {
     res.writeHead(200)
     return res.end(JSON.stringify(await getStatsAll()))
+  }
+
+  // ── LAUNCHER: manifests servidos DAQUI, não da Vercel ────────────────────
+  //
+  // POR QUE ESTA ROTA EXISTE (2026-08-23): a Vercel liga o Attack Challenge Mode
+  // sozinha quando acha o tráfego suspeito, e passa a exigir resolução de JavaScript
+  // antes de entregar qualquer arquivo. Navegador resolve; launcher não. O resultado é
+  // 403 em TODA requisição — o jogador não consegue atualizar o cliente nem o próprio
+  // launcher, e não há o que ele possa fazer.
+  //
+  // Aconteceu duas vezes em 22-23/08. Na primeira passou sozinho em minutos; na segunda
+  // travou o lançamento. Tentamos contornar mandando User-Agent de navegador, e
+  // funcionou UMA vez — no episódio seguinte a Vercel apertou o critério e o 403 voltou
+  // mesmo com o cabeçalho.
+  //
+  // A VPS não tem proteção anti-bot na frente. Servindo os manifests daqui, o launcher
+  // deixa de depender de um serviço que pode se fechar sozinho a qualquer momento.
+  //
+  // Os ARQUIVOS do jogo continuam no Drive: o que muda é só quem entrega a LISTA.
+  if (req.method === 'GET' && path.startsWith('/launcher/')) {
+    const nome = path.replace('/launcher/', '')
+
+    // Só estes dois. Sem isto, a rota viraria leitura livre de arquivo no disco.
+    const permitidos = ['launcher.json', 'games.json', 'manifest-interlude.json', 'news.json']
+    if (!permitidos.includes(nome)) {
+      res.writeHead(404)
+      return res.end(JSON.stringify({ message: 'not found' }))
+    }
+
+    try {
+      const txt = await fs.promises.readFile(pathMod.join(LAUNCHER_DIR, nome), 'utf8')
+      res.setHeader('Cache-Control', 'public, max-age=60')
+      res.writeHead(200)
+      return res.end(txt)
+    } catch (e) {
+      console.error(`launcher/${nome}:`, e.message)
+      res.writeHead(404)
+      return res.end(JSON.stringify({ message: 'not found' }))
+    }
   }
 
   // QR Code PIX — PÚBLICO (cliente do jogo carrega a imagem sem api-key)

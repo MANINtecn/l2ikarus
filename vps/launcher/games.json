@@ -1,0 +1,35 @@
+{
+  "games": [
+    {
+      "id": "l2ikarus",
+      "name": "L2 Ikarus Essence",
+      "status": "available",
+      "image": "https://www.l2ikarus.com/launcher/cards/l2ikarus.jpg",
+      "manifestUrl": "https://www.l2ikarus.com/launcher/manifest.json",
+      "installDir": "L2 Ikarus Essence",
+      "exe": "system\\L2.exe",
+      "exeArgs": "-INI=\".\\L2_decoded.ini\" -noStartupMovies"
+    },
+    {
+      "id": "l2nexus",
+      "name": "L2 Ikarus Interlude",
+      "status": "available",
+      "image": "https://www.l2ikarus.com/launcher/cards/l2nexus.jpg",
+      "manifestUrl": "https://www.l2ikarus.com/launcher/manifest-interlude.json",
+      "installDir": "L2 Ikarus Interlude",
+      "exe": "Interlud\\system\\l2.exe"
+    },
+    {
+      "id": "mu",
+      "name": "MuOnline",
+      "status": "soon",
+      "image": "https://www.l2ikarus.com/launcher/cards/mu.jpg"
+    },
+    {
+      "id": "cabal",
+      "name": "Cabal Online",
+      "status": "soon",
+      "image": "https://www.l2ikarus.com/launcher/cards/cabal.jpg"
+    }
+  ]
+}
