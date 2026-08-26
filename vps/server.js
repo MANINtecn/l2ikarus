@@ -64,12 +64,25 @@ async function getStats(server) {
   // porque a 7777 publica e um proxy DDoS do host (nao escuta na VPS). Se o banco responde
   // e a query roda, o servidor esta operacional; players vem do characters online=1 (dado real).
   try {
+    // IKARUS (26/08/2026) — QUEM ESTA' EM AUTOFARM/LOJA OFFLINE CONTA TAMBEM.
+    //
+    // A query era `WHERE online = 1` e deixava de fora todo mundo em farm ou loja offline:
+    // esses ficam gravados com **online = 2** (o `Player.isOnlineInt` devolve 2 quando o
+    // cliente esta' detached — o char continua no mundo, so' a conexao caiu).
+    //
+    // Isso subnotificava o servidor justamente no horario em que ele tem mais gente dentro:
+    // de madrugada, quando quase todos estao farmando offline.
+    //
+    // Os dois numeros vem SEPARADOS de proposito. Somar tudo em "players" enganaria quem
+    // olha (30 offline nao e' 30 pessoas jogando), e o `players` sozinho ja' e' consumido
+    // pelo site e pelo CB — mudar o significado dele quebraria os dois.
     const [[{ players }]] = await p.query('SELECT COUNT(*) AS players FROM characters WHERE online = 1')
+    const [[{ offline }]] = await p.query('SELECT COUNT(*) AS offline FROM characters WHERE online = 2')
     const [[{ accounts }]] = await p.query('SELECT COUNT(*) AS accounts FROM accounts')
-    return { online: true, players, accounts }
+    return { online: true, players, offline, accounts }
   } catch (e) {
     console.error(`DB error (status, server=${server || 'essence'}):`, e.message)
-    return { online: false, players: 0, accounts: 0 }
+    return { online: false, players: 0, offline: 0, accounts: 0 }
   }
 }
 
@@ -83,8 +96,9 @@ async function getStatsAll() {
     NETWORK_SERVERS.map(async (id) => ({ id, ...(await getStats(id)) }))
   )
   const players = servers.reduce((sum, s) => sum + (s.online ? s.players : 0), 0)
+  const offline = servers.reduce((sum, s) => sum + (s.online ? s.offline : 0), 0)
   const accounts = servers.reduce((sum, s) => sum + (s.online ? s.accounts : 0), 0)
-  return { online: servers.some((s) => s.online), players, accounts, servers }
+  return { online: servers.some((s) => s.online), players, offline, accounts, servers }
 }
 
 // ===== Cadastro de conta (a senha JA chega hasheada do Vercel — texto puro nunca trafega) =====

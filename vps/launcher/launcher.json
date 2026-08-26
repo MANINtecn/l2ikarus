@@ -1,7 +1,7 @@
 {
-  "version": "2.6",
-  "url": "https://drive.google.com/uc?export=download&id=1ONTwu49Fv0hUUvqUg1lw-dMXHmt_vkpw",
-  "driveFileId": "1ONTwu49Fv0hUUvqUg1lw-dMXHmt_vkpw",
-  "hash": "5B1F4F8328083561CD768B96D6CA2C57",
-  "notes": "O launcher deixa de depender da Vercel para saber o que atualizar. Quando ela liga a protecao anti-bot - o que acontece sozinho e ja travou o jogo duas vezes - as listas passam a vir da VPS, que nao tem essa protecao. Inclui as correcoes anteriores: cache que nao trava mais em versao antiga e login automatico que acha o cliente certo com mais de um jogo aberto."
+  "version": "2.6.2",
+  "url": "https://drive.google.com/uc?export=download&id=1mevVcw8FLb8lEWelBwYCbbqTH7M_0taP",
+  "driveFileId": "1mevVcw8FLb8lEWelBwYCbbqTH7M_0taP",
+  "hash": "01B4D0E0CC6D567FA374F2744F1F3782",
+  "notes": "Correcao: a versao 2.6.1 nao abria (faltava uma opcao no empacotamento). Se o seu launcher parou de abrir, baixe de novo pelo site. Novidade: o contador mostra tambem quem esta farmando offline, entao o servidor nao parece mais vazio de madrugada."
 }
