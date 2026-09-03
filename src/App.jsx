@@ -7,10 +7,9 @@ import Footer from './assets/components/Footer'
 import RegisterModal from './assets/components/RegisterModal'
 import HeroRede from './assets/components/HeroRede'
 import FeaturesTerminal from './assets/components/FeaturesTerminal'
-import DownloadTerminal from './assets/components/DownloadTerminal'
+import Comunidade from './assets/components/Comunidade'
 import InterludeInfo from './assets/components/InterludeInfo'
 import DonateTerminal from './assets/components/DonateTerminal'
-import DiscordCommunity from './assets/components/DiscordCommunity'
 import AdminPanel from './assets/components/AdminPanel'
 import PlayerPanel from './assets/components/PlayerPanel'
 
@@ -167,8 +166,7 @@ function App() {
                 <FeaturesTerminal />
               </div>
             )}
-            <DownloadTerminal />
-            <DiscordCommunity />
+            <Comunidade />
             <div className="section-divider" style={{ opacity: 0.1 }} />
             {/* Footer — TECX SOFTHOUSE redireciona para login admin */}
             <Footer onAdminClick={() => { window.location.href = '/api/auth/google' }} />
