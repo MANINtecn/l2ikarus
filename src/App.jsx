@@ -8,6 +8,7 @@ import RegisterModal from './assets/components/RegisterModal'
 import HeroRede from './assets/components/HeroRede'
 import FeaturesTerminal from './assets/components/FeaturesTerminal'
 import Comunidade from './assets/components/Comunidade'
+import PaginaServidor from './assets/components/PaginaServidor'
 import InterludeInfo from './assets/components/InterludeInfo'
 import DonateTerminal from './assets/components/DonateTerminal'
 import AdminPanel from './assets/components/AdminPanel'
@@ -32,6 +33,20 @@ function App() {
   const [loginError, setLoginError] = useState('')
   const [loginLoading, setLoginLoading] = useState(false)
   const containerRef = useRef(null)
+
+  // Rota simples via History API: '/' e as paginas dos servidores.
+  // Duas rotas nao justificam o peso de um router.
+  const [rota, setRota] = useState(window.location.pathname)
+  useEffect(() => {
+    const aoVoltar = () => setRota(window.location.pathname)
+    window.addEventListener('popstate', aoVoltar)
+    return () => window.removeEventListener('popstate', aoVoltar)
+  }, [])
+  const irPara = (destino) => {
+    window.history.pushState({}, '', destino)
+    setRota(destino)
+  }
+  const slugServidor = { '/interlude': 'interlude', '/300x': '300x', '/mu': 'mu' }[rota]
 
   useEffect(() => {
     // Verifica sessão admin
@@ -124,7 +139,14 @@ function App() {
   return (
     <main style={{ position: 'relative', background: '#050508', minHeight: '100vh' }}>
 
-      {!loading && (
+      {!loading && slugServidor && (
+        <PaginaServidor
+          slug={slugServidor}
+          onVoltar={(e) => { e.preventDefault(); irPara('/') }}
+        />
+      )}
+
+      {!loading && !slugServidor && (
         <>
           {bannerVisible && <BetaBanner onDismiss={() => setBannerVisible(false)} />}
           {/* IKARUS 2026-09-03: home da REDE (direcao Portais). Substituiu o Hero3D,
@@ -133,6 +155,7 @@ function App() {
           <HeroRede
             onRegisterClick={() => setIsRegisterOpen(true)}
             onLoginClick={() => setIsLoginOpen(true)}
+            onAbrirServidor={irPara}
           />
 
           <div ref={containerRef} className="scroll-content-container" style={{ position: 'relative', zIndex: 5, background: 'transparent' }}>

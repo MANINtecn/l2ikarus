@@ -9,7 +9,7 @@ import './HeroRede.css'
  * respirar. As posicoes dos cards estao TRAVADAS no CSS (o dono ajustou
  * uma a uma) — ver HeroRede.css.
  */
-export default function HeroRede({ onRegisterClick, onLoginClick }) {
+export default function HeroRede({ onRegisterClick, onLoginClick, onAbrirServidor }) {
   const navRef = useRef(null)
 
   // A nav nasce transparente e escurece quando a pagina sai do topo.
@@ -39,6 +39,7 @@ export default function HeroRede({ onRegisterClick, onLoginClick }) {
   const servidores = [
     {
       id: 'inter',
+      rota: '/interlude',
       nome: 'Interlude 30x',
       plataforma: 'PC',
       texto: 'Cada classe faz o que promete. Nada de build quebrada — aqui sua classe funciona.',
@@ -48,6 +49,7 @@ export default function HeroRede({ onRegisterClick, onLoginClick }) {
     },
     {
       id: 'pvp',
+      rota: '/300x',
       nome: 'Interlude PVP 300x',
       plataforma: 'PC',
       texto: 'Quanto mais você farma, mais forte fica no PvP. Progressão sem fim.',
@@ -57,6 +59,7 @@ export default function HeroRede({ onRegisterClick, onLoginClick }) {
     },
     {
       id: 'mu',
+      rota: '/mu',
       nome: 'Mu Online',
       plataforma: 'PC e celular',
       texto: 'Comece no PC, continue no celular. Mesmo personagem, mesmo mundo.',
@@ -66,6 +69,7 @@ export default function HeroRede({ onRegisterClick, onLoginClick }) {
     },
     {
       id: 'ess',
+      rota: null,
       nome: 'Essence',
       plataforma: 'PC',
       texto: 'Em preparação. Sua conta já vale aqui quando ele abrir.',
@@ -118,10 +122,11 @@ export default function HeroRede({ onRegisterClick, onLoginClick }) {
           {servidores.map((s) => (
             <a
               key={s.id}
-              href="#conta"
+              href={s.rota || '#servidores'}
               className={`rede-card rede-${s.id}`}
               onClick={(e) => {
-                if (!s.aberto) e.preventDefault()
+                e.preventDefault()
+                if (s.rota) onAbrirServidor(s.rota)
               }}
             >
               <span className="rede-veu-card" />

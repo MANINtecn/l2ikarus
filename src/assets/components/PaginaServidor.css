@@ -1,0 +1,184 @@
+/* Página dedicada de um servidor. Herda os tokens do HeroRede
+   (--void, --gold, --ink, --shell). Cada servidor pinta a própria
+   cor via --cor / --cor-clara, definidas no componente. */
+
+.srv-pag{
+  position:relative;z-index:6;
+  background:var(--void, #08070a);
+  min-height:100vh;
+  padding-bottom:clamp(50px,8vw,90px);
+}
+
+/* ── topo: arte do servidor centralizada ───────────────────────── */
+.srv-topo{
+  position:relative;overflow:hidden;
+  padding:clamp(70px,11vw,130px) 0 clamp(30px,5vw,56px);
+  text-align:center;
+}
+.srv-topo::before{
+  content:"";position:absolute;top:-12%;left:50%;transform:translateX(-50%);
+  width:min(900px,130%);aspect-ratio:1;pointer-events:none;
+  background:radial-gradient(circle,var(--cor-brilho),transparent 62%);
+}
+.srv-topo > *{position:relative}
+
+.srv-arte{
+  height:clamp(190px,30vw,340px);width:auto;max-width:88%;
+  margin:0 auto clamp(14px,2.5vw,26px);display:block;
+  filter:drop-shadow(0 22px 44px rgba(0,0,0,.7));
+}
+.srv-nome{
+  font:900 clamp(24px,4.6vw,46px)/1.08 'Cinzel Decorative',Georgia,serif;
+  color:#fff;margin:0 0 12px;text-wrap:balance;
+  text-shadow:0 2px 26px rgba(0,0,0,.8);
+}
+.srv-linha{
+  font:200 clamp(13.5px,1.7vw,17px)/1.55 'Sora',system-ui,sans-serif;
+  color:#cfc9bc;max-width:56ch;margin:0 auto;
+}
+.srv-estado{
+  display:inline-flex;align-items:center;gap:8px;margin-top:18px;
+  font:600 10.5px/1 'Sora',system-ui,sans-serif;letter-spacing:.16em;
+  text-transform:uppercase;color:#8fdca8;
+  border:1px solid #2c4a35;background:rgba(10,20,14,.7);
+  border-radius:100px;padding:8px 16px;
+}
+.srv-estado::before{
+  content:"";width:7px;height:7px;border-radius:50%;background:#6fcf97;
+  box-shadow:0 0 10px #6fcf97;
+}
+.srv-estado.fechado{color:#b6afa2;border-color:#3a3328;background:rgba(9,8,12,.7)}
+.srv-estado.fechado::before{background:#7d7768;box-shadow:none}
+
+/* ── voltar ── */
+.srv-voltar{
+  position:absolute;top:clamp(18px,3vw,28px);left:0;right:0;z-index:2;
+}
+.srv-voltar a{
+  display:inline-flex;align-items:center;gap:8px;text-decoration:none;
+  font:600 10px/1 'Sora',system-ui,sans-serif;letter-spacing:.16em;
+  text-transform:uppercase;color:#9b9484;
+  transition:color .2s;
+}
+.srv-voltar a:hover{color:var(--gold, #d9a441)}
+.srv-voltar span{
+  width:8px;height:8px;border-left:1.5px solid currentColor;
+  border-bottom:1.5px solid currentColor;transform:rotate(45deg);
+}
+
+/* ── download ──────────────────────────────────────────────────── */
+.srv-download{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:clamp(18px,3.5vw,44px);flex-wrap:wrap;
+  border:1px solid var(--cor-borda);border-radius:12px;
+  background:linear-gradient(135deg,var(--cor-fundo-a),var(--cor-fundo-b));
+  padding:clamp(22px,3.4vw,34px) clamp(22px,3.4vw,38px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05);
+  margin-bottom:clamp(30px,5vw,52px);
+}
+.srv-dl-txt{flex:1 1 300px}
+.srv-dl-txt h2{
+  font:900 clamp(17px,2.3vw,23px)/1.15 'Cinzel Decorative',Georgia,serif;
+  color:#fff;margin:0 0 8px;
+}
+.srv-dl-txt p{
+  margin:0;font:200 13px/1.6 'Sora',system-ui,sans-serif;color:#bdb7aa;max-width:52ch;
+}
+.srv-dl-meta{
+  display:flex;gap:14px;flex-wrap:wrap;margin-top:12px;
+  font:400 11px/1 'Sora',system-ui,sans-serif;color:#8b8477;
+}
+.srv-dl-meta b{color:#ded8cd;font-weight:600}
+.srv-dl-btn{
+  display:inline-flex;align-items:center;gap:10px;flex:none;
+  font:700 11.5px/1 'Sora',system-ui,sans-serif;letter-spacing:.14em;
+  text-transform:uppercase;text-decoration:none;
+  color:#12100a;background:linear-gradient(180deg,var(--cor-clara),var(--cor));
+  border-radius:6px;padding:15px 28px;border:0;cursor:pointer;
+  box-shadow:0 3px 18px var(--cor-brilho-forte),inset 0 1px 0 rgba(255,255,255,.3);
+  transition:transform .18s,box-shadow .25s,filter .2s;
+}
+.srv-dl-btn:hover{
+  transform:translateY(-2px);filter:brightness(1.08);
+  box-shadow:0 6px 26px var(--cor-brilho-forte),inset 0 1px 0 rgba(255,255,255,.35);
+}
+.srv-dl-btn:active{transform:translateY(0)}
+.srv-dl-seta{
+  width:9px;height:9px;border-right:2px solid currentColor;
+  border-bottom:2px solid currentColor;transform:rotate(45deg);margin-top:-3px;
+}
+
+/* ── blocos de informação ──────────────────────────────────────── */
+.srv-secao{margin-bottom:clamp(26px,4vw,44px)}
+.srv-secao-titulo{
+  font:600 10px/1 'Sora',system-ui,sans-serif;letter-spacing:.3em;
+  text-transform:uppercase;color:var(--gold-dim, #8a6d2f);
+  margin-bottom:clamp(14px,2vw,20px);text-align:center;
+}
+.srv-grade{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));
+  gap:clamp(10px,1.5vw,16px);
+}
+.srv-bloco{
+  border:1px solid rgba(255,255,255,.09);border-radius:10px;
+  background:rgba(255,255,255,.022);
+  padding:clamp(15px,2.2vw,20px);
+  display:flex;flex-direction:column;gap:8px;
+}
+.srv-bloco.largo{grid-column:1/-1}
+.srv-bloco-cabeca{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+}
+.srv-bloco-cabeca h3{
+  font:900 clamp(13.5px,1.6vw,16px)/1.2 'Cinzel Decorative',Georgia,serif;
+  color:#fff;margin:0;
+}
+.srv-tag{
+  font:400 9px/1 'Sora',system-ui,sans-serif;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--gold, #d9a441);
+  border:1px solid rgba(217,164,65,.4);border-radius:4px;padding:3px 7px;
+  white-space:nowrap;
+}
+.srv-bloco p{
+  margin:0;font:300 12.5px/1.62 'Sora',system-ui,sans-serif;color:#b8b2a5;
+}
+.srv-bloco b{color:#fff;font-weight:600}
+.srv-bloco em{font-style:normal;color:var(--cor-clara)}
+
+/* faixa de rates — larga, os numeros divididos por linhas verticais */
+.srv-faixa-rates{
+  display:grid;grid-auto-flow:column;grid-auto-columns:1fr;
+  border:1px solid rgba(255,255,255,.08);border-radius:10px;
+  background:rgba(255,255,255,.02);overflow:hidden;
+  margin-bottom:clamp(26px,4vw,44px);
+}
+.srv-rate{
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  padding:clamp(16px,2.6vw,24px) 10px;
+  border-left:1px solid rgba(255,255,255,.07);
+}
+.srv-rate:first-child{border-left:0}
+.srv-rate b{
+  font:700 clamp(20px,3.4vw,34px)/1 'Sora',system-ui,sans-serif;
+  color:var(--cor-clara);font-variant-numeric:tabular-nums;letter-spacing:-.01em;
+}
+.srv-rate span{
+  font:600 9.5px/1 'Sora',system-ui,sans-serif;letter-spacing:.2em;
+  text-transform:uppercase;color:#7d7768;
+}
+@media(max-width:620px){
+  .srv-faixa-rates{grid-auto-flow:row;grid-template-columns:repeat(2,1fr)}
+  .srv-rate{border-top:1px solid rgba(255,255,255,.07)}
+  .srv-rate:nth-child(-n+2){border-top:0}
+  .srv-rate:nth-child(odd){border-left:0}
+}
+
+
+@media (prefers-reduced-motion:reduce){
+  .srv-dl-btn{transition:none}
+}
+@media(max-width:620px){
+  .srv-arte{height:clamp(150px,44vw,220px)}
+  .srv-download{padding:20px 18px}
+  .srv-dl-btn{width:100%;justify-content:center}
+}
