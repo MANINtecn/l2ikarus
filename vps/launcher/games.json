@@ -26,10 +26,13 @@
       "image": "https://www.l2ikarus.com/launcher/cards/mu.jpg"
     },
     {
-      "id": "cabal",
-      "name": "Cabal Online",
-      "status": "soon",
-      "image": "https://www.l2ikarus.com/launcher/cards/cabal.jpg"
+      "id": "l2ikarus300x",
+      "name": "L2 Ikarus PVP 300x",
+      "status": "available",
+      "image": "https://www.l2ikarus.com/launcher/cards/l2ikarus300x.jpg",
+      "manifestUrl": "https://www.l2ikarus.com/launcher/manifest-300x.json",
+      "installDir": "L2 Ikarus PVP 300x",
+      "exe": "system\\l2.exe"
     }
   ]
 }

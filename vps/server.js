@@ -40,6 +40,20 @@ function getPool() {
   return pool
 }
 
+let pool300x
+function getPool300x() {
+  if (!pool300x) {
+    pool300x = mysql.createPool({
+      ...config.db300x,
+      waitForConnections: true,
+      connectionLimit: 3,
+      queueLimit: 0,
+      connectTimeout: 5000,
+    })
+  }
+  return pool300x
+}
+
 let poolInterlude
 function getPoolInterlude() {
   if (!poolInterlude) {
@@ -145,6 +159,20 @@ async function registerAccount(body) {
         }
       } catch (e) {
         console.error('interlude account mirror error:', e.message)
+      }
+      // IKARUS 2026-09-01: espelha tambem no 300x. E' aCis igual ao 30x, entao usa o
+      // MESMO hash BCrypt — nao da' pra reaproveitar o SHA1 do Essence aqui.
+      try {
+        const pool3 = getPool300x()
+        const conn3 = await pool3.getConnection()
+        try {
+          await conn3.query('INSERT IGNORE INTO accounts (login, password) VALUES (?, ?)', [login, passwordBcrypt])
+          await conn3.query('COMMIT')
+        } finally {
+          conn3.release()
+        }
+      } catch (e) {
+        console.error('300x account mirror error:', e.message)
       }
     }
     // Atribuicao de streamer/afiliado (first-touch): so grava se o slug existir e estiver ativo.
@@ -268,8 +296,9 @@ http.createServer(async (req, res) => {
   if (req.method === 'GET' && path.startsWith('/launcher/')) {
     const nome = path.replace('/launcher/', '')
 
-    // Só estes dois. Sem isto, a rota viraria leitura livre de arquivo no disco.
-    const permitidos = ['launcher.json', 'games.json', 'manifest-interlude.json', 'news.json']
+    // Allowlist. Sem isto, a rota viraria leitura livre de arquivo no disco.
+    // AO ADICIONAR UM JOGO NOVO, INCLUIR O manifest-<jogo>.json AQUI (senao da 404).
+    const permitidos = ['launcher.json', 'games.json', 'manifest-interlude.json', 'manifest-300x.json', 'news.json']
     if (!permitidos.includes(nome)) {
       res.writeHead(404)
       return res.end(JSON.stringify({ message: 'not found' }))

@@ -2,17 +2,15 @@ import { useState, useEffect, useRef } from 'react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import './index.css'
-import Navbar from './assets/components/Navbar'
 import BetaBanner, { BANNER_HEIGHT } from './assets/components/BetaBanner'
 import Footer from './assets/components/Footer'
 import RegisterModal from './assets/components/RegisterModal'
-import Hero3D from './assets/components/Hero3D'
+import HeroRede from './assets/components/HeroRede'
 import FeaturesTerminal from './assets/components/FeaturesTerminal'
 import DownloadTerminal from './assets/components/DownloadTerminal'
 import InterludeInfo from './assets/components/InterludeInfo'
 import DonateTerminal from './assets/components/DonateTerminal'
 import DiscordCommunity from './assets/components/DiscordCommunity'
-import Preloader from './assets/components/Preloader'
 import AdminPanel from './assets/components/AdminPanel'
 import PlayerPanel from './assets/components/PlayerPanel'
 
@@ -21,7 +19,8 @@ gsap.registerPlugin(ScrollTrigger)
 function App() {
   const [isRegisterOpen, setIsRegisterOpen] = useState(false)
   const [isLoginOpen, setIsLoginOpen] = useState(false)
-  const [loading, setLoading] = useState(true)
+  // IKARUS 2026-09-03: Preloader removido — a home entra direto, sem os 2,5s de espera.
+  const [loading] = useState(false)
   const [essenceOpen, setEssenceOpen] = useState(false)
   const [infoOpen, setInfoOpen] = useState(false)
   // IKARUS 2026-07-15: banner "BETA TESTE ABERTO" desativado a pedido do usuario
@@ -34,11 +33,6 @@ function App() {
   const [loginError, setLoginError] = useState('')
   const [loginLoading, setLoginLoading] = useState(false)
   const containerRef = useRef(null)
-
-  useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 2500)
-    return () => clearTimeout(timer)
-  }, [])
 
   useEffect(() => {
     // Verifica sessão admin
@@ -130,29 +124,17 @@ function App() {
 
   return (
     <main style={{ position: 'relative', background: '#050508', minHeight: '100vh' }}>
-      {loading && <Preloader />}
 
       {!loading && (
         <>
           {bannerVisible && <BetaBanner onDismiss={() => setBannerVisible(false)} />}
-          <Navbar
-            topOffset={bannerVisible ? BANNER_HEIGHT : 0}
+          {/* IKARUS 2026-09-03: home da REDE (direcao Portais). Substituiu o Hero3D,
+              que era de um servidor so'. O Hero3D continua no repo — se precisar
+              voltar, e' trocar HeroRede por ele aqui. */}
+          <HeroRede
             onRegisterClick={() => setIsRegisterOpen(true)}
             onLoginClick={() => setIsLoginOpen(true)}
           />
-          <Hero3D
-            onRegisterClick={() => setIsRegisterOpen(true)}
-            onEssenceClick={() => {
-              setEssenceOpen(true)
-              setTimeout(() => document.getElementById('essence-content')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60)
-            }}
-            onInfoClick={() => {
-              setInfoOpen(true)
-              setTimeout(() => document.getElementById('interlude-info')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60)
-            }}
-          />
-
-          <div style={{ height: '100vh', pointerEvents: 'none', position: 'relative', zIndex: 0 }} />
 
           <div ref={containerRef} className="scroll-content-container" style={{ position: 'relative', zIndex: 5, background: 'transparent' }}>
             {/* IKARUS 2026-07-16: divider removido daqui — como o hero e fixed, essa linha

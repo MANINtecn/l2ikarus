@@ -1,0 +1,328 @@
+
+.rede-escopo,:root{
+  --art-h:clamp(150px,25vh,208px);   /* altura da faixa reservada pra arte no topo */
+  --void:#08070a; --void-2:#0d0b10; --card:#100d13; --edge:#221d17;
+  --gold:#d9a441; --gold-dim:#8a6d2f; --gold-glow:rgba(217,164,65,.16);
+  --ink:#f4eee2; --ink-2:#9b9484; --ink-3:#6b6558;
+  --inter:#5b93c7; --pvp:#d1583c; --mu:#31b6a8;
+  --shell:1220px;
+  /* TROCAR AQUI pela arte definitiva: url('/hero.webp') */
+  --hero-img:url('/media/hero-rede.webp');
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+html{background:var(--void)}
+body{margin:0;background:transparent !important;color:var(--ink);
+     font:300 16px/1.65 'Sora',system-ui,-apple-system,sans-serif;overflow-x:hidden}
+.rede-shell{position:relative;z-index:5;max-width:var(--shell);margin:0 auto;padding:0 clamp(18px,4vw,40px)}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:3px}
+
+/* ── nav ── */
+.rede-nav{position:sticky;top:0;z-index:50;
+     background:transparent;border-bottom:1px solid transparent;
+     transition:background .3s ease,border-color .3s ease,backdrop-filter .3s ease}
+/* .rolou e' posto por JS assim que a pagina desce */
+.rede-nav.rolou{background:rgba(8,7,10,.88);backdrop-filter:blur(14px);border-bottom-color:#16130f}
+/* no topo, sobre a cena clara, o texto precisa de sombra pra ler */
+.rede-nav .rede-links a{text-shadow:0 1px 3px rgba(0,0,0,.95),0 2px 14px rgba(0,0,0,.85)}
+.rede-nav:not(.rolou) .rede-brand{text-shadow:0 2px 12px rgba(0,0,0,.9)}
+
+.rede-nav .rede-shell{display:flex;align-items:center;justify-content:space-between;height:58px;gap:20px}
+.rede-brand{font:900 15px/1 'Cinzel Decorative',Georgia,serif;letter-spacing:.16em;color:var(--gold);white-space:nowrap}
+.rede-links{display:flex;gap:26px;font-size:13px;font-weight:600;color:#fff}
+.rede-links a{transition:color .18s,text-shadow .18s}
+.rede-links a:hover{color:var(--gold)}
+.rede-acoes{display:flex;align-items:center;gap:14px}
+.rede-login{font:600 11px/1 'Sora',sans-serif;letter-spacing:.14em;text-transform:uppercase;
+  background:transparent;border:0;color:#fff;cursor:pointer;padding:8px 2px;
+  text-shadow:0 1px 3px rgba(0,0,0,.95),0 2px 14px rgba(0,0,0,.85);
+  transition:color .18s}
+.rede-login:hover{color:var(--gold)}
+.rede-entrar{cursor:pointer;font:700 11px/1 'Sora',sans-serif;letter-spacing:.16em;text-transform:uppercase;
+        border:1px solid var(--gold-dim);padding:12px 22px;border-radius:5px;
+        color:#1a1206;background:linear-gradient(180deg,#e8bd5f,#c8942f);
+        box-shadow:0 2px 14px rgba(217,164,65,.28);
+        transition:transform .18s,box-shadow .25s,filter .2s;white-space:nowrap}
+.rede-entrar:hover{transform:translateY(-1px);filter:brightness(1.08);
+        box-shadow:0 4px 22px rgba(217,164,65,.45)}
+.rede-entrar:active{transform:translateY(0)}
+@media(max-width:880px){
+  /* o menu nao some: desce pra uma linha propria, rolavel na horizontal */
+  .rede-nav .rede-shell{height:auto;flex-wrap:wrap;padding-top:10px;padding-bottom:10px;gap:10px}
+  .rede-links{order:3;width:100%;gap:18px;overflow-x:auto;padding-bottom:2px;
+         font-size:12.5px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .rede-links::-webkit-scrollbar{display:none}
+  .rede-links a{white-space:nowrap}
+  .rede-brand{font-size:13.5px}
+  .rede-entrar{padding:9px 14px;font-size:10.5px}
+}
+
+/* ── herói ── */
+.rede-hero{position:relative;z-index:2;text-align:center;
+  padding:clamp(290px,52vh,620px) 0 0;
+  overflow:hidden}
+/* ── ARTE DE FUNDO DA PAGINA (atras do heroi E dos cards) ─────────
+   Trocar --hero-img no :root pela arte definitiva. Fica fixa, cobrindo
+   toda a primeira tela; .rede-veu e' o que garante a leitura por cima. */
+.rede-bg{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:var(--hero-img,none);
+  background-size:cover;background-repeat:no-repeat;background-position:center top;
+  opacity:.9;filter:saturate(1.04)}
+/* video de fundo — entra por cima da imagem, que fica de fallback */
+.rede-vid{position:fixed;inset:0;z-index:0;pointer-events:none;
+  width:100%;height:100%;object-fit:cover;object-position:center top;
+  opacity:.9;filter:saturate(1.04)}
+/* quem pede menos movimento fica so' com a imagem */
+@media (prefers-reduced-motion:reduce){.rede-vid{display:none}}
+.rede-veu{position:fixed;inset:0;z-index:1;pointer-events:none;
+  background:
+    radial-gradient(46% 42% at 50% 34%,transparent,rgba(8,7,10,.34) 100%),
+    linear-gradient(180deg,rgba(8,7,10,.06) 0%,rgba(8,7,10,.04) 36%,
+                    rgba(8,7,10,.22) 64%,rgba(8,7,10,.50) 86%,rgba(8,7,10,.86) 100%)}
+.rede-hero::before{content:"";position:absolute;top:-30%;left:50%;transform:translateX(-50%);
+  width:min(1000px,140%);aspect-ratio:1;pointer-events:none;z-index:2;
+  background:radial-gradient(circle,var(--gold-glow),transparent 62%)}
+.rede-hero > .rede-shell{position:relative;z-index:3}
+.eyebrow{font:600 10px/1 'Sora',sans-serif;letter-spacing:.34em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:22px}
+.rede-hero h1{font:900 clamp(24px,min(4.6vw,5.6vh),46px)/1.08 'Cinzel Decorative',Georgia,serif;
+         margin:0 0 clamp(8px,1.4vh,14px);text-wrap:balance;letter-spacing:-.005em;
+         text-shadow:0 2px 28px rgba(0,0,0,.75)}
+.rede-hero h1 em{font-style:normal;color:var(--gold);display:block}
+.rede-uma-conta{display:inline-flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:12px;
+  margin-top:clamp(12px,2.2vh,22px)}
+.rede-ponto{width:3px;height:3px;border-radius:50%;background:var(--gold-dim)}
+@media(max-width:560px){.rede-ponto{display:none}}
+.rede-uc{font:300 12.5px/1 'Sora',sans-serif;color:#d8d2c6;letter-spacing:.01em;
+    text-shadow:0 1px 10px rgba(0,0,0,.9)}
+.rede-uc b{color:var(--gold);font-weight:600}
+/* ── SLOT DO SELO ────────────────────────────────────────────────
+   A arte definitiva entra em .rede-selo-arte como background-image
+   (PNG/WEBP com fundo TRANSPARENTE, 256x256 ou 512x512, quadrado).
+   Enquanto ela nao existe, o losango abaixo segura o lugar.
+   O texto fica FORA da arte — assim a imagem nao precisa conter
+   letra nenhuma e continua legivel em qualquer tamanho.        */
+.rede-selo{position:relative;display:inline-flex;align-items:center;gap:10px;
+  white-space:nowrap;flex:none;
+  border:1.5px solid #4a7a5c;background:rgba(9,18,13,.86);backdrop-filter:blur(8px);
+  padding:9px 20px 9px 13px;border-radius:100px;
+  box-shadow:0 0 0 1px rgba(217,164,65,.42),
+             0 4px 30px rgba(217,164,65,.38),
+             0 0 60px rgba(217,164,65,.18),
+             inset 0 1px 0 rgba(255,255,255,.09)}
+/* aura dourada por tras — pulsa devagar pra puxar o olho */
+.rede-selo-central::before{content:"";position:absolute;left:50%;bottom:-6px;
+  transform:translateX(-50%);width:min(420px,180%);height:140px;
+  pointer-events:none;border-radius:100px;
+  background:radial-gradient(closest-side,rgba(217,164,65,.52),transparent 74%);
+  animation:aura-selo 4.4s ease-in-out infinite}
+@keyframes aura-selo{
+  0%,100%{opacity:.62;transform:translateX(-50%) scale(.94)}
+  50%    {opacity:1;  transform:translateX(-50%) scale(1.09)}
+}
+.rede-selo-arte{width:28px;height:28px;flex:none;background-size:contain;
+  background-repeat:no-repeat;background-position:center;
+  /* PLACEHOLDER — trocar por: background-image:url('/selo-sem-p2w.webp'); */
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M12 2.6 21.4 12 12 21.4 2.6 12z' fill='none' stroke='%236fcf97' stroke-width='1.4'/><path d='M8.4 12.3l2.5 2.5 4.8-5.2' fill='none' stroke='%236fcf97' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'/></svg>")}
+.rede-selo-txt{display:flex;align-items:baseline;gap:8px;line-height:1;white-space:nowrap}
+.rede-selo-txt b{font:600 11.5px/1 'Sora',sans-serif;letter-spacing:.1em;color:#6fcf97}
+.rede-selo-txt i{font:300 11.5px/1 'Sora',sans-serif;font-style:normal;color:#8fae9c}
+@media(max-width:560px){.rede-selo-txt i{display:none}}
+
+/* selo no vao central, na mesma altura da base dos cards internos.
+   Os internos estao 110px abaixo; o selo acompanha esse deslocamento. */
+.rede-selo-central{position:relative;grid-column:3;align-self:start;display:flex;justify-content:center;
+  align-items:flex-end;height:100%;transform:translateY(20px);z-index:3;
+  padding-bottom:2px;overflow:visible}
+@media(max-width:1080px){
+  .rede-selo-central{grid-column:1/-1;transform:none;margin-top:18px}
+}
+
+.rede-faixa{text-align:center;margin-top:clamp(24px,4vh,44px);
+  display:flex;justify-content:center;width:100%;transform:translateY(-90px)}
+.rede-faixa p{font-size:clamp(13px,1.5vw,15.5px);color:#cfc9bc;max-width:none;
+  margin:0 auto;font-weight:200;line-height:1.55;text-shadow:0 2px 14px rgba(0,0,0,.8)}
+.rede-faixa .rede-uma-conta{margin-top:0;justify-content:center}
+@media(max-width:620px){.rede-faixa p{font-size:13px;max-width:40ch}}
+
+.rule{height:1px;margin:clamp(18px,3vw,28px) 0 clamp(18px,3vw,26px);
+      background:linear-gradient(90deg,transparent,#332c1f 15%,#332c1f 85%,transparent)}
+
+/* ── portais ── */
+.rede-portais{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(10px,1.4vw,16px);
+  align-items:start;margin-bottom:110px}
+/* 2 cards de cada lado + um VAO no meio: a logo do fundo ocupa o centro. */
+.rede-portais{grid-template-columns:1fr 1fr minmax(clamp(90px,14vw,260px),.9fr) 1fr 1fr}
+.rede-portais > *:nth-child(2){grid-column:2}
+.rede-portais > *:nth-child(3){grid-column:4}
+.rede-portais > *:nth-child(4){grid-column:5}
+/* posicoes finas — ESPELHADAS: 1 e 4 sao um par (pontas), 2 e 3 o outro (internos) */
+.rede-portais > *:nth-child(1){transform:translate(-55px,40px)}        /* 30x     */
+.rede-portais > *:nth-child(4){transform:translate(55px,40px)}         /* Essence */
+.rede-portais > *:nth-child(2){transform:translate(-50px,110px)}       /* 300x    */
+.rede-portais > *:nth-child(3){transform:translate(50px,110px)}        /* Mu      */
+@media(max-width:1080px){
+  .rede-portais{grid-template-columns:1fr 1fr;margin-bottom:0}
+  .rede-portais > *{grid-column:auto !important;margin-top:0 !important;transform:none !important}
+}
+@media(max-width:620px){.rede-portais{grid-template-columns:1fr}}
+@media(max-width:1080px){.rede-portais{grid-template-columns:1fr 1fr}}
+@media(max-width:620px){.rede-portais{grid-template-columns:1fr}}
+
+.rede-card{position:relative;display:flex;flex-direction:column;gap:5px;
+   background:transparent;
+   border:0;border-radius:8px;box-shadow:none;
+   padding:0;overflow:visible;
+   transition:transform .3s cubic-bezier(.2,.7,.3,1),border-color .3s,box-shadow .3s}
+.rede-card::before{content:"";position:absolute;inset:0;z-index:0;border-radius:inherit;opacity:0;
+  transition:opacity .3s}
+.rede-inter::before{background:radial-gradient(115% 62% at 50% 0,#16324f,transparent 68%)}
+.rede-pvp::before  {background:radial-gradient(115% 62% at 50% 0,#4a1d15,transparent 68%)}
+.rede-mu::before   {background:radial-gradient(115% 62% at 50% 0,#0d3b38,transparent 68%)}
+.rede-ess::before  {background:radial-gradient(115% 62% at 50% 0,#241f2e,transparent 68%)}
+
+/* ── borda de brasa ───────────────────────────────────────────────
+   A moldura inteira respira: acende e apaga devagar, como carvao vivo.
+   Nada gira. Cada card tem UMA cor (do brasa ao claro, mesma familia).
+   O brilho externo pulsa junto, um pouco defasado, pro calor parecer
+   vir de dentro da borda e nao de uma luz uniforme.               */
+.rede-moldura{position:absolute;inset:0;border-radius:5px;z-index:1;
+  pointer-events:none;padding:3px;
+  /* CHAMA (padrao): gradiente fundido */
+  background:linear-gradient(150deg,var(--brasa),var(--chama) 45%,var(--claro) 52%,var(--chama) 60%,var(--brasa));
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;
+  mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  mask-composite:exclude;
+  animation:brasa 3.6s ease-in-out infinite;
+  transition:filter .35s}
+/* RAIO (30x e 300x): gradiente com mais quebras — le como descarga */
+.rede-inter .rede-moldura,.rede-pvp .rede-moldura{
+  background:linear-gradient(120deg,var(--brasa) 18%,var(--claro) 34%,var(--chama) 40%,var(--brasa) 56%,var(--chama) 74%,var(--claro) 80%,var(--brasa) 92%)}
+@keyframes brasa{
+  0%,100%{opacity:.40;filter:drop-shadow(0 0 4px var(--brasa)) saturate(.85)}
+  50%    {opacity:1;  filter:drop-shadow(0 0 16px var(--chama)) saturate(1.2)}
+}
+/* RAIO — pulsa igual a chama, mas o pico e' mais frio e cortante */
+@keyframes raio{
+  0%,100%{opacity:.38;filter:drop-shadow(0 0 4px var(--brasa)) saturate(.9)}
+  50%    {opacity:1;  filter:drop-shadow(0 0 18px var(--claro)) saturate(1.35) brightness(1.15)}
+}
+/* cada card respira no seu tempo — senao os 4 piscam juntos, vira pisca-pisca */
+.rede-inter .rede-moldura{animation-name:raio;animation-duration:5.4s}
+.rede-pvp   .rede-moldura{animation-name:raio;animation-duration:4.3s;animation-delay:-2.1s}
+.rede-mu    .rede-moldura{animation-duration:4.6s;animation-delay:-1.5s}
+.rede-ess   .rede-moldura{animation-duration:6.2s;animation-delay:-3.1s;opacity:.6}
+
+/* veu base — TEM que vir ANTES dos overrides .rede-mu/.rede-pvp .rede-veu-card */
+.rede-veu-card{position:absolute;inset:0;z-index:1;border-radius:inherit;
+     background:none}
+.rede-inter{--brasa:#12345e;--chama:#3d8fd6;--claro:#bfe6ff;
+         --brilho:rgba(61,143,214,.45);--brilho-forte:rgba(61,143,214,.7)}   /* raio azul */
+.rede-pvp  {--brasa:#1d2a6b;--chama:#5566e0;--claro:#cfd6ff;
+         --brilho:rgba(85,102,224,.45);--brilho-forte:rgba(85,102,224,.7)}   /* raio violeta-azul */
+.rede-mu   {--brasa:#7a2a05;--chama:#e07020;--claro:#ffd39b;
+         --brilho:rgba(224,112,32,.45);--brilho-forte:rgba(224,112,32,.7)}   /* chama laranja */
+.rede-ess  {--brasa:#4a1d0a;--chama:#a04d1c;--claro:#d9a06a;
+         --brilho:rgba(160,77,28,.4);--brilho-forte:rgba(160,77,28,.6)}   /* chama apagada */
+.rede-ess .rede-moldura{opacity:.7}
+/* no hover a brasa acende de vez e para de respirar */
+.rede-card:hover .rede-moldura{animation:none;opacity:1;
+  filter:drop-shadow(0 0 22px var(--chama)) saturate(1.25)}
+
+@media (prefers-reduced-motion:reduce){.rede-moldura{animation:none;opacity:.75}}
+
+.rede-card:hover{box-shadow:inset 0 0 0 1px rgba(255,255,255,.09),0 22px 50px rgba(0,0,0,.5)}
+/* o 300x usa a arte do launcher — retangular, ja' com fundo. Vai um pouco maior e
+   sem drop-shadow, porque as bordas dela ja' foram esmaecidas pra fundir no card. */
+/* mesma altura dos vizinhos: o padding-top continua igual, a arte e' que passa por tras */
+/* veu leve por cima da arte inteira — so' o bastante pro texto ter contraste */
+/* texto com sombra propria: assim ele le por cima do brasao sem precisar apagar a arte */
+.rede-card:hover::before{opacity:.28}
+
+/* véu que garante leitura do texto sobre a arte */
+
+.rede-plataforma{position:absolute;top:7px;right:7px;z-index:3;font:600 8px/1 'Sora',sans-serif;
+  letter-spacing:.1em;text-transform:uppercase;color:#e2ddd3;
+  background:rgba(8,7,10,.78);border:1px solid #251f18;padding:4px 7px;border-radius:100px}
+.rede-mu .rede-plataforma{color:var(--mu);border-color:#17423e}
+
+.rede-nome{position:relative;z-index:2;font:900 clamp(12.5px,1.25vw,14.5px)/1.12 'Cinzel Decorative',Georgia,serif;margin:0 0 4px;color:#fff;
+    text-align:center;text-shadow:0 2px 14px rgba(0,0,0,.95);
+}
+.rede-texto{position:relative;z-index:2;font-size:10px;line-height:1.38;color:#cec8bc;font-weight:300;text-align:center;
+    min-height:0;margin:0 0 7px;
+    text-shadow:0 1px 10px rgba(0,0,0,.9);
+
+    margin:0 0 clamp(8px,1.4vh,12px);min-height:33px}
+.rede-taxas{position:relative;z-index:2;display:flex;flex-wrap:wrap;justify-content:center;gap:3px;padding-top:7px;
+  border-top:1px solid rgba(255,255,255,.11);margin-bottom:0}
+.rede-taxa{font:400 8.5px/1 'Sora',sans-serif;color:#ded8cd;background:rgba(8,7,10,.55);
+   backdrop-filter:blur(4px);
+   border:1px solid #1e1a14;padding:4px 6px;border-radius:3px;font-variant-numeric:tabular-nums}
+.rede-taxa b{font-weight:600}
+.rede-inter .rede-taxa b{color:var(--inter)} .rede-pvp .rede-taxa b{color:var(--pvp)} .rede-mu .rede-taxa b{color:var(--mu)}
+
+.rede-btn{display:block;text-align:center;font:600 9.5px/1 'Sora',sans-serif;letter-spacing:.14em;
+    text-transform:uppercase;padding:8px;border-radius:4px;font-size:9px;border:1px solid #453a26;
+    background:rgba(6,5,8,.78);backdrop-filter:blur(6px);color:var(--ink);
+    box-shadow:0 2px 12px rgba(0,0,0,.5);transition:background .22s,border-color .22s,color .22s}
+.rede-inter .rede-btn:hover{background:rgba(91,147,199,.13);border-color:var(--inter);color:#cfe4f7}
+.rede-pvp  .rede-btn:hover{background:rgba(209,88,60,.13);border-color:var(--pvp);color:#f7d8cf}
+.rede-mu   .rede-btn:hover{background:rgba(49,182,168,.13);border-color:var(--mu);color:#cff2ee}
+
+/* Essence em espera */
+
+  
+.rede-ess .rede-btn{cursor:default}
+
+/* todos os cards com a mesma altura: o botao encosta no rodape em qualquer um */
+.rede-corpo{display:flex;flex-direction:column;flex:1;position:relative;z-index:2;
+  background:rgba(7,6,10,.74);backdrop-filter:blur(8px);
+  border:1px solid rgba(255,255,255,.09);border-radius:5px;
+  padding:11px 12px 10px;gap:0}
+.rede-btn{margin-top:auto;position:relative;z-index:2}
+/* ABERTO — chama de verdade: fundo solido na cor do card, texto escuro, brilho */
+.rede-btn-on{font-weight:800;letter-spacing:.18em;color:#1a1206;border:0;
+  background:linear-gradient(180deg,var(--claro),var(--chama));
+  box-shadow:0 3px 16px var(--brilho),inset 0 1px 0 rgba(255,255,255,.35);
+  transition:transform .18s,box-shadow .25s,filter .2s}
+.rede-btn-on:hover{transform:translateY(-2px);filter:brightness(1.1);
+  box-shadow:0 6px 26px var(--brilho-forte),inset 0 1px 0 rgba(255,255,255,.4)}
+.rede-btn-on:active{transform:translateY(0)}
+/* FECHADO — informa, nao convida: neutro e sem brilho */
+.rede-btn-off{color:#b6afa2;border-color:#3a3328;background:rgba(6,5,8,.72);
+  box-shadow:none;cursor:default}
+
+/* ── rodapé da amostra ── */
+/* telas baixas: so' um alivio leve — o heroi continua alto o bastante pra
+   a cena do fundo aparecer, que e' o ponto do layout. */
+@media(max-height:800px) and (min-width:1080px){
+  .rede-hero{padding:clamp(250px,44vh,480px) 0 0}
+  }
+/* ── celular ─────────────────────────────────────────────────── */
+@media(max-width:620px){
+  .rede-hero{padding:clamp(120px,30vh,220px) 0 0}
+    .rede-uma-conta{flex-direction:column;gap:10px}
+  .rede-selo{padding:7px 14px}
+  .rede-card{padding:18px 14px 14px}
+  .rede-nome{font-size:16px}
+  .rede-texto{font-size:12px}
+    }
+/* tablet em pe: 2 colunas com respiro maior */
+@media(min-width:621px) and (max-width:1080px){
+  .rede-hero{padding:clamp(160px,32vh,300px) 0 0}
+  .rede-portais{gap:14px}
+}
+/* telas MUITO largas: nao deixa os cards esticarem demais */
+@media(min-width:1500px){ :root{--shell:1340px} }
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+
+
+
+/* ── integracao com o resto do site ──────────────────────────────
+   O video e a imagem sao position:fixed e ficam atras de tudo. O
+   conteudo que rola depois precisa de fundo proprio, senao o video
+   aparece atraves dele durante o scroll. */
+.scroll-content-container{position:relative;z-index:6;background:var(--void)}
