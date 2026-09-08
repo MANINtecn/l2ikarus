@@ -44,7 +44,7 @@ export default function HeroRede({ onRegisterClick, onLoginClick, onAbrirServido
       plataforma: 'PC',
       texto: 'Cada classe faz o que promete. Nada de build quebrada — aqui sua classe funciona.',
       taxas: [['XP', '30x'], ['SP', '30x'], ['Drop', '10x'], ['Spoil', '15x']],
-      acao: 'Jogar agora',
+      acao: 'Mais info',
       aberto: true,
     },
     {
@@ -54,7 +54,7 @@ export default function HeroRede({ onRegisterClick, onLoginClick, onAbrirServido
       plataforma: 'PC',
       texto: 'Quanto mais você farma, mais forte fica no PvP. Progressão sem fim.',
       taxas: [['XP', '300x'], ['SP', '300x'], ['Adena', '300x'], ['Sub', 'livre']],
-      acao: 'Jogar agora',
+      acao: 'Mais info',
       aberto: true,
     },
     {

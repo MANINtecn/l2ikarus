@@ -178,6 +178,32 @@ const SERVIDORES = {
         ),
       },
       {
+        titulo: 'Enchant sem limite',
+        tag: 'os dois scrolls são farmáveis',
+        largo: true,
+        corpo: (
+          <>
+            <p>
+              Não existe teto de enchant aqui. <b>Não vendemos scroll</b> — os dois são
+              farmados no jogo, e quem junta, sobe. Até +4 é seguro nos dois.
+            </p>
+            <p>
+              <b>Crystal — 50%.</b> Falhou, o item <b>fica no nível em que estava</b>. Não
+              quebra e não desce. É a subida sem risco: mais lenta, mas nunca tira o que
+              você já conquistou.
+            </p>
+            <p>
+              <b>Blessed — 50%.</b> Falhou, o item <b>desce dois níveis</b> — e também não
+              quebra. Serve para quem quer arriscar de verdade em troca de andar mais rápido.
+            </p>
+            <p>
+              Os dois <em>nunca destroem o item</em>. O limite é quanto você farma, não um
+              número que a gente escolheu.
+            </p>
+          </>
+        ),
+      },
+      {
         titulo: 'Progressão sem fim',
         tag: 'em desenvolvimento',
         largo: false,
