@@ -172,33 +172,36 @@ const SERVIDORES = {
         largo: false,
         corpo: (
           <p>
-            Subclasse <em>liberada direto</em>, sem a quest do Mimir. Troque de classe e
-            experimente builds sem perder dias em pré-requisito.
+            Subclasse <em>liberada direto</em>, sem a quest do Mimir. Ela nasce no nível 40 —
+            é a experiência normal de qualquer build nova, sem a pré-requisito da quest
+            travando o caminho.
           </p>
         ),
       },
       {
-        titulo: 'Enchant sem limite',
-        tag: 'Blessed comum, Crystal raríssimo',
+        titulo: 'Enchant: até +30 você farma, dali pra frente você joga',
+        tag: 'Normal, Blessed e Crystal',
         largo: true,
         corpo: (
           <>
             <p>
-              Não existe teto de enchant aqui. <b>Não vendemos scroll</b> — os dois são
-              farmados no jogo, e quem junta, sobe. Até +4 é seguro nos dois.
+              Três scrolls, três papéis. <b>Não vendemos nenhum</b> — todos vêm de jogar.
             </p>
             <p>
-              <b>Crystal — 100%.</b> <b>Nunca falha.</b> É raríssimo de encontrar, mas quando
-              você tem um na mão, o item sobe garantido — sem risco nenhum.
+              <b>Normal — 70% fixo.</b> Sem bônus de VIP, sem escalar. <b>Quebra</b> o item
+              se falhar. É o caminho rápido pros primeiros níveis, com risco de verdade.
             </p>
             <p>
-              <b>Blessed — 50%.</b> Falhou, o item <b>desce um nível</b> — e não quebra. É
-              o caminho farmável do dia a dia: mais fácil de conseguir, com um risco pequeno
-              a cada tentativa.
+              <b>Blessed — 8% a 1%, cai conforme o item sobe</b> (8% até +10, 4% até +20, 1%
+              até +30). <b>Nunca quebra</b> — se falhar, só não sobe. VIP dobra a chance. Tem
+              limite diário por personagem (50 free / 100 VIP). É o farm principal do
+              servidor: demorado no fim, mas sem risco de perder o item.
             </p>
             <p>
-              Os dois <em>nunca destroem o item</em>. O limite é quanto você farma, não um
-              número que a gente escolheu.
+              <b>Crystal — 100%, mas só funciona de +30 em diante</b> (até +34, trava em
+              +35). <b>Nunca quebra.</b> Não dropa de mob — vem da troca de Medalhas de
+              Evento, por personagem, intransferível. Esse é o trecho que você joga pra
+              conquistar, não farma pra acumular.
             </p>
           </>
         ),
