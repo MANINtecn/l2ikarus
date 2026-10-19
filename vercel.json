@@ -2,6 +2,10 @@
   "cleanUrls": true,
   "rewrites": [
     {
+      "source": "/jogos",
+      "destination": "/"
+    },
+    {
       "source": "/mu",
       "destination": "/"
     },

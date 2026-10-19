@@ -8,7 +8,7 @@
 // Jogos da IS Labs que aparecem na barra. Entra aqui so' o que estiver no ar;
 // quando outro servidor abrir, e' so' acrescentar uma linha.
 export const jogos = [
-  { id: 'l2', nome: 'Lineage II', sub: 'Interlude Sandbox', rota: '/sandbox', online: true, beta: true },
+  { id: 'l2', nome: 'Lineage II', sub: 'Interlude Sandbox', rota: '/', online: true, beta: true },
 ]
 
 // O link do download (e o tamanho) vem do painel admin, aba LINKS: config/linksComunidade.js.

@@ -37,8 +37,9 @@ function App() {
   const [painelSandbox, setPainelSandbox] = useState(null)
   const containerRef = useRef(null)
 
-  // Rota simples via History API: '/' e as paginas dos servidores.
-  // Duas rotas nao justificam o peso de um router.
+  // Rota simples via History API. IKARUS 2026-10-19: '/' e' a pagina do Lineage II Sandbox
+  // (a home nova; '/sandbox' abre a mesma). A home antiga da rede, com os cards de todos os
+  // servidores, virou a Central de Jogos em '/jogos'. Poucas rotas: nao justifica um router.
   const [rota, setRota] = useState(window.location.pathname)
   useEffect(() => {
     const aoVoltar = () => setRota(window.location.pathname)
@@ -50,6 +51,9 @@ function App() {
     setRota(destino)
   }
   const slugServidor = { '/interlude': 'interlude', '/300x': '300x', '/mu': 'mu' }[rota]
+  const ehCentral = rota === '/jogos'
+  // qualquer outra rota (/, /sandbox, /r/<slug> antes de limpar a URL) cai na home nova
+  const ehHome = !slugServidor && !ehCentral
 
   useEffect(() => {
     // Verifica sessão admin
@@ -95,7 +99,11 @@ function App() {
     }
     if (params.get('admin') === '1') {
       fetch('/api/auth/me').then(r => r.json()).then(d => {
-        if (d.authenticated) setAdminUser(d.user)
+        if (d.authenticated) {
+          setAdminUser(d.user)
+          // voltou do login Google (TECX SOFTHOUSE): na home nova o painel abre direto
+          setPainelSandbox('admin')
+        }
       })
       window.history.replaceState({}, '', '/')
     }
@@ -130,7 +138,7 @@ function App() {
       if (me.authenticated) {
         setPlayerData(me)
         setIsLoginOpen(false)
-        if (window.location.pathname === '/sandbox') setPainelSandbox('jogador')
+        if (ehHome) setPainelSandbox('jogador')
         setLoginForm({ login: '', password: '' })
       }
     } catch {
@@ -146,13 +154,13 @@ function App() {
       {!loading && slugServidor && (
         <PaginaServidor
           slug={slugServidor}
-          onVoltar={(e) => { e.preventDefault(); irPara('/') }}
+          onVoltar={(e) => { e.preventDefault(); irPara('/jogos') }}
         />
       )}
 
-      {!loading && rota === '/sandbox' && (
+      {!loading && ehHome && (
         <PaginaSandbox
-          onVoltar={(e) => { e.preventDefault(); irPara('/') }}
+          onVoltar={(e) => { e.preventDefault(); irPara('/jogos') }}
           jogador={playerData}
           admin={adminUser}
           onEntrar={() => setIsLoginOpen(true)}
@@ -162,15 +170,15 @@ function App() {
         />
       )}
 
-      {/* no /sandbox os paineis so' abrem quando a pessoa pede (na home abrem sozinhos apos o login) */}
-      {!loading && rota === '/sandbox' && painelSandbox === 'jogador' && playerData && (
+      {/* na home nova os paineis so' abrem quando a pessoa pede (na Central de Jogos abrem sozinhos apos o login) */}
+      {!loading && ehHome && painelSandbox === 'jogador' && playerData && (
         <PlayerPanel
           data={playerData}
           onLogout={() => { window.location.href = '/api/player/logout' }}
           onFechar={() => setPainelSandbox(null)}
         />
       )}
-      {!loading && rota === '/sandbox' && painelSandbox === 'admin' && adminUser && (
+      {!loading && ehHome && painelSandbox === 'admin' && adminUser && (
         <AdminPanel
           user={adminUser}
           onLogout={() => { window.location.href = '/api/auth/logout' }}
@@ -178,7 +186,7 @@ function App() {
         />
       )}
 
-      {!loading && !slugServidor && rota !== '/sandbox' && (
+      {!loading && ehCentral && (
         <>
           {bannerVisible && <BetaBanner onDismiss={() => setBannerVisible(false)} />}
           {/* IKARUS 2026-09-03: home da REDE (direcao Portais). Substituiu o Hero3D,

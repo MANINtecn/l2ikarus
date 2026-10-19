@@ -9,7 +9,8 @@ import {
 } from '../../config/weaponMod'
 
 /**
- * Pagina do Lineage II Sandbox (/sandbox), dentro da marca IS Labs.
+ * Home do site (/, tambem em /sandbox): o Lineage II Sandbox, dentro da marca IS Labs.
+ * A Central de Jogos (home antiga da rede) fica em /jogos.
  * Conteudo todo em src/config/weaponMod.js; aqui so' a apresentacao.
  * Ordem pensada para o celular: logo, o jogo, baixar, mapa do jogo, e o resto
  * fechado em blocos que a pessoa abre se quiser ler.
@@ -213,14 +214,14 @@ export default function PaginaSandbox({ onVoltar, jogador, admin, onEntrar, onCr
       {/* barra: jogos da IS Labs (so os que estao no ar) + baixar */}
       <nav className="sbx-nav" aria-label="Jogos IS Labs">
         <div className="rede-shell">
-          <a className="sbx-todos" href="/" onClick={onVoltar} title="Central de jogos IS Labs">
+          <a className="sbx-todos" href="/jogos" onClick={onVoltar} title="Central de jogos IS Labs">
             <i aria-hidden="true"><b /><b /><b /><b /></i>
             <span>Jogos</span>
           </a>
           <div className="sbx-jogos">
             {jogos.map((j) => (
-              <a key={j.id} className={`sbx-jogo${j.rota === '/sandbox' ? ' on' : ''}`} href={j.rota}
-                onClick={j.rota === '/sandbox' ? ir('topo') : undefined}>
+              <a key={j.id} className={`sbx-jogo${j.rota === '/' ? ' on' : ''}`} href={j.rota}
+                onClick={j.rota === '/' ? ir('topo') : undefined}>
                 {j.online && <em aria-label="online" />}
                 <span><b>{j.nome}{j.beta && <u className="sbx-tag-beta">Beta</u>}</b><small>{j.sub}</small></span>
               </a>
