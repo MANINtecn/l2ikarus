@@ -1,5 +1,6 @@
 import crypto from 'crypto'
 import { getConnection } from './_db.js'
+import { LINK_CHAVES, SQL_TABELA, validarLink, lerLinks } from './_links.js'
 import { createRequire } from 'module'
 const require = createRequire(import.meta.url)
 const ITEMS_DB = require('./items-db.json')
@@ -584,6 +585,37 @@ export default async function handler(req, res) {
         )
       }
       return res.status(200).json({ success: true, message: `Oferta ${oid} salva com sucesso.` })
+    }
+
+    // GET /api/admin/links — links de convite (grupo e Discord) que o site mostra
+    if (action === 'links' && req.method !== 'POST') {
+      const links = await lerLinks(db)
+      return res.status(200).json({ links: links || {}, tabela: links !== null })
+    }
+
+    // POST /api/admin/links-save — grava os links do painel: grupo e Discord (vazio = esconder o
+    // botao), download do cliente (obrigatorio, so' Google Drive) e o tamanho (opcional).
+    // Campo que nao veio no corpo nao e' mexido.
+    if (action === 'links-save' && req.method === 'POST') {
+      const gravar = []
+      for (const tipo of Object.keys(LINK_CHAVES)) {
+        if (req.body?.[tipo] === undefined) continue
+        const r = validarLink(tipo, req.body[tipo])
+        if (!r.ok) return res.status(400).json({ error: r.error })
+        gravar.push([LINK_CHAVES[tipo], r.url])
+      }
+      if (!gravar.length) return res.status(400).json({ error: 'Nada para salvar.' })
+      await db.query(SQL_TABELA)
+      const now = Date.now()
+      const quem = admin.email || admin.name || 'admin'
+      for (const [k, v] of gravar) {
+        await db.query(
+          `INSERT INTO site_settings (k, v, updated_at, updated_by) VALUES (?, ?, ?, ?)
+           ON DUPLICATE KEY UPDATE v = ?, updated_at = ?, updated_by = ?`,
+          [k, v, now, quem, v, now, quem]
+        )
+      }
+      return res.status(200).json({ success: true, message: 'Links salvos. O site atualiza em até 1 minuto.' })
     }
 
     // POST /api/admin/ban — banir conta

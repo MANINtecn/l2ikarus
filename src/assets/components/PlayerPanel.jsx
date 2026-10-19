@@ -19,7 +19,7 @@ function formatTime(secs) {
   return h > 0 ? `${h}h` : '0h'
 }
 
-export default function PlayerPanel({ data, onLogout }) {
+export default function PlayerPanel({ data, onLogout, onFechar }) {
   const [buyOpen, setBuyOpen] = useState(false)
   const [amount, setAmount] = useState(100)
   const [buying, setBuying] = useState(false)
@@ -130,7 +130,7 @@ export default function PlayerPanel({ data, onLogout }) {
           {/* IKARUS: antes so' existia SAIR, entao quem entrava no painel so' conseguia
               voltar pro site deslogando. Este botao leva de volta a home mantendo a sessao.
               Usa a mesma classe do "COMPRAR IKOIN" (btn btn-primary = dourado do tema). */}
-          <button onClick={() => { window.location.href = '/' }} className="btn btn-primary" style={{
+          <button onClick={() => { if (onFechar) onFechar(); else window.location.href = '/' }} className="btn btn-primary" style={{
             padding: '0.5rem 1.2rem', fontSize: '0.65rem', letterSpacing: '2px',
           }}>VOLTAR AO SITE</button>
           <button onClick={onLogout} style={{

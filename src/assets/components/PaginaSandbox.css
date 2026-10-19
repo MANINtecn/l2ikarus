@@ -1,0 +1,646 @@
+/* Pagina /sandbox (Lineage II Sandbox, marca IS Labs). Herda os tokens do HeroRede
+   (--void, --gold, --ink, --shell). Cor de raridade chega por --c.
+   Visual da logo IS Labs: aco escovado + azul eletrico com brilho. */
+
+.sbx{
+  position:relative;z-index:6;background:var(--void,#08070a);min-height:100vh;
+  color:var(--ink,#f4eee2);
+  --azul:#4f8dff;--azul-claro:#8fb6ff;--brilho:rgba(79,141,255,.55);--rubi:#c2412d;--card:#100d13;--edge:#221d17;
+}
+.sbx b{font-weight:600;color:#fff}
+
+/* ── barra ── */
+.sbx-nav{
+  position:sticky;top:0;z-index:30;background:rgba(8,7,10,.9);backdrop-filter:blur(12px);
+  border-bottom:1px solid #1c2233;
+}
+.sbx-nav .rede-shell{display:flex;align-items:center;gap:10px;min-height:58px}
+.sbx-todos{
+  display:inline-flex;align-items:center;gap:8px;text-decoration:none;flex:0 0 auto;
+  font:600 10.5px/1 'Sora',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#9b9484;
+  padding:8px 12px 8px 0;border-right:1px solid #1c2233;margin-right:2px;transition:color .2s;
+}
+.sbx-todos:hover{color:#fff}
+.sbx-todos i{display:grid;grid-template-columns:repeat(2,6px);gap:3px}
+.sbx-todos i b{width:6px;height:6px;border-radius:2px;background:#3d5c9e}
+.sbx-todos:hover i b{background:var(--azul)}
+.sbx-jogos{display:flex;gap:6px;flex:1 1 auto;min-width:0;overflow-x:auto;scrollbar-width:none}
+.sbx-jogos::-webkit-scrollbar{display:none}
+.sbx-jogo{
+  display:inline-flex;align-items:center;gap:9px;text-decoration:none;flex:0 0 auto;
+  padding:7px 13px;border-radius:8px;border:1px solid transparent;color:#cfc9bc;transition:border-color .2s,background .2s;
+}
+.sbx-jogo.on{border-color:#3a5a9c;background:linear-gradient(135deg,rgba(40,100,230,.3),rgba(12,14,24,.9))}
+.sbx-jogo em{width:7px;height:7px;border-radius:50%;background:#6fcf97;box-shadow:0 0 8px #6fcf97}
+.sbx-jogo span{display:flex;flex-direction:column;gap:3px}
+.sbx-jogo b{font:700 12px/1 'Sora',sans-serif;letter-spacing:.04em}
+.sbx-jogo small{font:500 9px/1 'Sora',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--azul-claro)}
+
+/* ── botoes chanfrados (facetas da logo IS Labs) ──
+   O fundo do proprio botao vira a BORDA; o ::before, 1.5px para dentro e com o mesmo corte,
+   e' o miolo. --q = tamanho do canto cortado. */
+.sbx-baixar,.sbx-btn,.sbx-mapa-acoes button{
+  --q:11px;
+  position:relative;isolation:isolate;overflow:hidden;
+  display:inline-flex;align-items:center;justify-content:center;gap:11px;flex:0 0 auto;text-decoration:none;cursor:pointer;
+  font:800 11.5px/1 'Sora',sans-serif;letter-spacing:.16em;text-transform:uppercase;
+  padding:16px 28px;border:0;border-radius:0;
+  clip-path:polygon(var(--q) 0,100% 0,100% calc(100% - var(--q)),calc(100% - var(--q)) 100%,0 100%,0 var(--q));
+  transition:transform .2s,filter .2s,color .2s;
+}
+.sbx-baixar::before,.sbx-btn::before,.sbx-mapa-acoes button::before{
+  content:"";position:absolute;inset:1.5px;z-index:-1;
+  clip-path:polygon(calc(var(--q) - .6px) 0,100% 0,100% calc(100% - var(--q) + .6px),calc(100% - var(--q) + .6px) 100%,0 100%,0 calc(var(--q) - .6px));
+}
+/* brilho que atravessa o botao no hover */
+.sbx-baixar::after,.sbx-btn::after,.sbx-mapa-acoes button::after{
+  content:"";position:absolute;top:0;bottom:0;left:-60%;width:40%;z-index:0;pointer-events:none;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.28),transparent);transform:skewX(-20deg);
+  transition:left .55s ease;
+}
+.sbx-baixar:hover::after,.sbx-btn:hover::after,.sbx-mapa-acoes button:hover::after{left:120%}
+.sbx-baixar:hover,.sbx-btn:hover,.sbx-mapa-acoes button:hover{transform:translateY(-2px)}
+
+/* principal: aco azul eletrico */
+.sbx-baixar,.sbx-mapa-acoes button.prox{
+  color:#fff;text-shadow:0 1px 0 rgba(0,0,0,.35);
+  background:linear-gradient(180deg,#d6e6ff,#4f8dff 50%,#1f4fc0);
+}
+.sbx-baixar::before,.sbx-mapa-acoes button.prox::before{
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.22),transparent 45%),
+    linear-gradient(180deg,#3b78ee,#1d47b0 58%,#13347f);
+}
+.sbx-baixar:hover,.sbx-mapa-acoes button.prox:hover{filter:brightness(1.12) saturate(1.1)}
+.sbx-baixar.nav{--q:8px;padding:11px 17px;font-size:10.5px}
+
+/* secundario: so' o contorno chanfrado */
+.sbx-btn,.sbx-mapa-acoes button{color:#d8d2c6;background:#34405e}
+.sbx-btn::before,.sbx-mapa-acoes button::before{background:linear-gradient(180deg,#121624,#0a0c13)}
+.sbx-btn:hover,.sbx-mapa-acoes button:hover{background:#6fa3ff;color:#fff}
+
+/* seta de download: losango com risco, no lugar do V */
+.sbx-seta{
+  position:relative;width:12px;height:12px;flex:0 0 auto;
+  border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:translateY(-3px) rotate(45deg);
+}
+.sbx-seta::after{content:"";position:absolute;right:3px;bottom:3px;width:2px;height:9px;background:currentColor;transform:rotate(-45deg);transform-origin:bottom right}
+.sbx-dl-meta{font:400 11.5px/1.4 'Sora',sans-serif;color:#7d7768;margin-top:12px}
+
+/* ── marca IS Labs, colada na barra ── */
+.sbx-marca{position:relative;text-align:center;padding-top:4px;scroll-margin-top:60px}
+.sbx-marca::before{
+  content:"";position:absolute;left:50%;top:-30%;transform:translateX(-50%);width:min(900px,150%);aspect-ratio:1.6;
+  pointer-events:none;background:radial-gradient(ellipse at center,rgba(40,100,230,.18),transparent 60%);
+}
+/* fundo preto da logo: 'screen' some com o preto sobre o fundo escuro; a mascara apaga o quadrado */
+.sbx-logo{
+  position:relative;display:block;width:min(330px,70vw);margin:-28px auto -40px;
+  mix-blend-mode:screen;pointer-events:none;animation:sbx-surge 1.1s cubic-bezier(.2,1,.3,1) both;
+  -webkit-mask-image:radial-gradient(circle,#000 48%,transparent 68%);mask-image:radial-gradient(circle,#000 48%,transparent 68%);
+}
+/* versao ilustracao: imagem cheia (sem 'screen'), bordas e pe' se dissolvendo no fundo;
+   o bloco do jogo sobe um pouco por cima do pe' da imagem */
+.sbx-logo.cena{
+  width:min(860px,100%);margin:0 auto -70px;mix-blend-mode:normal;
+  /* laterais, topo e pe' morrem no preto em curva suave (sem linha de corte); as duas mascaras se cruzam */
+  --lado:linear-gradient(90deg,transparent 0%,rgba(0,0,0,.06) 6%,rgba(0,0,0,.2) 12%,rgba(0,0,0,.45) 19%,rgba(0,0,0,.75) 26%,#000 34%,#000 66%,rgba(0,0,0,.75) 74%,rgba(0,0,0,.45) 81%,rgba(0,0,0,.2) 88%,rgba(0,0,0,.06) 94%,transparent 100%);
+  --alto:linear-gradient(180deg,transparent 0%,rgba(0,0,0,.6) 5%,#000 11%,#000 64%,rgba(0,0,0,.7) 76%,rgba(0,0,0,.3) 87%,transparent 97%);
+  -webkit-mask-image:var(--lado),var(--alto);
+  -webkit-mask-composite:source-in;
+  mask-image:var(--lado),var(--alto);
+  mask-composite:intersect;
+}
+@media (max-width:760px){.sbx-logo.cena{width:120%;max-width:none;margin:0 -10% -24px}}
+.sbx-marca:has(.cena) + .rede-shell .sbx-jogo-hero{position:relative;z-index:2}
+@keyframes sbx-surge{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:none}}
+
+/* ── o jogo ── */
+.sbx-jogo-hero{
+  position:relative;overflow:hidden;border-radius:16px;border:1px solid #2a2230;
+  background:
+    radial-gradient(ellipse at 85% 0%,rgba(40,100,230,.12),transparent 55%),
+    linear-gradient(160deg,#120f18,#0a090d 70%);
+  padding:clamp(26px,5vw,56px) clamp(20px,4vw,48px) clamp(20px,3vw,32px);
+  box-shadow:0 30px 60px rgba(0,0,0,.5);
+}
+.sbx-jogo-hero-txt{max-width:620px}
+.sbx-jogo-status{
+  display:inline-flex;align-items:center;gap:8px;font:600 10px/1 'Sora',sans-serif;letter-spacing:.18em;
+  text-transform:uppercase;color:#8fdca8;background:rgba(10,20,14,.7);border:1px solid #2c4a35;border-radius:100px;padding:7px 12px;
+}
+.sbx-jogo-status em{width:7px;height:7px;border-radius:50%;background:#6fcf97;box-shadow:0 0 10px #6fcf97}
+.sbx-jogo-hero h1{font:900 clamp(30px,6vw,58px)/1.02 'Cinzel Decorative',Georgia,serif;color:#fff;margin:18px 0 12px;text-wrap:balance}
+.sbx-jogo-hero h1 small{display:block;font:700 clamp(12px,1.6vw,15px)/1 'Cinzel',serif;letter-spacing:.3em;text-transform:uppercase;color:#e07a5f;margin-bottom:14px}
+.sbx-jogo-hero p{font:300 clamp(14.5px,1.8vw,17px)/1.55 'Sora',sans-serif;color:#d8d2c6;margin:0;max-width:44ch}
+.sbx-hero-cta{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px}
+/* texto a esquerda, fatos espalhados a direita */
+.sbx-jogo-hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:clamp(20px,3vw,40px);align-items:center}
+.sbx-fatos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.sbx-fato{
+  position:relative;background:rgba(14,13,20,.85);border:1px solid #262236;border-radius:12px;padding:15px 16px;
+  box-shadow:0 16px 34px rgba(0,0,0,.4);transition:transform .25s,border-color .25s;
+}
+.sbx-fato:hover{border-color:#3a5a9c}
+/* desencontro leve para a area parecer distribuida, nao uma tabela */
+.sbx-fato.f1{transform:translateY(-10px)}
+.sbx-fato.f2{transform:translateY(14px)}
+.sbx-fato.f3{transform:translateY(-4px)}
+.sbx-fato.f4{transform:translateY(20px)}
+.sbx-fato > b{display:inline;font:700 clamp(26px,3.4vw,34px)/1 'Cinzel',serif;color:var(--gold,#d9a441)}
+.sbx-fato > span{display:inline;margin-left:8px;font:600 10px/1 'Sora',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#cfc9bc}
+.sbx-fato p{font:300 12.5px/1.5 'Sora',sans-serif;color:#a8a194;margin:8px 0 0}
+.sbx-fato-cores{display:flex;gap:5px;margin-top:9px}
+.sbx-fato-cores i{width:22px;height:6px;border-radius:3px;background:var(--c);box-shadow:0 0 8px var(--c)}
+.sbx-fato.build{
+  grid-column:1/-1;margin-top:22px;padding:18px 20px;border-color:#3a5a9c;
+  background:linear-gradient(135deg,rgba(40,100,230,.22),rgba(14,13,20,.92) 60%);
+  box-shadow:0 18px 40px rgba(0,0,0,.45),0 0 0 1px rgba(79,141,255,.08),0 0 40px rgba(79,141,255,.12);
+}
+.sbx-fato.build small{font:700 9.5px/1 'Sora',sans-serif;letter-spacing:.22em;text-transform:uppercase;color:#8fb6ff}
+.sbx-fato.build h3{font:700 clamp(19px,2.2vw,24px)/1.15 'Cinzel',serif;color:#fff;margin:7px 0 0}
+.sbx-fato.build p{font-size:13.5px;color:#cfc9bc}
+.sbx-fato-slots{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.sbx-fato-slots span{
+  display:inline-flex;align-items:center;gap:7px;font:500 11.5px/1 'Sora',sans-serif;color:#e8e2d6;
+  border:1px solid color-mix(in srgb,var(--c) 40%,transparent);background:color-mix(in srgb,var(--c) 9%,transparent);
+  border-radius:6px;padding:7px 9px;
+}
+.sbx-fato-slots i{width:9px;height:9px;border:1.5px solid var(--c);border-radius:2px;transform:rotate(45deg);background:color-mix(in srgb,var(--c) 35%,transparent)}
+
+/* ── secoes ── */
+.sbx-sec{padding-top:clamp(48px,7vw,84px);scroll-margin-top:66px}
+.sbx-sec-cab{margin-bottom:clamp(16px,3vw,26px)}
+.sbx-sec-cab h2{font:700 clamp(23px,3.4vw,34px)/1.15 'Cinzel',serif;color:#fff;margin:0 0 6px}
+.sbx-sec-cab p{font:300 14.5px/1.5 'Sora',sans-serif;color:#9b9484;margin:0}
+.sbx-h3{font:700 16px/1.3 'Cinzel',serif;color:#fff;margin:26px 0 12px;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.sbx-h3 small{font:600 10px/1 'Sora',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#f2b632}
+.sbx-nota{font:300 13px/1.6 'Sora',sans-serif;color:#9b9484;margin:14px 0 0}
+.sbx-selo{
+  display:inline-flex;align-items:center;gap:6px;vertical-align:middle;
+  font:600 9.5px/1 'Sora',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--c);
+  border:1px solid color-mix(in srgb,var(--c) 40%,transparent);border-radius:100px;padding:6px 10px;
+}
+.sbx-selo::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--c)}
+
+/* ── mapa do jogo ──
+   PC: trilha horizontal, ramos em cima/embaixo. Celular: trilha vertical, ramos ao lado. */
+.sbx-mapa{display:grid;gap:16px}
+.sbx-trilha{
+  list-style:none;margin:0;padding:96px 0;display:grid;grid-template-columns:repeat(6,1fr);position:relative;
+}
+.sbx-trilha::before{
+  /* 96 de padding + metade do circulo (58) */
+  content:"";position:absolute;left:8%;right:8%;top:125px;height:2px;transform:translateY(-1px);
+  background:linear-gradient(90deg,#26324a,var(--azul),#26324a);
+}
+.sbx-trilha > li{position:relative;display:flex;justify-content:center}
+.sbx-no{
+  position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:10px;cursor:pointer;
+  background:none;border:0;padding:0;color:inherit;
+}
+.sbx-no i{
+  display:grid;place-items:center;width:58px;height:58px;border-radius:50%;font:700 18px/1 'Cinzel',serif;font-style:normal;
+  color:#cfd9ef;background:#0d111c;border:2px solid #2a3a5c;transition:all .25s;
+}
+.sbx-no span{display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center}
+.sbx-no b{font:700 14px/1.1 'Cinzel',serif}
+.sbx-no small{font:300 11.5px/1.2 'Sora',sans-serif;color:#9b9484}
+.sbx-no:hover i{border-color:var(--azul)}
+.sbx-trilha > li.on .sbx-no i{color:#fff;background:linear-gradient(160deg,#2f6ae0,#173a86);border-color:#8fb6ff;box-shadow:0 0 0 6px rgba(79,141,255,.14),0 0 26px rgba(79,141,255,.5)}
+.sbx-trilha > li.volta .sbx-no i::after{
+  content:"\21BB";position:absolute;right:-6px;top:-6px;font:700 13px/1 'Sora',sans-serif;color:var(--gold,#d9a441);
+  background:#0d111c;border:1px solid var(--gold-dim,#8a6d2f);border-radius:50%;width:22px;height:22px;display:grid;place-items:center;
+}
+.sbx-trilha > li.volta .sbx-no{position:relative}
+.sbx-no i{position:relative}
+.sbx-ramo{
+  position:absolute;left:50%;transform:translateX(-50%);width:max-content;max-width:150px;text-align:center;
+  border:1px dashed #3a4566;border-radius:8px;padding:8px 10px;background:#0b0d14;
+}
+.sbx-ramo b{display:block;font:700 12.5px/1.1 'Sora',sans-serif;color:var(--azul-claro)}
+.sbx-ramo span{display:block;font:300 11px/1.3 'Sora',sans-serif;color:#9b9484;margin-top:3px}
+.sbx-ramo.cima{bottom:calc(100% + 14px)}
+.sbx-ramo.baixo{top:calc(100% + 14px)}
+.sbx-ramo.cima::after,.sbx-ramo.baixo::after{content:"";position:absolute;left:50%;width:0;border-left:1px dashed #3a4566;height:14px}
+.sbx-ramo.cima::after{top:100%}
+.sbx-ramo.baixo::after{bottom:100%}
+.sbx-mapa-det{
+  background:linear-gradient(160deg,rgba(26,40,72,.45),var(--card) 55%);border:1px solid #2a3a5c;border-radius:14px;
+  padding:clamp(18px,3vw,26px);animation:sbx-in .35s ease both;
+}
+.sbx-mapa-det.cel{display:none}
+@keyframes sbx-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.sbx-mapa-det small{font:700 9.5px/1 'Sora',sans-serif;letter-spacing:.2em;text-transform:uppercase;color:#6fa3ff}
+.sbx-mapa-det h3{font:700 22px/1.2 'Cinzel',serif;color:#fff;margin:8px 0 10px}
+.sbx-mapa-det ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
+.sbx-mapa-det li{font:300 14.5px/1.5 'Sora',sans-serif;color:#d8d2c6}
+.sbx-mapa-det li::marker{color:var(--azul)}
+.sbx-mapa-acoes{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.sbx-mapa-acoes button{--q:8px;font-size:10.5px;padding:12px 18px}
+
+/* ── raridades ── */
+.sbx-rars{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.sbx-rar{
+  background:#050507;border:1px solid var(--edge);border-radius:14px;overflow:hidden;
+  box-shadow:inset 0 -60px 70px -50px color-mix(in srgb,var(--c) 35%,transparent);
+}
+.sbx-rar img{display:block;width:100%;aspect-ratio:1;object-fit:cover}
+.sbx-rar-txt{padding:4px 14px 14px;text-align:center}
+.sbx-rar h3{font:700 15px/1 'Cinzel',serif;letter-spacing:.14em;text-transform:uppercase;color:var(--c);margin:0}
+.sbx-rar-chance{font:700 30px/1.15 'Cinzel',serif;color:#fff;margin:6px 0 10px}
+.sbx-rar-chance small{display:block;font:500 9.5px/1.3 'Sora',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#7d7768}
+.sbx-rar dl{margin:0;display:flex;flex-direction:column;gap:5px;text-align:left}
+.sbx-rar dl div{display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding:7px 9px;border-radius:6px;
+  background:color-mix(in srgb,var(--c) 7%,rgba(255,255,255,.02));border:1px solid color-mix(in srgb,var(--c) 16%,transparent)}
+.sbx-rar dt{font:700 9.5px/1 'Sora',sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--c)}
+.sbx-rar dd{margin:0;font:400 12px/1.3 'Sora',sans-serif;color:#cfc9bc;text-align:right}
+.sbx-rar-legenda{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.sbx-rar-legenda div{background:var(--card);border:1px solid var(--edge);border-radius:10px;padding:12px 14px}
+.sbx-rar-legenda b{display:block;font:700 14px/1.2 'Cinzel',serif;margin-bottom:4px}
+.sbx-rar-legenda span{font:300 13px/1.4 'Sora',sans-serif;color:#b9b2a4}
+
+/* ── blocos que abrem e fecham ── */
+.sbx-dets{display:flex;flex-direction:column;gap:8px}
+.sbx-det{border:1px solid var(--edge);border-radius:12px;background:var(--card);scroll-margin-top:70px;transition:border-color .2s}
+.sbx-det.aberto{border-color:#3a3328}
+.sbx-det-cab{
+  display:flex;align-items:center;justify-content:space-between;gap:14px;width:100%;cursor:pointer;
+  background:none;border:0;color:inherit;text-align:left;padding:17px clamp(16px,2.6vw,22px);
+}
+.sbx-det-cab span{display:flex;flex-direction:column;gap:5px;min-width:0}
+.sbx-det-cab b{font:700 16px/1.2 'Cinzel',serif}
+.sbx-det-cab small{font:300 12.5px/1.4 'Sora',sans-serif;color:#9b9484}
+.sbx-det-cab i{
+  flex:0 0 auto;width:28px;height:28px;border-radius:50%;border:1px solid #3a3328;position:relative;transition:transform .25s,border-color .2s;
+}
+.sbx-det-cab i::before,.sbx-det-cab i::after{content:"";position:absolute;left:50%;top:50%;width:10px;height:1.5px;background:var(--gold,#d9a441);transform:translate(-50%,-50%)}
+.sbx-det-cab i::after{transform:translate(-50%,-50%) rotate(90deg);transition:opacity .2s}
+.sbx-det.aberto .sbx-det-cab i::after{opacity:0}
+.sbx-det-cab:hover i{border-color:var(--gold-dim,#8a6d2f)}
+.sbx-det-corpo{padding:0 clamp(14px,2.6vw,22px) clamp(16px,2.6vw,22px);animation:sbx-in .3s ease both}
+
+/* ── conteudo dos blocos ── */
+.sbx-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.sbx-tabs button{
+  cursor:pointer;text-align:left;background:#0b090e;border:1px solid var(--edge);border-radius:8px;
+  padding:12px;color:#fff;font:700 15px/1.2 'Cinzel',serif;
+}
+.sbx-tabs button span{display:block;font:300 11.5px/1.4 'Sora',sans-serif;color:#8a8478;margin-top:4px}
+.sbx-tabs button.on{border-color:var(--gold-dim,#8a6d2f);color:var(--gold,#d9a441)}
+.sbx-tabela-wrap{overflow-x:auto;border:1px solid var(--edge);border-radius:10px}
+.sbx-tabela{width:100%;border-collapse:collapse;min-width:600px}
+.sbx-tabela th,.sbx-tabela td{padding:11px 13px;text-align:left;border-bottom:1px solid var(--edge);font:300 12.5px/1.4 'Sora',sans-serif}
+.sbx-tabela tr:last-child td{border-bottom:0}
+.sbx-tabela th{font:600 10px/1 'Sora',sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#8a8478;cursor:pointer;background:#0b090e}
+.sbx-tabela th.ativa{color:var(--c)}
+.sbx-tabela td:first-child{font-weight:600;color:#e8e2d6}
+.sbx-tabela td{color:#5d574c;transition:color .2s,background .2s}
+.sbx-tabela td.ativa{color:#e8e2d6;background:color-mix(in srgb,var(--c) 7%,transparent)}
+.sbx-sockets{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.sbx-sockets > div{background:#0b090e;border:1px solid var(--edge);border-radius:10px;padding:12px}
+.sbx-sockets span{font:600 12px/1 'Sora',sans-serif;color:var(--c)}
+.sbx-sockets > div > div{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.sbx-sockets i{width:15px;height:15px;border:1.5px solid var(--c);border-radius:3px;transform:rotate(45deg);box-shadow:0 0 8px color-mix(in srgb,var(--c) 40%,transparent)}
+.sbx-runas{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.sbx-runas div{background:#0b090e;border:1px solid var(--edge);border-radius:10px;padding:14px}
+.sbx-runas.lend div{border-color:rgba(242,182,50,.35);background:linear-gradient(180deg,rgba(242,182,50,.07),#0b090e 60%)}
+.sbx-runas.lend b{color:#f2b632}
+.sbx-runas.epic b{color:#b98cff}
+.sbx-runas b{font:700 14px/1.3 'Cinzel',serif}
+.sbx-runas p{font:300 12.5px/1.5 'Sora',sans-serif;color:#b9b2a4;margin:6px 0 0}
+.sbx-attrs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.sbx-attrs > div{background:#0b090e;border:1px solid var(--edge);border-radius:10px;padding:12px}
+.sbx-attrs small{display:block;font:600 10px/1 'Sora',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--rubi);margin-bottom:10px}
+.sbx-attrs > div > div{display:flex;flex-wrap:wrap;gap:5px}
+.sbx-attrs span{font:400 11px/1 'Sora',sans-serif;color:#e8e2d6;border:1px solid #2c2620;border-radius:4px;padding:6px 7px}
+.sbx-oficios{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.sbx-oficio{background:#0b090e;border:1px solid var(--edge);border-radius:12px;padding:16px}
+.sbx-oficio-cab{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.sbx-oficio h3{font:700 17px/1.2 'Cinzel',serif;color:#fff;margin:0}
+.sbx-oficio > p{font:300 13px/1.55 'Sora',sans-serif;color:#b9b2a4;margin:8px 0 0}
+.sbx-oficio ul{margin:12px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
+.sbx-oficio li{font:300 12.5px/1.5 'Sora',sans-serif;color:#cfc9bc}
+.sbx-oficio li::marker{color:var(--rubi)}
+.sbx-refino{margin-top:12px;display:flex;flex-direction:column;gap:10px}
+.sbx-refino small{display:block;font:500 11px/1 'Sora',sans-serif;color:#8a8478;margin-bottom:6px}
+.sbx-pilha{display:flex;height:22px;border-radius:5px;overflow:hidden}
+.sbx-pilha i{display:grid;place-items:center;font:700 10px/1 'Sora',sans-serif;font-style:normal;color:#120c06;min-width:3px}
+.sbx-cards4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.sbx-cards4 > div{background:#0b090e;border:1px solid var(--edge);border-radius:10px;padding:15px}
+.sbx-cards4 small{display:block;font:700 12px/1 'Cinzel',serif;color:var(--rubi);margin-bottom:8px}
+.sbx-cards4 b{font:700 14.5px/1.3 'Cinzel',serif}
+.sbx-cards4 p{font:300 13px/1.5 'Sora',sans-serif;color:#b9b2a4;margin:6px 0 0}
+.sbx-camadas-grade{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.sbx-camadas-grade div{border:1px solid var(--edge);border-radius:8px;padding:13px;background:#0b090e}
+.sbx-camadas-grade .nova{border-color:var(--rubi);background:rgba(194,65,45,.08)}
+.sbx-camadas-grade small{display:block;font:600 9.5px/1 'Sora',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#8a8478;margin-bottom:8px}
+.sbx-camadas-grade .nova small{color:#e07a5f}
+.sbx-camadas-grade b{display:block;font:700 14.5px/1.2 'Cinzel',serif;margin-bottom:4px}
+.sbx-camadas-grade span{font:300 12.5px/1.5 'Sora',sans-serif;color:#b9b2a4}
+.sbx-road{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.sbx-road > div{background:#0b090e;border:1px solid var(--edge);border-radius:10px;padding:15px}
+.sbx-road ul{margin:12px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:7px}
+.sbx-road li{font:300 13px/1.45 'Sora',sans-serif;color:#cfc9bc;padding-left:14px;position:relative}
+.sbx-road li::before{content:"";position:absolute;left:0;top:.6em;width:5px;height:5px;border-radius:50%;background:var(--gold-dim,#8a6d2f)}
+
+/* ── prints do cliente ── */
+.sbx-prints{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px}
+.sbx-print{margin:0}
+.sbx-print button{
+  position:relative;display:block;width:100%;padding:0;cursor:zoom-in;background:#000;
+  border:1px solid var(--edge);border-radius:10px;overflow:hidden;transition:border-color .2s;
+}
+.sbx-print button:hover{border-color:var(--gold-dim,#8a6d2f)}
+.sbx-print img{display:block;width:100%;aspect-ratio:16/10;object-fit:cover;transition:transform .4s}
+.sbx-print button:hover img{transform:scale(1.03)}
+.sbx-print.alto img{aspect-ratio:auto;max-height:420px;object-fit:contain}
+.sbx-print-tag{
+  position:absolute;top:10px;left:10px;font:600 9.5px/1 'Sora',sans-serif;letter-spacing:.14em;text-transform:uppercase;
+  color:#fff;background:rgba(194,65,45,.9);padding:6px 9px;border-radius:4px;
+}
+.sbx-print figcaption{font:300 12px/1.5 'Sora',sans-serif;color:#9b9484;margin-top:7px}
+.sbx-prova{
+  display:grid;grid-template-columns:minmax(0,240px) 1fr;gap:clamp(16px,3vw,28px);align-items:center;margin-top:14px;
+  background:var(--card);border:1px solid var(--edge);border-radius:12px;padding:clamp(14px,2.4vw,20px);
+}
+.sbx-det .sbx-prova{background:#0b090e}
+.sbx-prova h3{font:700 17px/1.3 'Cinzel',serif;color:#fff;margin:0 0 6px}
+.sbx-prova p{font:300 13.5px/1.6 'Sora',sans-serif;color:#b9b2a4;margin:0}
+.sbx-zoom{
+  position:fixed;inset:0;z-index:12000;background:rgba(2,2,3,.94);backdrop-filter:blur(8px);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:16px;cursor:zoom-out;
+}
+.sbx-zoom img{max-width:min(1400px,100%);max-height:84vh;object-fit:contain;border-radius:8px;border:1px solid var(--edge)}
+.sbx-zoom p{font:300 14px/1.5 'Sora',sans-serif;color:#cfc9bc;margin:0;text-align:center}
+
+/* ── download final ── */
+.sbx-final{
+  margin-top:clamp(48px,7vw,84px);text-align:center;border-radius:16px;border:1px solid #3a3020;
+  background:radial-gradient(ellipse at 50% 0%,rgba(217,164,65,.14),transparent 65%),var(--card);
+  padding:clamp(28px,5vw,52px) 20px;scroll-margin-top:70px;
+}
+.sbx-final h2{font:700 clamp(22px,3.4vw,32px)/1.2 'Cinzel',serif;color:#fff;margin:0 0 8px}
+.sbx-final p{font:300 14.5px/1.55 'Sora',sans-serif;color:#b9b2a4;margin:0 auto 22px;max-width:46ch}
+
+/* barra fixa de baixar: so no celular */
+.sbx-barra-baixar{display:none}
+
+@media (prefers-reduced-motion:reduce){.sbx-logo,.sbx-mapa-det,.sbx-det-corpo{animation:none}}
+
+/* ── responsivo ── */
+@media (max-width:980px){
+  .sbx-rars,.sbx-sockets,.sbx-runas,.sbx-attrs,.sbx-cards4{grid-template-columns:repeat(2,1fr)}
+  .sbx-oficios,.sbx-road{grid-template-columns:1fr}
+}
+@media (max-width:900px){
+  .sbx-jogo-hero{grid-template-columns:minmax(0,1fr)}
+  .sbx-fato.f1,.sbx-fato.f2,.sbx-fato.f3,.sbx-fato.f4{transform:none}
+  .sbx-fato.build{margin-top:0}
+}
+@media (max-width:760px){
+  .sbx-baixar.nav{display:none}
+  /* mapa vertical: numero e nome em linha, ramos como etiqueta ao lado */
+  .sbx-trilha{grid-template-columns:1fr;padding:0;gap:14px}
+  .sbx-trilha::before{left:28px;right:auto;top:20px;bottom:20px;width:2px;height:auto;transform:none;
+    background:linear-gradient(180deg,#26324a,var(--azul),#26324a)}
+  .sbx-trilha > li{justify-content:flex-start;flex-wrap:wrap;gap:8px 0}
+  .sbx-no{flex-direction:row;gap:14px;width:100%}
+  .sbx-no span{align-items:flex-start;text-align:left}
+  .sbx-no b{font-size:16px}
+  .sbx-ramo{position:static;transform:none;order:2;margin-left:72px;text-align:left;max-width:none;padding:6px 10px}
+  .sbx-ramo::after{display:none}
+  .sbx-ramo b,.sbx-ramo span{display:inline}
+  .sbx-ramo span{margin-left:6px}
+  .sbx-ramo.cima b::before{content:"+ "}
+  .sbx-ramo.baixo b::before{content:"\2194  "}
+  .sbx-mapa-det.pc{display:none}
+  .sbx-mapa-det.cel{display:block;order:3;width:calc(100% - 72px);margin-left:72px;position:relative;z-index:1}
+  .sbx-barra-baixar{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    position:fixed;left:0;right:0;bottom:0;z-index:40;padding:10px 16px calc(10px + env(safe-area-inset-bottom));
+    background:rgba(8,7,10,.94);backdrop-filter:blur(12px);border-top:1px solid #3a3020;
+  }
+  .sbx-barra-baixar span{display:flex;flex-direction:column;gap:3px;min-width:0}
+  .sbx-barra-baixar b{font:700 13px/1.1 'Cinzel',serif}
+  .sbx-barra-baixar small{font:400 11px/1.2 'Sora',sans-serif;color:#9b9484}
+  .sbx-barra-baixar .sbx-baixar{--q:8px;padding:13px 16px;font-size:10.5px}
+}
+@media (max-width:560px){
+  .sbx-fato > span{display:block;margin:6px 0 0}
+  .sbx-fato{padding:13px 13px}
+  .sbx-rars,.sbx-rar-legenda,.sbx-runas,.sbx-attrs,.sbx-cards4,.sbx-tabs,.sbx-prints,.sbx-prova,.sbx-camadas-grade{grid-template-columns:1fr}
+  .sbx-hero-cta{flex-direction:column}
+  .sbx-hero-cta > *{text-align:center}
+  .sbx-todos span{display:none}
+  .sbx-rar{display:grid;grid-template-columns:104px minmax(0,1fr);align-items:center}
+  .sbx-rar img{height:100%;aspect-ratio:auto;min-height:150px}
+  .sbx-rar-txt{padding:12px 12px 12px 10px;text-align:left}
+  .sbx-rar-chance{font-size:24px;margin:4px 0 8px}
+  .sbx-rar-chance small{display:inline;margin-left:6px}
+}
+
+/* ── cantos chanfrados na pagina inteira ──
+   corner-shape:bevel corta o canto em diagonal e desenha a borda no corte (Chrome/Edge 139+).
+   Circulos (50%) viram losangos e etiquetas viram hexagonos. Onde o navegador nao suporta
+   (Safari/Firefox hoje), os cantos ficam quase retos em vez de arredondados. */
+@supports (corner-shape:bevel){
+  .sbx *{corner-shape:bevel}
+}
+@supports not (corner-shape:bevel){
+  .sbx :is(div,section,button,a,figure,table,dl,span){border-radius:2px !important}
+}
+
+/* ══ visual da logo IS Labs: aco escovado + azul eletrico ══ */
+.sbx{
+  --aco:linear-gradient(180deg,#ffffff 0%,#e3e9f3 28%,#99a5ba 50%,#cdd5e2 68%,#f4f7fb 100%);
+  --eletrico:#4f8dff;--brilho:rgba(79,141,255,.55);
+}
+
+/* titulos e numeros em metal (como as letras IS) */
+.sbx-jogo-hero h1,.sbx-sec-cab h2,.sbx-final h2,.sbx-fato.build h3,.sbx-mapa-det h3,.sbx-fato > b,.sbx-rar-chance{
+  background:var(--aco);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;
+}
+/* brilho so' nos titulos grandes; nos de secao o blur deixava um retangulo claro atras */
+.sbx-jogo-hero h1,.sbx-fato > b{filter:drop-shadow(0 0 16px rgba(79,141,255,.3)) drop-shadow(0 2px 1px rgba(0,0,0,.7))}
+.sbx-jogo-hero h1 small,.sbx-rar-chance small{-webkit-text-fill-color:currentColor}
+.sbx-jogo-hero h1 small{color:#8fb6ff;text-shadow:0 0 14px var(--brilho)}
+
+/* feixe de luz embaixo dos titulos (o risco azul sob o LABS) */
+.sbx-sec-cab::after,.sbx-final h2::after{
+  content:"";display:block;height:2px;width:min(380px,70%);margin-top:14px;
+  background:linear-gradient(90deg,transparent,rgba(79,141,255,.6) 18%,#cfe0ff 32%,#fff 36%,#cfe0ff 40%,rgba(79,141,255,.6) 56%,transparent);
+  filter:drop-shadow(0 0 6px var(--eletrico));
+}
+.sbx-final h2::after{margin:14px auto 0}
+
+/* luz correndo pela quina dos paineis (borda acesa da logo) */
+.sbx-jogo-hero,.sbx-mapa-det,.sbx-final,.sbx-fato.build{position:relative;border-color:#2b3956;
+  box-shadow:inset 0 1px 0 rgba(200,220,255,.1),0 30px 60px rgba(0,0,0,.5)}
+.sbx-jogo-hero::before,.sbx-mapa-det::before,.sbx-final::before,.sbx-fato.build::before{
+  content:"";position:absolute;top:0;left:8%;width:46%;height:1.5px;pointer-events:none;
+  background:linear-gradient(90deg,transparent,#8fb6ff 30%,#fff 50%,#8fb6ff 70%,transparent);
+  filter:drop-shadow(0 0 8px var(--eletrico));animation:sbx-quina 7s ease-in-out infinite;
+}
+.sbx-jogo-hero::after,.sbx-final::after{
+  content:"";position:absolute;bottom:0;right:6%;width:30%;height:1.5px;pointer-events:none;
+  background:linear-gradient(90deg,transparent,#4f8dff 40%,#cfe0ff 60%,transparent);filter:drop-shadow(0 0 8px var(--eletrico));
+}
+@keyframes sbx-quina{50%{left:46%}}
+.sbx-fato.build{border-color:#4f8dff;box-shadow:0 18px 40px rgba(0,0,0,.45),0 0 44px rgba(79,141,255,.2)}
+.sbx-fato,.sbx-det,.sbx-rar,.sbx-rar-legenda div{box-shadow:inset 0 1px 0 rgba(200,220,255,.06)}
+.sbx-fato:hover,.sbx-det.aberto{border-color:#3a5a9c;box-shadow:0 0 24px rgba(79,141,255,.16)}
+
+/* botao principal: face de aco + aro azul eletrico */
+.sbx-baixar,.sbx-mapa-acoes button.prox{
+  color:#0a1426;text-shadow:0 1px 0 rgba(255,255,255,.55);
+  background:linear-gradient(180deg,#e2edff,#4f8dff 45%,#1f4fc0);
+}
+.sbx-baixar::before,.sbx-mapa-acoes button.prox::before{
+  background:linear-gradient(180deg,#ffffff 0%,#e3e9f3 32%,#a3aec1 52%,#ccd4e1 74%,#f1f4f9 100%);
+}
+.sbx-baixar::after,.sbx-mapa-acoes button.prox::after{background:linear-gradient(100deg,transparent,rgba(255,255,255,.75),transparent)}
+.sbx-baixar:hover,.sbx-mapa-acoes button.prox:hover{filter:brightness(1.06)}
+/* secundario: miolo escuro, aro de aco */
+.sbx-btn,.sbx-mapa-acoes button{background:linear-gradient(180deg,#9aa6bb,#3a465e 60%,#4f5d78)}
+.sbx-btn:hover,.sbx-mapa-acoes button:hover{background:linear-gradient(180deg,#cfe0ff,#4f8dff)}
+
+/* o span do botao segura o brilho (o corte chanfrado apagaria a sombra) */
+.sbx-brilho{display:inline-flex;flex:0 0 auto;filter:drop-shadow(0 0 7px var(--brilho)) drop-shadow(0 6px 16px rgba(30,80,200,.35));animation:sbx-pulso 2.8s ease-in-out infinite}
+.sbx-brilho > .sbx-baixar{flex:1}
+@keyframes sbx-pulso{50%{filter:drop-shadow(0 0 14px rgba(79,141,255,.85)) drop-shadow(0 8px 22px rgba(30,80,200,.45))}}
+
+/* losangos do mapa em aco; o ativo acende em azul */
+.sbx-no i{color:#eef2f8;background:linear-gradient(160deg,#3a465e,#10141f 60%);border-color:#7d8aa3}
+.sbx-trilha > li.on .sbx-no i{color:#fff;background:linear-gradient(160deg,#6fa3ff,#173a86);border-color:#e2edff;
+  box-shadow:0 0 0 6px rgba(79,141,255,.16),0 0 32px rgba(79,141,255,.75)}
+.sbx-trilha::before{background:linear-gradient(90deg,transparent,#4f8dff 15%,#cfe0ff 50%,#4f8dff 85%,transparent);filter:drop-shadow(0 0 6px var(--eletrico))}
+.sbx-ramo b,.sbx-fato.build small,.sbx-mapa-det small,.sbx-jogo small{text-shadow:0 0 10px var(--brilho)}
+.sbx-jogo.on{border-color:#4f8dff;box-shadow:0 0 18px rgba(79,141,255,.3)}
+
+/* fagulhas */
+.sbx-faiscas{position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden}
+.sbx-faiscas i{
+  position:absolute;width:5px;height:5px;border-radius:50%;background:#e2edff;opacity:0;
+  box-shadow:0 0 8px 2px rgba(79,141,255,.9);animation:sbx-pisca var(--d) ease-in-out var(--a) infinite;
+}
+@keyframes sbx-pisca{0%,100%{opacity:0;transform:translateY(8px) scale(.6)}50%{opacity:.95;transform:translateY(-14px) scale(1)}}
+.sbx-marca .sbx-logo{position:relative;z-index:0}
+
+@media (prefers-reduced-motion:reduce){
+  .sbx-brilho,.sbx-faiscas i,.sbx-jogo-hero::before,.sbx-mapa-det::before,.sbx-final::before,.sbx-fato.build::before{animation:none}
+  .sbx-faiscas i{opacity:.6}
+}
+
+/* icone de abrir/fechar dos blocos em azul */
+.sbx-det-cab i{border-color:#3a4a6e}
+.sbx-det-cab i::before,.sbx-det-cab i::after{background:#8fb6ff;box-shadow:0 0 6px var(--eletrico)}
+.sbx-det-cab:hover i{border-color:#4f8dff}
+
+/* ── beta em destaque (ambar: a unica cor quente perto do topo, para chamar atencao) ── */
+.sbx{--ambar:#ffb43a;--ambar-brilho:rgba(255,170,40,.5)}
+.sbx-tag-beta{
+  text-decoration:none;display:inline-block;margin-left:7px;padding:3px 6px 2px;vertical-align:1px;
+  font:800 8.5px/1 'Sora',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#1a1004;
+  background:var(--ambar);border-radius:3px;box-shadow:0 0 10px var(--ambar-brilho);
+}
+.sbx-beta{
+  position:relative;z-index:2;display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin:0 0 14px;
+  padding:13px 18px;border:1px solid rgba(255,180,58,.55);border-radius:10px;
+  background:
+    repeating-linear-gradient(135deg,rgba(255,180,58,.07) 0 10px,transparent 10px 20px),
+    linear-gradient(90deg,rgba(60,38,8,.85),rgba(14,11,8,.92));
+  box-shadow:0 0 28px rgba(255,170,40,.16),inset 0 1px 0 rgba(255,220,150,.12);
+}
+.sbx-beta p{margin:0;flex:1 1 300px;font:300 13.5px/1.5 'Sora',sans-serif;color:#e6dcc8}
+.sbx-beta p b{color:#ffd38a}
+.sbx-beta-selo,.sbx-jogo-status.beta{
+  display:inline-flex;align-items:center;gap:8px;flex:0 0 auto;
+  font:800 10.5px/1 'Sora',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:var(--ambar);
+  text-shadow:0 0 10px var(--ambar-brilho);
+}
+.sbx-beta-selo{border:1px solid rgba(255,180,58,.6);border-radius:100px;padding:8px 13px;background:rgba(30,20,4,.8)}
+.sbx-beta-selo em,.sbx-jogo-status.beta em{
+  width:8px;height:8px;border-radius:50%;background:var(--ambar);box-shadow:0 0 10px var(--ambar);
+  animation:sbx-beta-pisca 1.6s ease-in-out infinite;
+}
+.sbx-jogo-status.beta{background:rgba(30,20,4,.75);border-color:rgba(255,180,58,.5);color:var(--ambar)}
+@keyframes sbx-beta-pisca{50%{opacity:.35;box-shadow:0 0 2px var(--ambar)}}
+@media (prefers-reduced-motion:reduce){.sbx-beta-selo em,.sbx-jogo-status.beta em{animation:none}}
+.sbx-jogo-status.marca{color:#8fb6ff;border-color:#2b3956;background:rgba(10,14,26,.75)}
+.sbx-jogo-status.marca em{background:#4f8dff;box-shadow:0 0 10px #4f8dff}
+
+/* ── celular: mais direto ── */
+@media (max-width:560px){
+  /* numeros compactos: so' numero e rotulo (o texto longo fica no PC) */
+  .sbx-fato.f1 p,.sbx-fato.f2 p,.sbx-fato.f4 p{display:none}
+  .sbx-fato.f3 p{display:none}
+  .sbx-fato:not(.build){padding:12px 12px 13px}
+  .sbx-fatos{gap:8px}
+  /* legenda das raridades: um card, tres linhas */
+  .sbx-rar-legenda{grid-template-columns:1fr;gap:0;border:1px solid var(--edge);border-radius:10px;background:var(--card)}
+  .sbx-rar-legenda div{border:0;border-radius:0;background:none;padding:10px 14px;display:flex;justify-content:space-between;gap:12px;align-items:baseline}
+  .sbx-rar-legenda div + div{border-top:1px solid var(--edge)}
+  .sbx-rar-legenda b{margin:0;font-size:13px;flex:0 0 auto}
+  .sbx-rar-legenda span{font-size:12px;text-align:right}
+}
+@media (max-width:760px){
+  .sbx-ramo{max-width:calc(100% - 72px)}
+  .sbx-mapa-det.cel ul{padding-left:18px}
+}
+
+/* ── barra: comunidade e conta ── */
+.sbx-nav .rede-shell{gap:12px}
+.sbx-acoes{display:flex;align-items:center;gap:8px;flex:0 0 auto;margin-left:auto}
+.sbx-social{
+  display:inline-flex;align-items:center;gap:7px;text-decoration:none;flex:0 0 auto;
+  font:700 10.5px/1 'Sora',sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#d8e2f4;
+  padding:9px 12px;border:1px solid #2b3956;border-radius:7px;background:rgba(12,16,28,.8);
+  transition:border-color .2s,color .2s,box-shadow .2s;
+}
+.sbx-social.zap:hover{border-color:#25d366;color:#7dffb0;box-shadow:0 0 16px rgba(37,211,102,.3)}
+.sbx-social.dc:hover{border-color:#5865f2;color:#b8beff;box-shadow:0 0 16px rgba(88,101,242,.35)}
+.sbx-social.zap svg{color:#25d366}
+.sbx-social.dc svg{color:#8b95ff}
+.sbx-conta{
+  cursor:pointer;flex:0 0 auto;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  font:700 10.5px/1 'Sora',sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#fff;
+  padding:10px 14px;border:1px solid #4f5d78;border-radius:7px;background:linear-gradient(180deg,#1a2133,#0d111c);
+  transition:border-color .2s,box-shadow .2s;
+}
+.sbx-conta:hover{border-color:#8fb6ff;box-shadow:0 0 16px rgba(79,141,255,.3)}
+.sbx-conta.admin{color:var(--ambar,#ffb43a);border-color:rgba(255,180,58,.5)}
+
+/* fechamento: conta e comunidade */
+.sbx-final-conta{margin:16px auto 0 !important;font:300 13.5px/1.5 'Sora',sans-serif;color:#9b9484}
+.sbx-final-conta button{background:none;border:0;padding:0;cursor:pointer;color:#8fb6ff;font:600 13.5px/1.5 'Sora',sans-serif;text-decoration:underline;text-underline-offset:3px}
+.sbx-final-com{margin-top:26px;padding-top:22px;border-top:1px solid #1f2638}
+.sbx-final-com > span{display:block;font:300 13px/1.5 'Sora',sans-serif;color:#9b9484;margin-bottom:12px}
+.sbx-final-com > div{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.sbx-social.grande{padding:13px 18px;font-size:11px}
+
+
+@media (max-width:760px){
+  .sbx-nav .rede-shell{gap:8px}
+  .sbx-acoes{gap:6px}
+  .sbx-social:not(.grande) span{display:none}
+  .sbx-social:not(.grande){padding:9px}
+  .sbx-conta{padding:10px 11px;max-width:96px}
+  .sbx-jogo small{display:none}
+  /* barra cabe em 360px: aba do jogo, comunidade e Entrar sem cortar */
+  .sbx-jogo{padding:8px 9px;gap:6px}
+  .sbx-jogo em{display:none}
+  .sbx-tag-beta{margin-left:5px}
+  .sbx-social:not(.grande){padding:8px}
+  .sbx-conta{padding:9px 10px;letter-spacing:.08em}
+  .sbx-todos{padding-right:8px}
+}
+@media (max-width:380px){
+  .sbx-nav .rede-shell{gap:5px}
+  .sbx-acoes{gap:4px}
+  .sbx-todos{padding-right:6px}
+}
+
+/* rodape da home dentro da pagina: respiro antes dele; no celular, espaco para a barra fixa de baixar */
+.sbx > footer{margin-top:clamp(50px,7vw,80px)}
+@media (max-width:760px){.sbx > footer{padding-bottom:96px !important}}

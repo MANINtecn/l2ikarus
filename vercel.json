@@ -14,6 +14,10 @@
       "destination": "/"
     },
     {
+      "source": "/sandbox",
+      "destination": "/"
+    },
+    {
       "source": "/r/:slug",
       "destination": "/"
     },
@@ -212,6 +216,18 @@
     {
       "source": "/regulamento-indicacao",
       "destination": "/regulamento-indicacao.html"
+    },
+    {
+      "source": "/api/links",
+      "destination": "/api/status?action=links"
+    },
+    {
+      "source": "/api/admin/links",
+      "destination": "/api/admin?action=links"
+    },
+    {
+      "source": "/api/admin/links-save",
+      "destination": "/api/admin?action=links-save"
     }
   ]
 }

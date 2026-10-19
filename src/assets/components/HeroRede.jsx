@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import './HeroRede.css'
+import { useLinksComunidade } from '../../config/linksComunidade'
 
 /**
  * Home da rede IS SERVERS — direcao "Portais" (aprovada 2026-09-03).
@@ -10,6 +11,7 @@ import './HeroRede.css'
  * uma a uma) — ver HeroRede.css.
  */
 export default function HeroRede({ onRegisterClick, onLoginClick, onAbrirServidor }) {
+  const links = useLinksComunidade()
   const navRef = useRef(null)
 
   // A nav nasce transparente e escurece quando a pagina sai do topo.
@@ -102,7 +104,7 @@ export default function HeroRede({ onRegisterClick, onLoginClick, onAbrirServido
             <a href="#servidores">Servidores</a>
             <a href="#conta">Conta</a>
             <a href="#ranking">Ranking</a>
-            <a href="https://discord.gg/ikarus" target="_blank" rel="noreferrer">Discord</a>
+            {links.discord && <a href={links.discord} target="_blank" rel="noreferrer">Discord</a>}
           </div>
           <div className="rede-acoes">
             <button type="button" className="rede-login" onClick={onLoginClick}>

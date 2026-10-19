@@ -1,9 +1,22 @@
+import { getConnection } from './_db.js';
+import { lerLinks } from './_links.js';
+
 const VPS_STATUS_URL = process.env.VPS_STATUS_URL;   // ex: http://192.99.110.164:8080/status
 const VPS_API_KEY   = process.env.VPS_STATUS_TOKEN;  // mesmo valor de STATUS_API_KEY no VPS
 
 export default async function handler(_req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Content-Type', 'application/json');
+
+  // IKARUS 2026-10-19: GET /api/links (rewrite -> ?action=links) = links de convite da
+  // comunidade que o admin grava no painel. Publico, so' leitura. Mora aqui para nao criar
+  // mais uma funcao na Vercel. links=null -> o site usa os links padrao.
+  if (_req.query?.action === 'links') {
+    let links = null;
+    try { links = await lerLinks(await getConnection()); } catch {}
+    res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=300');
+    return res.status(200).json({ links });
+  }
 
   if (!VPS_STATUS_URL || !VPS_API_KEY) {
     return res.status(200).json({ online: false, players: 0, offline: 0, accounts: 0,

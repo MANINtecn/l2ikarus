@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import ReferralAdmin from './ReferralAdmin'
+import LinksAdmin from './LinksAdmin'
 
 const TABS = [
   { id: 'overview', label: 'VISÃO GERAL' },
@@ -11,6 +12,7 @@ const TABS = [
   { id: 'streamers', label: 'STREAMERS' },
   { id: 'indicacao', label: 'INDICAÇÃO' },
   { id: 'charmgmt', label: 'PERSONAGENS' },
+  { id: 'links', label: 'LINKS' },
 ]
 
 
@@ -216,7 +218,7 @@ const Table = ({ cols, rows, emptyMsg = 'Nenhum dado' }) => (
       </table>
 )
 
-export default function AdminPanel({ user, onLogout }) {
+export default function AdminPanel({ user, onLogout, onFechar }) {
   const [tab, setTab] = useState('overview')
   const [stats, setStats] = useState(null)
   const [players, setPlayers] = useState([])
@@ -505,6 +507,8 @@ export default function AdminPanel({ user, onLogout }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
           {user.picture && <img src={user.picture} alt="" style={{ width: '32px', height: '32px', borderRadius: '50%', border: '2px solid rgba(197,160,89,0.4)' }} />}
           <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.75rem' }}>{user.email}</span>
+          {/* aberto por cima de outra pagina (ex.: /sandbox): fecha e volta para ela */}
+          {onFechar && <button onClick={onFechar} className="btn btn-primary" style={{ padding: '0.4rem 1rem', fontSize: '0.65rem', letterSpacing: '2px' }}>VOLTAR AO SITE</button>}
           <button onClick={onLogout} style={{ background: 'rgba(255,68,68,0.1)', border: '1px solid rgba(255,68,68,0.3)', color: '#ff4444', padding: '0.4rem 1rem', borderRadius: '6px', fontSize: '0.65rem', letterSpacing: '2px', cursor: 'pointer' }}>SAIR</button>
         </div>
       </div>
@@ -914,6 +918,9 @@ export default function AdminPanel({ user, onLogout }) {
         {/* ABA PROGRAMA DE INDICAÇÃO — aprovar inscrições, pagar saques, ver parceiros.
             Componente próprio: este arquivo já passa de 900 linhas. */}
         {tab === 'indicacao' && <ReferralAdmin />}
+
+        {/* ABA LINKS — convites do grupo e do Discord que os botoes do site abrem */}
+        {tab === 'links' && <LinksAdmin />}
 
         {/* ABA PERSONAGENS (edição offline) */}
         {tab === 'charmgmt' && (

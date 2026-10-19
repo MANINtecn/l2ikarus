@@ -9,6 +9,7 @@ import HeroRede from './assets/components/HeroRede'
 import FeaturesTerminal from './assets/components/FeaturesTerminal'
 import Comunidade from './assets/components/Comunidade'
 import PaginaServidor from './assets/components/PaginaServidor'
+import PaginaSandbox from './assets/components/PaginaSandbox'
 import InterludeInfo from './assets/components/InterludeInfo'
 import DonateTerminal from './assets/components/DonateTerminal'
 import AdminPanel from './assets/components/AdminPanel'
@@ -32,6 +33,8 @@ function App() {
   const [loginForm, setLoginForm] = useState({ login: '', password: '' })
   const [loginError, setLoginError] = useState('')
   const [loginLoading, setLoginLoading] = useState(false)
+  // /sandbox: qual painel esta aberto por cima da pagina ('jogador' | 'admin' | null)
+  const [painelSandbox, setPainelSandbox] = useState(null)
   const containerRef = useRef(null)
 
   // Rota simples via History API: '/' e as paginas dos servidores.
@@ -99,7 +102,7 @@ function App() {
   }, [])
 
   useEffect(() => {
-    if (loading) return
+    if (loading || !containerRef.current) return
     const sections = containerRef.current.querySelectorAll('section')
     sections.forEach((section) => {
       gsap.to(section, {
@@ -127,6 +130,7 @@ function App() {
       if (me.authenticated) {
         setPlayerData(me)
         setIsLoginOpen(false)
+        if (window.location.pathname === '/sandbox') setPainelSandbox('jogador')
         setLoginForm({ login: '', password: '' })
       }
     } catch {
@@ -146,7 +150,35 @@ function App() {
         />
       )}
 
-      {!loading && !slugServidor && (
+      {!loading && rota === '/sandbox' && (
+        <PaginaSandbox
+          onVoltar={(e) => { e.preventDefault(); irPara('/') }}
+          jogador={playerData}
+          admin={adminUser}
+          onEntrar={() => setIsLoginOpen(true)}
+          onCriarConta={() => setIsRegisterOpen(true)}
+          onAbrirConta={() => setPainelSandbox('jogador')}
+          onAbrirAdmin={() => setPainelSandbox('admin')}
+        />
+      )}
+
+      {/* no /sandbox os paineis so' abrem quando a pessoa pede (na home abrem sozinhos apos o login) */}
+      {!loading && rota === '/sandbox' && painelSandbox === 'jogador' && playerData && (
+        <PlayerPanel
+          data={playerData}
+          onLogout={() => { window.location.href = '/api/player/logout' }}
+          onFechar={() => setPainelSandbox(null)}
+        />
+      )}
+      {!loading && rota === '/sandbox' && painelSandbox === 'admin' && adminUser && (
+        <AdminPanel
+          user={adminUser}
+          onLogout={() => { window.location.href = '/api/auth/logout' }}
+          onFechar={() => setPainelSandbox(null)}
+        />
+      )}
+
+      {!loading && !slugServidor && rota !== '/sandbox' && (
         <>
           {bannerVisible && <BetaBanner onDismiss={() => setBannerVisible(false)} />}
           {/* IKARUS 2026-09-03: home da REDE (direcao Portais). Substituiu o Hero3D,
@@ -195,63 +227,6 @@ function App() {
             <Footer onAdminClick={() => { window.location.href = '/api/auth/google' }} />
           </div>
 
-          {/* MODAL DE CADASTRO */}
-          <RegisterModal
-            isOpen={isRegisterOpen}
-            onClose={() => { setIsRegisterOpen(false); setGoogleData(null) }}
-            googleData={googleData}
-          />
-
-          {/* MODAL DE LOGIN DO JOGADOR */}
-          {isLoginOpen && (
-            <div style={{
-              position: 'fixed', inset: 0, zIndex: 11000,
-              background: 'rgba(2,2,3,0.98)', display: 'flex', alignItems: 'center', justifyContent: 'center',
-              backdropFilter: 'blur(40px)',
-            }} onClick={() => { setIsLoginOpen(false); setLoginError('') }}>
-              <div className="glass-panel" style={{
-                padding: '3.5rem', width: '100%', maxWidth: '420px', textAlign: 'center',
-                border: '1px solid rgba(197,160,89,0.3)',
-                animation: 'fadeUp 0.6s cubic-bezier(0.2,1,0.3,1) forwards',
-              }} onClick={e => e.stopPropagation()}>
-                <div style={{ width: '40px', height: '2px', background: 'var(--gold)', margin: '0 auto 2rem' }} />
-                <h2 className="cinzel" style={{ color: 'var(--gold)', marginBottom: '0.75rem', fontSize: '1.8rem' }}>PAINEL DO JOGADOR</h2>
-                <p style={{ color: 'var(--text-mute)', fontSize: '0.75rem', letterSpacing: '2px', marginBottom: '2rem' }}>
-                  Acesse sua conta para gerenciar personagens.
-                </p>
-
-                {loginError && (
-                  <div style={{ background: 'rgba(255,68,68,0.1)', border: '1px solid rgba(255,68,68,0.3)', padding: '0.8rem', marginBottom: '1.5rem', color: '#ff4444', fontSize: '0.75rem' }}>
-                    {loginError}
-                  </div>
-                )}
-
-                <form onSubmit={handlePlayerLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2rem' }}>
-                  <input
-                    type="text" placeholder="LOGIN" required
-                    value={loginForm.login}
-                    onChange={e => setLoginForm({ ...loginForm, login: e.target.value })}
-                    style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', padding: '1rem', color: '#fff', fontSize: '0.85rem', outline: 'none', borderRadius: '4px' }}
-                  />
-                  <input
-                    type="password" placeholder="SENHA" required
-                    value={loginForm.password}
-                    onChange={e => setLoginForm({ ...loginForm, password: e.target.value })}
-                    style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', padding: '1rem', color: '#fff', fontSize: '0.85rem', outline: 'none', borderRadius: '4px' }}
-                  />
-                  <button type="submit" className="btn btn-primary" disabled={loginLoading} style={{ width: '100%', padding: '1rem' }}>
-                    {loginLoading ? 'CONECTANDO...' : 'CONECTAR'}
-                  </button>
-                </form>
-
-                <button onClick={() => { setIsLoginOpen(false); setLoginError('') }}
-                  style={{ background: 'none', border: 'none', color: 'var(--text-mute)', fontSize: '0.7rem', cursor: 'pointer', letterSpacing: '2px' }}>
-                  CANCELAR
-                </button>
-              </div>
-            </div>
-          )}
-
           {/* PAINEL DO JOGADOR (após login) */}
           {playerData && (
             <PlayerPanel
@@ -291,6 +266,65 @@ function App() {
           </div> */}
         </>
       )}
+
+      {/* cadastro e login do jogador: valem em qualquer pagina (home e /sandbox) */}
+      {/* MODAL DE CADASTRO */}
+      <RegisterModal
+        isOpen={isRegisterOpen}
+        onClose={() => { setIsRegisterOpen(false); setGoogleData(null) }}
+        googleData={googleData}
+      />
+
+      {/* MODAL DE LOGIN DO JOGADOR */}
+      {isLoginOpen && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 11000,
+          background: 'rgba(2,2,3,0.98)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          backdropFilter: 'blur(40px)',
+        }} onClick={() => { setIsLoginOpen(false); setLoginError('') }}>
+          <div className="glass-panel" style={{
+            padding: '3.5rem', width: '100%', maxWidth: '420px', textAlign: 'center',
+            border: '1px solid rgba(197,160,89,0.3)',
+            animation: 'fadeUp 0.6s cubic-bezier(0.2,1,0.3,1) forwards',
+          }} onClick={e => e.stopPropagation()}>
+            <div style={{ width: '40px', height: '2px', background: 'var(--gold)', margin: '0 auto 2rem' }} />
+            <h2 className="cinzel" style={{ color: 'var(--gold)', marginBottom: '0.75rem', fontSize: '1.8rem' }}>PAINEL DO JOGADOR</h2>
+            <p style={{ color: 'var(--text-mute)', fontSize: '0.75rem', letterSpacing: '2px', marginBottom: '2rem' }}>
+              Acesse sua conta para gerenciar personagens.
+            </p>
+
+            {loginError && (
+              <div style={{ background: 'rgba(255,68,68,0.1)', border: '1px solid rgba(255,68,68,0.3)', padding: '0.8rem', marginBottom: '1.5rem', color: '#ff4444', fontSize: '0.75rem' }}>
+                {loginError}
+              </div>
+            )}
+
+            <form onSubmit={handlePlayerLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2rem' }}>
+              <input
+                type="text" placeholder="LOGIN" required
+                value={loginForm.login}
+                onChange={e => setLoginForm({ ...loginForm, login: e.target.value })}
+                style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', padding: '1rem', color: '#fff', fontSize: '0.85rem', outline: 'none', borderRadius: '4px' }}
+              />
+              <input
+                type="password" placeholder="SENHA" required
+                value={loginForm.password}
+                onChange={e => setLoginForm({ ...loginForm, password: e.target.value })}
+                style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', padding: '1rem', color: '#fff', fontSize: '0.85rem', outline: 'none', borderRadius: '4px' }}
+              />
+              <button type="submit" className="btn btn-primary" disabled={loginLoading} style={{ width: '100%', padding: '1rem' }}>
+                {loginLoading ? 'CONECTANDO...' : 'CONECTAR'}
+              </button>
+            </form>
+
+            <button onClick={() => { setIsLoginOpen(false); setLoginError('') }}
+              style={{ background: 'none', border: 'none', color: 'var(--text-mute)', fontSize: '0.7rem', cursor: 'pointer', letterSpacing: '2px' }}>
+              CANCELAR
+            </button>
+          </div>
+        </div>
+      )}
+
     </main>
   )
 }
