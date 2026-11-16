@@ -10,6 +10,7 @@ import FeaturesTerminal from './assets/components/FeaturesTerminal'
 import Comunidade from './assets/components/Comunidade'
 import PaginaServidor from './assets/components/PaginaServidor'
 import PaginaSandbox from './assets/components/PaginaSandbox'
+import PaginaIkarusWeb from './assets/components/PaginaIkarusWeb'
 import InterludeInfo from './assets/components/InterludeInfo'
 import DonateTerminal from './assets/components/DonateTerminal'
 import AdminPanel from './assets/components/AdminPanel'
@@ -54,6 +55,9 @@ function App() {
   const ehCentral = rota === '/jogos'
   // qualquer outra rota (/, /sandbox, /r/<slug> antes de limpar a URL) cai na home nova
   const ehHome = !slugServidor && !ehCentral
+  // IKARUS 2026-11-16: a home ('/') passa a ser o L2 Ikarus Web (hack and slash).
+  // O Sandbox continua em '/sandbox', sem link na home.
+  const ehSandbox = rota.replace(/\/+$/, '') === '/sandbox'
 
   useEffect(() => {
     // Verifica sessão admin
@@ -158,7 +162,18 @@ function App() {
         />
       )}
 
-      {!loading && ehHome && (
+      {!loading && ehHome && !ehSandbox && (
+        <PaginaIkarusWeb
+          jogador={playerData}
+          admin={adminUser}
+          onEntrar={() => setIsLoginOpen(true)}
+          onCriarConta={() => setIsRegisterOpen(true)}
+          onAbrirConta={() => setPainelSandbox('jogador')}
+          onAbrirAdmin={() => setPainelSandbox('admin')}
+        />
+      )}
+
+      {!loading && ehHome && ehSandbox && (
         <PaginaSandbox
           onVoltar={(e) => { e.preventDefault(); irPara('/jogos') }}
           jogador={playerData}
