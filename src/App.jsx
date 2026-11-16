@@ -11,6 +11,7 @@ import Comunidade from './assets/components/Comunidade'
 import PaginaServidor from './assets/components/PaginaServidor'
 import PaginaSandbox from './assets/components/PaginaSandbox'
 import PaginaIkarusWeb from './assets/components/PaginaIkarusWeb'
+import PainelIkarusWeb from './assets/components/PainelIkarusWeb'
 import InterludeInfo from './assets/components/InterludeInfo'
 import DonateTerminal from './assets/components/DonateTerminal'
 import AdminPanel from './assets/components/AdminPanel'
@@ -186,7 +187,14 @@ function App() {
       )}
 
       {/* na home nova os paineis so' abrem quando a pessoa pede (na Central de Jogos abrem sozinhos apos o login) */}
-      {!loading && ehHome && painelSandbox === 'jogador' && playerData && (
+      {!loading && ehHome && !ehSandbox && painelSandbox === 'jogador' && playerData && (
+        <PainelIkarusWeb
+          data={playerData}
+          onLogout={() => { window.location.href = '/api/player/logout' }}
+          onFechar={() => setPainelSandbox(null)}
+        />
+      )}
+      {!loading && ehHome && ehSandbox && painelSandbox === 'jogador' && playerData && (
         <PlayerPanel
           data={playerData}
           onLogout={() => { window.location.href = '/api/player/logout' }}
@@ -299,7 +307,28 @@ function App() {
       />
 
       {/* MODAL DE LOGIN DO JOGADOR */}
-      {isLoginOpen && (
+      {/* login na home nova: mesma API, com a cara do L2 Ikarus Web */}
+      {isLoginOpen && ehHome && !ehSandbox && (
+        <div className="ikw ikp-modal" onClick={() => { setIsLoginOpen(false); setLoginError('') }}>
+          <form className="ikp-modal-caixa" onClick={e => e.stopPropagation()} onSubmit={handlePlayerLogin}>
+            <h3>Entrar</h3>
+            <p className="ikp-mudo">Acesse sua conta para ver seu saldo de Ikoin e comprar skins.</p>
+            {loginError && <div className="ikp-erro">{loginError}</div>}
+            <input className="ikp-campo" type="text" placeholder="Login" required autoComplete="username" autoFocus
+              value={loginForm.login} onChange={e => setLoginForm({ ...loginForm, login: e.target.value })} />
+            <input className="ikp-campo" type="password" placeholder="Senha" required autoComplete="current-password"
+              value={loginForm.password} onChange={e => setLoginForm({ ...loginForm, password: e.target.value })} />
+            <button type="submit" className="ikw-btn alto ikp-cheio" disabled={loginLoading}>
+              {loginLoading ? 'Conectando...' : 'Entrar'}
+            </button>
+            <button type="button" className="ikp-link" onClick={() => { setIsLoginOpen(false); setLoginError(''); setIsRegisterOpen(true) }}>
+              Não tem conta? Criar agora
+            </button>
+          </form>
+        </div>
+      )}
+
+      {isLoginOpen && !(ehHome && !ehSandbox) && (
         <div style={{
           position: 'fixed', inset: 0, zIndex: 11000,
           background: 'rgba(2,2,3,0.98)', display: 'flex', alignItems: 'center', justifyContent: 'center',
