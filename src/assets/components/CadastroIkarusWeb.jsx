@@ -44,7 +44,7 @@ export default function CadastroIkarusWeb({ isOpen, onClose, googleData, onEntra
     try {
       const res = await fetch('/api/register', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ login: f.login, email: f.email, password: f.senha, referredBy }),
+        body: JSON.stringify({ login: f.login, email: googleData?.email || f.email, password: f.senha, referredBy }),   // Google: e-mail verificado
       })
       const data = await res.json()
       if (res.ok) {
@@ -95,11 +95,14 @@ export default function CadastroIkarusWeb({ isOpen, onClose, googleData, onEntra
                 <input className="ikp-campo" type="text" required autoFocus autoComplete="username"
                   value={f.login} onChange={mudar('login')} placeholder="Escolha seu login" />
               </label>
-              <label>
-                <span>E-mail</span>
-                <input className="ikp-campo" type="email" required autoComplete="email"
-                  value={f.email} onChange={mudar('email')} placeholder="seu@email.com" readOnly={!!googleData} />
-              </label>
+              {/* com Google o e-mail ja' vem verificado (selo verde acima): o jogador so' escolhe login e senha */}
+              {!googleData && (
+                <label>
+                  <span>E-mail</span>
+                  <input className="ikp-campo" type="email" required autoComplete="email"
+                    value={f.email} onChange={mudar('email')} placeholder="seu@email.com" />
+                </label>
+              )}
               <div className="ikc-duas">
                 <label>
                   <span>Senha</span>
