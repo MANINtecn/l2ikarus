@@ -267,3 +267,69 @@
   .ikw-rodape { padding-bottom: 6rem; }
   .ikw-islabs .sbx-social span { display: none; }
 }
+
+/* ══ COLLAB IS Labs × L2 Ikarus: as duas artes sobem por tras da barra ══ */
+.ikw-islabs { min-height: 0 !important; background: none !important; }
+.ikw-barra {
+  position: fixed !important; top: 0; left: 0; right: 0; z-index: 60;
+  background: linear-gradient(180deg, rgba(4, 5, 10, .7), rgba(4, 5, 10, 0)) !important;
+  border-bottom-color: transparent !important; backdrop-filter: none !important;
+  transition: background .3s, border-color .3s;
+}
+.ikw-barra.cheia {
+  background: rgba(8, 7, 10, .9) !important; border-bottom-color: #1c2233 !important;
+  backdrop-filter: blur(12px) !important;
+}
+.ikw-collab {
+  position: relative; isolation: isolate; overflow: hidden;
+  display: grid; grid-template-columns: minmax(0, 40fr) minmax(0, 60fr); align-items: start;
+  padding-bottom: 1rem;
+}
+#ikw-combate { padding-top: clamp(2.5rem, 5vw, 4rem); }
+.ikw-collab-fundo {
+  position: absolute; inset: 0; z-index: -1;
+  background:
+    radial-gradient(ellipse 35% 45% at 20% 30%, rgba(40, 100, 230, .16), transparent 70%),
+    radial-gradient(ellipse 45% 50% at 66% 38%, rgba(40, 90, 200, .22), transparent 70%),
+    linear-gradient(180deg, #06070c 0%, var(--ik-bg) 100%);
+}
+.ikw-collab-islabs { position: relative; z-index: 1; }
+.ikw-collab-islabs img {
+  display: block; width: 124%; margin-left: -12%; height: auto; animation: ikw-surge 1.2s cubic-bezier(.2, .9, .3, 1) both;
+  --h: linear-gradient(90deg, transparent 0%, #000 14%, #000 62%, rgba(0,0,0,.5) 80%, transparent 100%);
+  --v: linear-gradient(180deg, #000 0%, #000 60%, rgba(0,0,0,.45) 80%, transparent 97%);
+  -webkit-mask-image: var(--h), var(--v); -webkit-mask-composite: source-in;
+  mask-image: var(--h), var(--v); mask-composite: intersect;
+}
+.ikw-collab-islabs .sbx-faiscas { z-index: 2; }
+.ikw-collab-jogo {
+  position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; text-align: center;
+  margin-left: -7%; padding: 2.2rem clamp(1rem, 3vw, 2.5rem) 0 0;
+}
+.ikw-collab-arte {
+  display: block; width: 100%; max-width: 980px; height: auto;
+  mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 62%, transparent 99%);
+  animation: ikw-surge 1.2s .15s cubic-bezier(.2, .9, .3, 1) both;
+}
+.ikw-collab-txt { margin-top: -2.2rem; max-width: 640px; animation: ikw-sobe .9s .4s cubic-bezier(.2, .9, .3, 1) both; }
+.ikw-collab-txt .ikw-apresenta { margin-bottom: .9rem; }
+.ikw-apresenta span { color: var(--ik-prata); letter-spacing: 0; font-size: 1rem; }
+
+@media (max-width: 1100px) {
+  .ikw-collab { grid-template-columns: minmax(0, 36fr) minmax(0, 64fr); }
+  .ikw-collab-txt { margin-top: -1rem; }
+}
+@media (max-width: 760px) {
+  .ikw-collab { display: block; min-height: 0; }
+  .ikw-collab-islabs { position: absolute; top: 0; left: -6%; width: 80%; }
+  .ikw-collab-islabs img { width: 100%; margin-left: 0; }
+  .ikw-collab-islabs img {
+    --h: linear-gradient(90deg, transparent 0%, #000 12%, #000 58%, transparent 100%);
+    --v: linear-gradient(180deg, #000 0%, #000 50%, transparent 92%);
+  }
+  .ikw-collab-jogo { margin: 0; padding: 64vw 0 0; }
+  .ikw-collab-arte { width: 128%; max-width: none; margin: 0 -14%; }
+  .ikw-collab-txt { margin-top: -.6rem; padding: 0 1rem; }
+  .ikw-collab-txt .ikw-hero-acoes { flex-direction: column; align-items: stretch; }
+  .ikw-collab-txt .ikw-hero-acoes > * { justify-content: center; }
+}

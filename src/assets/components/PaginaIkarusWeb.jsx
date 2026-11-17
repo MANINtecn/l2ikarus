@@ -78,13 +78,20 @@ export default function PaginaIkarusWeb({ jogador, admin, onEntrar, onCriarConta
   const links = useLinksComunidade()
   const status = useStatusJogo()
 
+  const [rolou, setRolou] = useState(false)
+  useEffect(() => {
+    const f = () => setRolou(window.scrollY > 30)
+    f()
+    window.addEventListener('scroll', f, { passive: true })
+    return () => window.removeEventListener('scroll', f)
+  }, [])
   useEffect(() => { document.title = 'L2 Ikarus — o único L2 hack and slash · IS Labs' }, [])
 
   return (
     <div className="ikw">
       {/* TOPO DA IS LABS: a mesma barra e a mesma logo do site no ar (estilos de PaginaSandbox.css) */}
       <div className="sbx ikw-islabs">
-        <nav className="sbx-nav" aria-label="Jogos IS Labs">
+        <nav className={`sbx-nav ikw-barra ${rolou ? 'cheia' : ''}`} aria-label="Jogos IS Labs">
           <div className="rede-shell">
             {/* "Jogos" vai virar a vitrine dos jogos web da IS Labs; por enquanto nao leva a lugar nenhum */}
             <span className="sbx-todos ikw-em-breve" title="Mais jogos da IS Labs em breve">
@@ -92,7 +99,7 @@ export default function PaginaIkarusWeb({ jogador, admin, onEntrar, onCriarConta
               <span>Jogos</span>
             </span>
             <div className="sbx-jogos">
-              <a className="sbx-jogo on" href="#ikw-jogo" onClick={ir('ikw-jogo')}>
+              <a className="sbx-jogo on" href="#ikw-combate" onClick={ir('ikw-combate')}>
                 <em aria-label="online" />
                 <span><b>L2 Ikarus<u className="sbx-tag-beta">Beta</u></b><small>Hack and slash web</small></span>
               </a>
@@ -122,39 +129,42 @@ export default function PaginaIkarusWeb({ jogador, admin, onEntrar, onCriarConta
           </div>
         </nav>
 
-        <div id="topo" className="sbx-marca">
+      </div>
+
+      {/* COLLAB: IS Labs no alto a esquerda, L2 Ikarus em destaque do centro para a direita.
+          As duas artes sobem por tras da barra, que fica transparente enquanto a pagina esta no topo. */}
+      <section className="ikw-collab" id="ikw-jogo">
+        <div className="ikw-collab-fundo" aria-hidden="true" />
+        <div className="ikw-collab-islabs" id="topo">
           <div className="sbx-faiscas" aria-hidden="true">
             {FAISCAS.map(([x, y, d, a], i) => (
               <i key={i} style={{ left: `${x}%`, top: `${y}%`, '--d': `${d}s`, '--a': `${a}s` }} />
             ))}
           </div>
-          <img className="sbx-logo cena" src="/media/sandbox/islabs_fortaleza.webp" alt="IS Labs" />
+          <img src="/media/sandbox/islabs_fortaleza.webp" alt="IS Labs" width="1100" height="1100" />
         </div>
-      </div>
-
-      {/* O JOGO: L2 Ikarus, apresentado pela IS Labs */}
-      <section className="ikw-hero" id="ikw-jogo">
-        <div className="ikw-hero-fundo" aria-hidden="true" />
-        <p className="ikw-apresenta"><i aria-hidden="true" />IS Labs apresenta</p>
-        <img className="ikw-hero-arte" src="/media/web/capa.webp" alt="L2 Ikarus — o único L2 hack and slash" width="1400" height="788" loading="lazy" />
-        <div className="ikw-hero-txt">
-          <p className="ikw-hero-sub">
-            Ação em tempo real com a alma do Lineage 2. Esquive, bloqueie e encadeie skills contra hordas,
-            suba a <b>Torre do Baium</b> e enfrente o chefe.
-          </p>
-          <div className="ikw-hero-acoes">
-            <BotaoJogar grande />
-            {!jogador && <button className="ikw-btn fantasma alto" onClick={onCriarConta}>Criar conta grátis</button>}
+        <div className="ikw-collab-jogo">
+          <img className="ikw-collab-arte" src="/media/web/capa.webp" alt="L2 Ikarus — o único L2 hack and slash" width="1400" height="788" fetchpriority="high" />
+          <div className="ikw-collab-txt">
+            <p className="ikw-apresenta"><i aria-hidden="true" />IS Labs <span>×</span> L2 Ikarus</p>
+            <p className="ikw-hero-sub">
+              Ação em tempo real com a alma do Lineage 2. Esquive, bloqueie e encadeie skills contra hordas,
+              suba a <b>Torre do Baium</b> e enfrente o chefe.
+            </p>
+            <div className="ikw-hero-acoes">
+              <BotaoJogar grande />
+              {!jogador && <button className="ikw-btn fantasma alto" onClick={onCriarConta}>Criar conta grátis</button>}
+            </div>
+            <div className="ikw-chips">
+              <span>Direto no navegador</span>
+              <span>PC e celular</span>
+              <span>Sem download</span>
+              <span>Grátis para jogar</span>
+            </div>
+            {status?.on && (
+              <p className="ikw-status"><i aria-hidden="true" />Servidor online{status.n > 0 && ` · ${status.n} ${status.n === 1 ? 'jogador' : 'jogadores'} agora`}</p>
+            )}
           </div>
-          <div className="ikw-chips">
-            <span>Direto no navegador</span>
-            <span>PC e celular</span>
-            <span>Sem download</span>
-            <span>Grátis para jogar</span>
-          </div>
-          {status?.on && (
-            <p className="ikw-status"><i aria-hidden="true" />Servidor online{status.n > 0 && ` · ${status.n} ${status.n === 1 ? 'jogador' : 'jogadores'} agora`}</p>
-          )}
         </div>
       </section>
 
