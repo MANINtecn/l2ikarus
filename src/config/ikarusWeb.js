@@ -1,7 +1,7 @@
 // L2 Ikarus Web (o hack and slash): enderecos e textos da home nova de l2ikarus.com.
 // Na etapa final o jogo muda de isblade.tecx.pro para l2ikarus.tecx.pro: trocar so' aqui.
 
-export const URL_JOGO = 'https://www.isblade.tecx.pro/login.html'
+export const URL_JOGO = 'https://isblade.tecx.pro/login.html'
 export const URL_STATUS_JOGO = 'https://play.isblade.tecx.pro/status'
 
 export const pilares = [
