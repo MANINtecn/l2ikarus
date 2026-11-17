@@ -53,34 +53,11 @@
 }
 @keyframes ikw-varre { 0%, 55% { transform: translateX(-120%); } 85%, 100% { transform: translateX(120%); } }
 
-/* ── topo ── */
-.ikw-topo {
-  position: fixed; inset: 0 0 auto 0; z-index: 50;
-  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
-  padding: 1rem clamp(1rem, 4vw, 3rem);
-  transition: background .3s, padding .3s, box-shadow .3s;
-}
-.ikw-topo.cheio { background: rgba(4, 5, 10, 0.88); backdrop-filter: blur(14px); padding-block: 0.7rem; box-shadow: 0 1px 0 var(--ik-linha); }
-.ikw-marca { display: flex; align-items: center; gap: 0.6rem; text-decoration: none; color: var(--ik-prata); font: 400 1.05rem 'Cinzel', serif; letter-spacing: 3px; }
-.ikw-marca b { font-weight: 900; color: #fff; }
-.ikw-marca i { width: 12px; height: 12px; background: var(--ik-azul); transform: rotate(45deg); box-shadow: var(--ik-brilho); }
-.ikw-nav { display: flex; align-items: center; gap: 1.8rem; }
-.ikw-nav > a { color: var(--ik-texto); text-decoration: none; font-size: 0.82rem; letter-spacing: 1.5px; text-transform: uppercase; position: relative; }
-.ikw-nav > a::after { content: ''; position: absolute; left: 0; right: 100%; bottom: -6px; height: 1px; background: var(--ik-azul2); transition: right .25s; }
-.ikw-nav > a:hover { color: #fff; }
-.ikw-nav > a:hover::after { right: 0; }
-.ikw-nav-conta { display: flex; gap: 0.6rem; margin-left: 0.6rem; }
-.ikw-burger { display: none; background: none; border: 0; width: 40px; height: 40px; cursor: pointer; padding: 10px 8px; flex-direction: column; justify-content: space-between; }
-.ikw-burger i { display: block; height: 2px; background: var(--ik-prata); transition: transform .25s, opacity .25s; }
-.ikw-burger.x i:nth-child(1) { transform: translateY(8px) rotate(45deg); }
-.ikw-burger.x i:nth-child(2) { opacity: 0; }
-.ikw-burger.x i:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
-
 /* ── hero ── */
 .ikw-hero {
-  position: relative; min-height: 100svh;
+  position: relative;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  padding: 5.5rem 1rem 4rem; text-align: center; isolation: isolate;
+  padding: 5.5rem 1rem 4.5rem; text-align: center; isolation: isolate;
 }
 .ikw-hero-fundo {
   position: absolute; inset: 0; z-index: -1;
@@ -115,9 +92,6 @@
 .ikw-status { margin-top: 1.2rem; font-size: 0.8rem; color: var(--ik-mudo); display: inline-flex; align-items: center; gap: 0.55rem; }
 .ikw-status i { width: 8px; height: 8px; background: #34d399; transform: rotate(45deg); box-shadow: 0 0 10px #34d399; animation: ikw-pulsa 1.8s ease-in-out infinite; }
 @keyframes ikw-pulsa { 50% { opacity: .35; } }
-.ikw-descer { position: absolute; bottom: 1.4rem; left: 50%; transform: translateX(-50%); padding: 10px; }
-.ikw-descer i { display: block; width: 14px; height: 14px; border-right: 2px solid var(--ik-azul2); border-bottom: 2px solid var(--ik-azul2); transform: rotate(45deg); animation: ikw-desce 1.8s ease-in-out infinite; }
-@keyframes ikw-desce { 50% { transform: translateY(6px) rotate(45deg); opacity: .5; } }
 
 /* ── secoes ── */
 .ikw-sec { max-width: 1200px; margin: 0 auto; padding: clamp(4rem, 9vw, 7rem) clamp(1rem, 4vw, 2rem); }
@@ -243,22 +217,8 @@
   .ikw-loja { grid-template-columns: 1fr; }
   .ikw-loja-vitrine { order: -1; }
 }
-@media (max-width: 820px) {
-  .ikw-burger { display: flex; }
-  .ikw-nav {
-    position: fixed; inset: 64px 0 auto 0; flex-direction: column; align-items: stretch; gap: 0;
-    background: rgba(4,5,10,.97); backdrop-filter: blur(14px); padding: 0.5rem 1rem 1.2rem;
-    box-shadow: 0 1px 0 var(--ik-linha); transform: translateY(-8px); opacity: 0; pointer-events: none;
-    transition: opacity .25s, transform .25s;
-  }
-  .ikw-nav.aberto { opacity: 1; transform: none; pointer-events: auto; }
-  .ikw-nav > a { padding: 0.95rem 0.2rem; border-bottom: 1px solid var(--ik-linha); }
-  .ikw-nav > a::after { display: none; }
-  .ikw-nav-conta { margin: 1rem 0 0; }
-  .ikw-nav-conta .ikw-btn { flex: 1; padding: 0.95rem; }
-}
 @media (max-width: 560px) {
-  .ikw-hero { padding-top: 5rem; justify-content: flex-start; }
+  .ikw-hero { padding-top: 4.5rem; }
   .ikw-hero-arte { width: 135%; max-width: none; margin-inline: -17.5%; }
   .ikw-hero-txt { margin-top: -1rem; }
   .ikw-hero-acoes { flex-direction: column; align-items: stretch; }
@@ -274,4 +234,36 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .ikw *, .ikw *::before, .ikw *::after { animation: none !important; transition: none !important; }
+}
+
+/* ── topo IS Labs (barra + logo do site no ar, estilos em PaginaSandbox.css) ── */
+.ikw-islabs { min-height: 0; z-index: 7; }
+.ikw-em-breve { cursor: default; opacity: .7; }
+.ikw-em-breve:hover { color: #9b9484; }
+.ikw-play { width: 11px; height: 11px; fill: currentColor; flex: none; }
+.ikw-marca i { width: 12px; height: 12px; background: var(--ik-azul); transform: rotate(45deg); box-shadow: var(--ik-brilho); }
+.ikw-marca { display: flex; align-items: center; gap: 0.6rem; text-decoration: none; color: var(--ik-prata); font: 400 1.05rem 'Cinzel', serif; letter-spacing: 3px; }
+.ikw-marca b { font-weight: 900; color: #fff; }
+.ikw-apresenta {
+  display: inline-flex; align-items: center; gap: .7rem; margin-bottom: .4rem;
+  font: 600 .74rem 'Outfit', sans-serif; letter-spacing: 4px; text-transform: uppercase; color: var(--ik-azul2);
+}
+.ikw-apresenta i { width: 8px; height: 8px; background: var(--ik-azul2); transform: rotate(45deg); box-shadow: var(--ik-brilho); }
+.ikw-hero-fundo { mask-image: linear-gradient(180deg, transparent, #000 18%); }
+
+/* celular: barra fixa de jogar */
+.ikw-barra-jogar { display: none; }
+@media (max-width: 760px) {
+  .ikw-barra-jogar {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
+    padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+    background: rgba(4, 5, 10, .94); backdrop-filter: blur(12px); box-shadow: 0 -1px 0 var(--ik-linha);
+  }
+  .ikw-barra-jogar span { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+  .ikw-barra-jogar b { font: 700 13px/1.1 'Cinzel', serif; }
+  .ikw-barra-jogar small { font-size: 11px; color: var(--ik-mudo); }
+  .ikw-barra-jogar .ikw-jogar { padding: .85rem 1.1rem; font-size: .78rem; letter-spacing: 2px; }
+  .ikw-rodape { padding-bottom: 6rem; }
+  .ikw-islabs .sbx-social span { display: none; }
 }

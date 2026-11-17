@@ -141,3 +141,30 @@
   .ikp-hist li small { grid-column: 1; grid-row: 2; }
   .ikp-hist li b { grid-row: 1 / 3; grid-column: 2; }
 }
+
+/* cadastro (CadastroIkarusWeb.jsx) */
+.ikc { position: relative; max-width: 480px; }
+.ikc-fechar { position: absolute; top: .9rem; right: .9rem; width: 32px !important; height: 32px; background: none; border: 0; cursor: pointer; }
+.ikc-fechar i { position: absolute; left: 7px; right: 7px; top: 15px; height: 2px; background: var(--ik-mudo); transform: rotate(45deg); }
+.ikc-fechar i + i { transform: rotate(-45deg); }
+.ikc-fechar:hover i { background: #fff; }
+.ikc-google {
+  display: flex; align-items: center; justify-content: center; gap: .7rem; text-decoration: none;
+  padding: .95rem 1rem; font: 600 .85rem 'Outfit', sans-serif; color: #1f2430; background: #f4f6fa;
+  clip-path: var(--ik-chanfro-p); transition: filter .2s;
+}
+.ikc-google:hover { filter: brightness(1.06); }
+.ikc-google-ok { display: flex; align-items: center; justify-content: center; gap: .6rem; font-size: .82rem; color: #86efac; padding: .7rem; background: rgba(74,222,128,.08); clip-path: var(--ik-chanfro-p); }
+.ikc-ou { display: flex; align-items: center; gap: .8rem; color: var(--ik-mudo); font-size: .75rem; letter-spacing: 2px; text-transform: uppercase; }
+.ikc-ou::before, .ikc-ou::after { content: ''; flex: 1; height: 1px; background: var(--ik-linha); }
+.ikc-form { display: flex; flex-direction: column; gap: .8rem; text-align: left; }
+.ikc-form label { display: flex; flex-direction: column; gap: .35rem; min-width: 0; }
+.ikc-form label span { font-size: .7rem; letter-spacing: 2px; text-transform: uppercase; color: var(--ik-mudo); }
+.ikc-form .ikp-campo { text-align: left; width: 100%; }
+.ikc-form .ikp-campo[readonly] { opacity: .6; }
+.ikc-duas { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; }
+.ikc-termos { font-size: .75rem; color: var(--ik-mudo); text-align: center; }
+.ikc-termos a { color: var(--ik-azul2); }
+.ikc-ok { width: 64px !important; height: 64px; display: grid; place-items: center; background: rgba(74,222,128,.14); clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
+.ikc-ok svg { width: 28px; height: 28px; fill: none; stroke: #4ade80; stroke-width: 2.4; stroke-linejoin: miter; }
+@media (max-width: 480px) { .ikc-duas { grid-template-columns: 1fr; } }

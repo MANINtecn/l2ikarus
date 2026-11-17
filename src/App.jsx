@@ -12,6 +12,7 @@ import PaginaServidor from './assets/components/PaginaServidor'
 import PaginaSandbox from './assets/components/PaginaSandbox'
 import PaginaIkarusWeb from './assets/components/PaginaIkarusWeb'
 import PainelIkarusWeb from './assets/components/PainelIkarusWeb'
+import CadastroIkarusWeb from './assets/components/CadastroIkarusWeb'
 import InterludeInfo from './assets/components/InterludeInfo'
 import DonateTerminal from './assets/components/DonateTerminal'
 import AdminPanel from './assets/components/AdminPanel'
@@ -300,8 +301,15 @@ function App() {
 
       {/* cadastro e login do jogador: valem em qualquer pagina (home e /sandbox) */}
       {/* MODAL DE CADASTRO */}
+      {/* na home nova o cadastro tem a cara do L2 Ikarus Web; nas legadas, o antigo */}
+      <CadastroIkarusWeb
+        isOpen={isRegisterOpen && ehHome && !ehSandbox}
+        onClose={() => { setIsRegisterOpen(false); setGoogleData(null) }}
+        googleData={googleData}
+        onEntrar={() => setIsLoginOpen(true)}
+      />
       <RegisterModal
-        isOpen={isRegisterOpen}
+        isOpen={isRegisterOpen && !(ehHome && !ehSandbox)}
         onClose={() => { setIsRegisterOpen(false); setGoogleData(null) }}
         googleData={googleData}
       />

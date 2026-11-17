@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react'
+import './HeroRede.css'
+import './PaginaSandbox.css'
 import './PaginaIkarusWeb.css'
 import { useLinksComunidade } from '../../config/linksComunidade'
 import { IconeWhatsapp, IconeDiscord } from './IconesComunidade'
@@ -16,6 +18,13 @@ const ir = (id) => (e) => {
   e?.preventDefault()
   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
+
+// [x%, y%, duracao, atraso] das fagulhas em volta da logo IS Labs (as mesmas do site no ar)
+const FAISCAS = [
+  [14, 22, 3.2, 0], [22, 58, 4.1, 1.2], [28, 12, 3.6, 2.1], [33, 74, 4.4, .6], [38, 36, 3.1, 1.8],
+  [62, 30, 3.8, .3], [67, 66, 4.2, 2.4], [72, 14, 3.4, 1.1], [78, 48, 4.6, .9], [86, 26, 3.3, 2.7],
+  [9, 44, 4.8, 1.5], [91, 62, 3.9, .2], [45, 8, 4.3, 3], [56, 82, 3.5, 1.4], [18, 84, 4, 2.2],
+]
 
 // Icones dos pilares: so' linhas retas
 const ICONES = {
@@ -68,53 +77,66 @@ function useStatusJogo() {
 export default function PaginaIkarusWeb({ jogador, admin, onEntrar, onCriarConta, onAbrirConta, onAbrirAdmin }) {
   const links = useLinksComunidade()
   const status = useStatusJogo()
-  const [menu, setMenu] = useState(false)
-  const [rolou, setRolou] = useState(false)
 
-  useEffect(() => {
-    const f = () => setRolou(window.scrollY > 40)
-    f()
-    window.addEventListener('scroll', f, { passive: true })
-    return () => window.removeEventListener('scroll', f)
-  }, [])
-
-  const nav = [
-    ['ikw-combate', 'O jogo'],
-    ['ikw-classes', 'Classes'],
-    ['ikw-torre', 'Torre do Baium'],
-    ['ikw-loja', 'Loja'],
-  ]
-  const clicarNav = (id) => (e) => { setMenu(false); ir(id)(e) }
+  useEffect(() => { document.title = 'L2 Ikarus — o único L2 hack and slash · IS Labs' }, [])
 
   return (
     <div className="ikw">
-      {/* TOPO */}
-      <header className={`ikw-topo ${rolou ? 'cheio' : ''}`}>
-        <a className="ikw-marca" href="/" aria-label="L2 Ikarus, início">
-          <i aria-hidden="true" />
-          <span>L2 <b>IKARUS</b></span>
-        </a>
-        <nav className={`ikw-nav ${menu ? 'aberto' : ''}`}>
-          {nav.map(([id, t]) => <a key={id} href={`#${id}`} onClick={clicarNav(id)}>{t}</a>)}
-          <div className="ikw-nav-conta">
-            {admin && <button className="ikw-btn fantasma" onClick={onAbrirAdmin}>Admin</button>}
-            {jogador
-              ? <button className="ikw-btn" onClick={() => { setMenu(false); onAbrirConta() }}>Minha conta</button>
-              : <>
-                  <button className="ikw-btn fantasma" onClick={() => { setMenu(false); onEntrar() }}>Entrar</button>
-                  <button className="ikw-btn" onClick={() => { setMenu(false); onCriarConta() }}>Criar conta</button>
-                </>}
+      {/* TOPO DA IS LABS: a mesma barra e a mesma logo do site no ar (estilos de PaginaSandbox.css) */}
+      <div className="sbx ikw-islabs">
+        <nav className="sbx-nav" aria-label="Jogos IS Labs">
+          <div className="rede-shell">
+            {/* "Jogos" vai virar a vitrine dos jogos web da IS Labs; por enquanto nao leva a lugar nenhum */}
+            <span className="sbx-todos ikw-em-breve" title="Mais jogos da IS Labs em breve">
+              <i aria-hidden="true"><b /><b /><b /><b /></i>
+              <span>Jogos</span>
+            </span>
+            <div className="sbx-jogos">
+              <a className="sbx-jogo on" href="#ikw-jogo" onClick={ir('ikw-jogo')}>
+                <em aria-label="online" />
+                <span><b>L2 Ikarus<u className="sbx-tag-beta">Beta</u></b><small>Hack and slash web</small></span>
+              </a>
+            </div>
+            <div className="sbx-acoes">
+              {links.grupo && (
+                <a className="sbx-social zap" href={links.grupo} target="_blank" rel="noreferrer" title="Entrar no grupo do WhatsApp">
+                  <IconeWhatsapp size={17} /><span>Grupo</span>
+                </a>
+              )}
+              {links.discord && (
+                <a className="sbx-social dc" href={links.discord} target="_blank" rel="noreferrer" title="Entrar no Discord">
+                  <IconeDiscord size={18} /><span>Discord</span>
+                </a>
+              )}
+              {admin && <button className="sbx-conta admin" onClick={onAbrirAdmin} title="Painel administrativo">Admin</button>}
+              {jogador
+                ? <button className="sbx-conta" onClick={onAbrirConta} title="Painel do jogador">{jogador.login || 'Minha conta'}</button>
+                : <button className="sbx-conta" onClick={onEntrar}>Entrar</button>}
+              <span className="sbx-brilho nav">
+                <a className="sbx-baixar nav" href={URL_JOGO}>
+                  <svg className="ikw-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4 L19 12 L7 20 Z" /></svg>
+                  Jogar agora
+                </a>
+              </span>
+            </div>
           </div>
         </nav>
-        <button className={`ikw-burger ${menu ? 'x' : ''}`} onClick={() => setMenu(!menu)} aria-label="Menu" aria-expanded={menu}>
-          <i /><i /><i />
-        </button>
-      </header>
 
-      {/* HERO */}
-      <section className="ikw-hero">
+        <div id="topo" className="sbx-marca">
+          <div className="sbx-faiscas" aria-hidden="true">
+            {FAISCAS.map(([x, y, d, a], i) => (
+              <i key={i} style={{ left: `${x}%`, top: `${y}%`, '--d': `${d}s`, '--a': `${a}s` }} />
+            ))}
+          </div>
+          <img className="sbx-logo cena" src="/media/sandbox/islabs_fortaleza.webp" alt="IS Labs" />
+        </div>
+      </div>
+
+      {/* O JOGO: L2 Ikarus, apresentado pela IS Labs */}
+      <section className="ikw-hero" id="ikw-jogo">
         <div className="ikw-hero-fundo" aria-hidden="true" />
-        <img className="ikw-hero-arte" src="/media/web/capa.webp" alt="L2 Ikarus — o único L2 hack and slash" width="1400" height="788" fetchpriority="high" />
+        <p className="ikw-apresenta"><i aria-hidden="true" />IS Labs apresenta</p>
+        <img className="ikw-hero-arte" src="/media/web/capa.webp" alt="L2 Ikarus — o único L2 hack and slash" width="1400" height="788" loading="lazy" />
         <div className="ikw-hero-txt">
           <p className="ikw-hero-sub">
             Ação em tempo real com a alma do Lineage 2. Esquive, bloqueie e encadeie skills contra hordas,
@@ -134,7 +156,6 @@ export default function PaginaIkarusWeb({ jogador, admin, onEntrar, onCriarConta
             <p className="ikw-status"><i aria-hidden="true" />Servidor online{status.n > 0 && ` · ${status.n} ${status.n === 1 ? 'jogador' : 'jogadores'} agora`}</p>
           )}
         </div>
-        <a className="ikw-descer" href="#ikw-combate" onClick={ir('ikw-combate')} aria-label="Ver mais"><i /></a>
       </section>
 
       {/* COMBATE */}
@@ -254,6 +275,12 @@ export default function PaginaIkarusWeb({ jogador, admin, onEntrar, onCriarConta
         <p>Abre no navegador do PC ou do celular. No celular, dá para instalar como app.</p>
         <BotaoJogar grande />
       </section>
+
+      {/* celular: jogar sempre a um toque */}
+      <div className="ikw-barra-jogar">
+        <span><b>L2 Ikarus</b><small>Hack and slash no navegador</small></span>
+        <BotaoJogar />
+      </div>
 
       {/* RODAPE */}
       <footer className="ikw-rodape">
