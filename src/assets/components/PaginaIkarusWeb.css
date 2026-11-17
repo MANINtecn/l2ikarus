@@ -396,9 +396,9 @@
 
 /* ══ doacao por PIX, ao lado do titulo "Voce nao clica no alvo" ══ */
 .ikw-cab-linha { display: flex; justify-content: space-between; align-items: flex-start; gap: 2rem; margin-bottom: 3rem; }
-.ikw-cab-linha .ikw-cab { margin-bottom: 0; }
+.ikw-cab-linha .ikw-cab { margin-bottom: 0; flex: 1 1 0; min-width: 0; }
 .ikw-doacao {
-  flex: 0 1 560px; display: flex; gap: 1.4rem; align-items: center; padding: 1.3rem 1.4rem;
+  flex: 0 0 520px; display: flex; gap: 1.4rem; align-items: center; padding: 1.3rem 1.4rem;
   background: linear-gradient(135deg, rgba(230, 195, 90, .1), var(--ik-card) 55%);
   clip-path: var(--ik-chanfro); box-shadow: inset 0 0 0 1px rgba(230, 195, 90, .28);
 }
