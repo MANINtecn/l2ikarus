@@ -361,15 +361,6 @@
 .ikw-versus-linha .classico { color: var(--ik-mudo); text-decoration: line-through; text-decoration-color: rgba(125,136,158,.45); }
 .ikw-versus-linha .ikarus { color: #e8eef8; background: linear-gradient(90deg, rgba(59,130,246,.12), rgba(59,130,246,.03)); box-shadow: inset 2px 0 0 var(--ik-azul2); }
 
-/* ══ galeria ══ */
-.ikw-galeria { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-.ikw-galeria figure { margin: 0; }
-.ikw-galeria img {
-  display: block; width: 100%; height: auto; aspect-ratio: 12 / 7; object-fit: cover;
-  clip-path: var(--ik-chanfro); box-shadow: inset 0 0 0 1px var(--ik-linha);
-}
-.ikw-galeria figcaption { font-size: .82rem; color: var(--ik-mudo); margin-top: .6rem; }
-
 /* ══ PC e celular ══ */
 .ikw-plataformas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
 .ikw-plat { padding: 1.8rem 1.6rem; background: linear-gradient(180deg, var(--ik-card), var(--ik-bg)); clip-path: var(--ik-chanfro); box-shadow: inset 0 0 0 1px var(--ik-linha); }
@@ -391,7 +382,6 @@
   .ikw-versus-linha p small { display: block; font-size: .62rem; letter-spacing: 2px; text-transform: uppercase; margin-bottom: .3rem; text-decoration: none; }
   .ikw-versus-linha .ikarus small { color: var(--ik-azul2); }
   .ikw-versus-linha .classico { text-decoration: none; opacity: .75; }
-  .ikw-galeria { grid-template-columns: 1fr; }
 }
 
 /* ══ doacao por PIX, ao lado do titulo "Voce nao clica no alvo" ══ */

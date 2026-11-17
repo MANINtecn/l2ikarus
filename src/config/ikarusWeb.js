@@ -39,9 +39,9 @@ export const versus = [
   ['Onde jogar', 'Só no PC, com cliente pesado.', 'No navegador, no PC e no celular. Sem download.'],
 ]
 
+// reserva da vitrine: so' aparece enquanto nao houver imagem subida pelo painel admin (aba Galeria)
 export const galeria = [
-  { src: '/media/web/jogo_baium.webp', legenda: 'Na mira do gigante: o retículo no centro da tela é a sua mira.' },
-  { src: '/media/web/jogo_combo.webp', legenda: 'Combo encadeado: dano, efeito da skill e contador de combo.' },
+  { card: '/media/web/jogo_baium.webp', full: '/media/web/jogo_baium.webp', legenda: 'Na mira do gigante: o retículo no centro é a sua mira.' },
 ]
 
 export const plataformas = [

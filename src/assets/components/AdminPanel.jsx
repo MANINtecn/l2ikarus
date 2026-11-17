@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import ReferralAdmin from './ReferralAdmin'
 import LinksAdmin from './LinksAdmin'
+import GaleriaAdmin from './GaleriaAdmin'
 
 const TABS = [
   { id: 'overview', label: 'VISÃO GERAL' },
@@ -13,6 +14,7 @@ const TABS = [
   { id: 'indicacao', label: 'INDICAÇÃO' },
   { id: 'charmgmt', label: 'PERSONAGENS' },
   { id: 'links', label: 'LINKS' },
+  { id: 'galeria', label: 'GALERIA' },
 ]
 
 
@@ -921,6 +923,7 @@ export default function AdminPanel({ user, onLogout, onFechar }) {
 
         {/* ABA LINKS — convites do grupo e do Discord que os botoes do site abrem */}
         {tab === 'links' && <LinksAdmin />}
+        {tab === 'galeria' && <GaleriaAdmin />}
 
         {/* ABA PERSONAGENS (edição offline) */}
         {tab === 'charmgmt' && (

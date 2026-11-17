@@ -1,5 +1,6 @@
 import { getConnection } from './_db.js';
 import { lerLinks } from './_links.js';
+import { lerGaleria } from './_galeria.js';
 
 const VPS_STATUS_URL = process.env.VPS_STATUS_URL;   // ex: http://192.99.110.164:8080/status
 const VPS_API_KEY   = process.env.VPS_STATUS_TOKEN;  // mesmo valor de STATUS_API_KEY no VPS
@@ -16,6 +17,15 @@ export default async function handler(_req, res) {
     try { links = await lerLinks(await getConnection()); } catch {}
     res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=300');
     return res.status(200).json({ links });
+  }
+
+  // GET /api/galeria (rewrite -> ?action=galeria) = imagens visiveis da vitrine da home.
+  // Publico, so' leitura. A lista muda pouco: CDN guarda 5 min.
+  if (_req.query?.action === 'galeria') {
+    let imagens = null;
+    try { imagens = await lerGaleria(await getConnection()); } catch {}
+    res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=3600');
+    return res.status(200).json({ imagens: imagens || [] });
   }
 
   if (!VPS_STATUS_URL || !VPS_API_KEY) {

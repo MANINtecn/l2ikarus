@@ -1,6 +1,7 @@
 import crypto from 'crypto'
 import { getConnection } from './_db.js'
 import { LINK_CHAVES, SQL_TABELA, validarLink, lerLinks } from './_links.js'
+import { SQL_TABELA_GALERIA, lerGaleria, subirImagem, apagarImagem, limparLegenda } from './_galeria.js'
 import { createRequire } from 'module'
 const require = createRequire(import.meta.url)
 const ITEMS_DB = require('./items-db.json')
@@ -616,6 +617,47 @@ export default async function handler(req, res) {
         )
       }
       return res.status(200).json({ success: true, message: 'Links salvos. O site atualiza em até 1 minuto.' })
+    }
+
+    // ===== GALERIA (vitrine de imagens reais da home) =====
+    // GET /api/admin/galeria — todas, inclusive as escondidas
+    if (action === 'galeria' && req.method !== 'POST') {
+      const lista = await lerGaleria(db, { todas: true })
+      return res.status(200).json({ imagens: lista || [], blob: !!process.env.BLOB_READ_WRITE_TOKEN })
+    }
+
+    // POST /api/admin/galeria-upload — { card, full (data URL webp), legenda }
+    if (action === 'galeria-upload' && req.method === 'POST') {
+      const r = await subirImagem(db, req.body || {}, admin.email || admin.name || 'admin')
+      if (!r.ok) return res.status(400).json({ error: r.error })
+      return res.status(200).json({ success: true, message: 'Imagem publicada na vitrine.' })
+    }
+
+    // POST /api/admin/galeria-editar — { id, legenda?, visivel? }
+    if (action === 'galeria-editar' && req.method === 'POST') {
+      const { id, legenda, visivel } = req.body || {}
+      if (!Number.isInteger(id)) return res.status(400).json({ error: 'Imagem inválida.' })
+      await db.query(SQL_TABELA_GALERIA)
+      if (legenda !== undefined) await db.query('UPDATE site_galeria SET legenda = ? WHERE id = ?', [limparLegenda(legenda), id])
+      if (visivel !== undefined) await db.query('UPDATE site_galeria SET visivel = ? WHERE id = ?', [visivel ? 1 : 0, id])
+      return res.status(200).json({ success: true })
+    }
+
+    // POST /api/admin/galeria-ordem — { ids: [id, id, ...] } na ordem nova
+    if (action === 'galeria-ordem' && req.method === 'POST') {
+      const ids = Array.isArray(req.body?.ids) ? req.body.ids.filter(Number.isInteger).slice(0, 500) : []
+      if (!ids.length) return res.status(400).json({ error: 'Ordem inválida.' })
+      for (let i = 0; i < ids.length; i++) await db.query('UPDATE site_galeria SET ordem = ? WHERE id = ?', [i, ids[i]])
+      return res.status(200).json({ success: true })
+    }
+
+    // POST /api/admin/galeria-apagar — { id }: apaga os arquivos do Blob e tira da lista
+    if (action === 'galeria-apagar' && req.method === 'POST') {
+      const id = req.body?.id
+      if (!Number.isInteger(id)) return res.status(400).json({ error: 'Imagem inválida.' })
+      const r = await apagarImagem(db, id)
+      if (!r.ok) return res.status(404).json({ error: r.error })
+      return res.status(200).json({ success: true })
     }
 
     // POST /api/admin/ban — banir conta

@@ -5,6 +5,7 @@ import './PaginaIkarusWeb.css'
 import { useLinksComunidade } from '../../config/linksComunidade'
 import { IconeWhatsapp, IconeDiscord } from './IconesComunidade'
 import IkoinEmblema from './IkoinEmblema'
+import GaleriaJogo from './GaleriaJogo'
 import QRCode from 'qrcode'
 import { pixCopiaECola } from '../../config/pixEstatico'
 import { PIX_DOACAO, URL_JOGO, URL_STATUS_JOGO, pilares, classes, andares, progressao, versus, galeria, plataformas } from '../../config/ikarusWeb'
@@ -246,22 +247,8 @@ export default function PaginaIkarusWeb({ jogador, admin, onEntrar, onCriarConta
         </div>
       </section>
 
-      {/* VEJA O JOGO: imagens reais da versao beta */}
-      <section className="ikw-sec ikw-galeria-sec" id="ikw-galeria">
-        <div className="ikw-cab">
-          <small>Imagens reais · versão beta</small>
-          <h2>Veja o jogo</h2>
-          <p>Capturas do jogo rodando no navegador. Vídeos de gameplay no PC e no celular chegando.</p>
-        </div>
-        <div className="ikw-galeria">
-          {galeria.map((g) => (
-            <figure key={g.src}>
-              <img src={g.src} alt={g.legenda} loading="lazy" width="1200" height="700" />
-              <figcaption>{g.legenda}</figcaption>
-            </figure>
-          ))}
-        </div>
-      </section>
+      {/* VEJA O JOGO: vitrine de imagens reais (o admin sobe pelo painel, aba Galeria) */}
+      <GaleriaJogo reserva={galeria} />
 
       {/* PC E CELULAR */}
       <section className="ikw-sec" id="ikw-plataformas">

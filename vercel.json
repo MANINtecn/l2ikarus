@@ -232,6 +232,41 @@
     {
       "source": "/api/admin/links-save",
       "destination": "/api/admin?action=links-save"
+    },
+    {
+      "source": "/api/galeria",
+      "destination": "/api/status?action=galeria"
+    },
+    {
+      "source": "/api/admin/galeria-upload",
+      "destination": "/api/admin?action=galeria-upload"
+    },
+    {
+      "source": "/api/admin/galeria-editar",
+      "destination": "/api/admin?action=galeria-editar"
+    },
+    {
+      "source": "/api/admin/galeria-ordem",
+      "destination": "/api/admin?action=galeria-ordem"
+    },
+    {
+      "source": "/api/admin/galeria-apagar",
+      "destination": "/api/admin?action=galeria-apagar"
+    },
+    {
+      "source": "/api/admin/galeria",
+      "destination": "/api/admin?action=galeria"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/media/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=2592000, stale-while-revalidate=86400"
+        }
+      ]
     }
   ]
 }

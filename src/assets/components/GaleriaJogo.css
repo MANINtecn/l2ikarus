@@ -1,0 +1,71 @@
+/* Vitrine de imagens reais (GaleriaJogo.jsx). Tokens de PaginaIkarusWeb.css (.ikw). Formas angulares. */
+.gal-palco { position: relative; }
+.gal-trilho {
+  --por-vez: 5;
+  display: grid; grid-auto-flow: column; column-gap: 14px;
+  grid-auto-columns: calc((100% - (var(--por-vez) - 1) * 14px) / var(--por-vez));
+  overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; overscroll-behavior-x: contain;
+  scrollbar-width: none; padding: 4px 0;
+}
+.gal-trilho::-webkit-scrollbar { display: none; }
+.gal-card {
+  position: relative; display: block; padding: 0; border: 0; cursor: zoom-in; background: var(--ik-card);
+  aspect-ratio: 3 / 4; overflow: hidden; scroll-snap-align: start;
+  clip-path: var(--ik-chanfro);
+}
+.gal-card::after { /* contorno e brilho por cima da imagem */
+  content: ''; position: absolute; inset: 0; pointer-events: none; clip-path: var(--ik-chanfro);
+  box-shadow: inset 0 0 0 1px rgba(124, 192, 255, .22);
+  background: linear-gradient(180deg, transparent 55%, rgba(4, 5, 10, .85) 100%);
+  transition: box-shadow .3s;
+}
+.gal-card img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; transition: transform .5s cubic-bezier(.2, .9, .3, 1); }
+.gal-card:hover img { transform: scale(1.06); }
+.gal-card:hover::after { box-shadow: inset 0 0 0 1px var(--ik-azul2), inset 0 0 30px rgba(59, 130, 246, .3); }
+.gal-card span {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 1; padding: .8rem .9rem;
+  font: 500 .8rem/1.35 'Outfit', sans-serif; color: #e8eef8; text-align: left;
+}
+
+.gal-seta {
+  position: absolute; top: 50%; z-index: 3; transform: translateY(-50%);
+  width: 44px; height: 44px; border: 0; cursor: pointer; display: grid; place-items: center;
+  background: rgba(4, 5, 10, .82); box-shadow: inset 0 0 0 1px rgba(124, 192, 255, .35);
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); transition: background .2s;
+}
+.gal-seta:hover { background: rgba(59, 130, 246, .5); }
+.gal-seta i { width: 10px; height: 10px; border-top: 2px solid #fff; border-right: 2px solid #fff; }
+.gal-seta.esq { left: -22px; }
+.gal-seta.esq i { transform: translateX(2px) rotate(-135deg); }
+.gal-seta.dir { right: -22px; }
+.gal-seta.dir i { transform: translateX(-2px) rotate(45deg); }
+
+/* tela cheia */
+.gal-zoom {
+  position: fixed; inset: 0; z-index: 25000; display: flex; align-items: center; justify-content: center;
+  padding: 3.5rem 4.5rem; background: rgba(2, 3, 6, .94); backdrop-filter: blur(8px);
+  animation: gal-entra .25s ease both;
+}
+@keyframes gal-entra { from { opacity: 0; } to { opacity: 1; } }
+.gal-zoom figure { margin: 0; max-width: 100%; max-height: 100%; display: flex; flex-direction: column; align-items: center; gap: .8rem; }
+.gal-zoom img { max-width: 100%; max-height: calc(100svh - 9rem); object-fit: contain; display: block; box-shadow: 0 0 0 1px rgba(124, 192, 255, .25), 0 20px 60px rgba(0, 0, 0, .6); }
+.gal-zoom figcaption { display: flex; gap: 1rem; align-items: baseline; color: var(--ik-texto); font-size: .9rem; text-align: center; }
+.gal-zoom figcaption small { color: var(--ik-mudo); font-size: .75rem; }
+.gal-zoom .gal-seta.esq { left: 1rem; }
+.gal-zoom .gal-seta.dir { right: 1rem; }
+.gal-fechar { position: absolute; top: 1rem; right: 1rem; width: 40px; height: 40px; background: none; border: 0; cursor: pointer; }
+.gal-fechar i { position: absolute; left: 8px; right: 8px; top: 19px; height: 2px; background: #fff; transform: rotate(45deg); }
+.gal-fechar i + i { transform: rotate(-45deg); }
+
+@media (max-width: 1100px) { .gal-trilho { --por-vez: 4; } }
+@media (max-width: 860px) { .gal-trilho { --por-vez: 3; } }
+@media (max-width: 600px) {
+  .gal-trilho { --por-vez: 2; column-gap: 10px; grid-auto-columns: calc((100% - 10px) / 2.15); }
+  .gal-seta { display: none; }
+  .gal-zoom { padding: 3.5rem .6rem; }
+  .gal-zoom .gal-seta { display: grid; top: auto; bottom: 1.2rem; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gal-trilho { scroll-behavior: auto; }
+  .gal-card img, .gal-zoom { transition: none; animation: none; }
+}
