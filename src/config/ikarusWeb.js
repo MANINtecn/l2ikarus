@@ -53,7 +53,7 @@ export const plataformas = [
 // Doacao livre por PIX (chave aleatoria). Preencher os tres campos para o cartao aparecer com QR.
 // nome: como esta no banco (ate 25 letras); cidade: ate 15 letras. Sem acento tudo bem.
 export const PIX_DOACAO = {
-  chave: '',
-  nome: '',
-  cidade: '',
+  chave: '03794579-e15e-4231-9444-c8889695ceb7',
+  nome: 'ICARO FILGUEIRAS LOPES',
+  cidade: 'Tocantins',
 }
