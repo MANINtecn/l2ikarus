@@ -5,14 +5,10 @@ import GaleriaAdmin from './GaleriaAdmin'
 
 const TABS = [
   { id: 'overview', label: 'VISÃO GERAL' },
-  { id: 'players', label: 'ONLINE' },
   { id: 'accounts', label: 'CONTAS' },
-  { id: 'ranking', label: 'RANKING' },
   { id: 'codes', label: 'CÓDIGOS' },
-  { id: 'offer', label: 'OFERTA' },
   { id: 'streamers', label: 'STREAMERS' },
   { id: 'indicacao', label: 'INDICAÇÃO' },
-  { id: 'charmgmt', label: 'PERSONAGENS' },
   { id: 'links', label: 'LINKS' },
   { id: 'galeria', label: 'GALERIA' },
 ]

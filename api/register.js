@@ -71,16 +71,16 @@ export default async function handler(req, res) {
   if (email && !EMAIL_RE.test(email)) return res.status(400).json({ message: 'E-mail inválido' })
 
   try {
-    // Hasheia a senha AQUI (texto puro nunca trafega) e manda só os hashes pra VPS.
-    // Dois formatos porque os engines diferem: Essence = SHA1-base64; Interlude (aCis) = BCrypt.
-    const hashedPassword = crypto.createHash('sha1').update(password).digest('base64')
-    const bcryptPassword = bcryptHash(password, 10)
+    // Hasheia a senha AQUI (texto puro nunca trafega) e manda so' o hash pra VPS.
+    // Banco novo (VPS do L2 Ikarus, 11/2026): scrypt, conferido no login (api/player.js).
+    const sal = crypto.randomBytes(16).toString('hex')
+    const hashedPassword = 'scrypt$' + sal + '$' + crypto.scryptSync(password, sal, 32, { N: 16384 }).toString('hex')
     const base = process.env.VPS_API_URL || (process.env.VPS_STATUS_URL || '').replace(/\/status$/, '')
     if (!base) return res.status(500).json({ message: 'Servidor de cadastro não configurado (VPS_API_URL).' })
     const vpsRes = await fetch(base + '/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-api-key': process.env.VPS_STATUS_TOKEN },
-      body: JSON.stringify({ login, passwordHash: hashedPassword, passwordBcrypt: bcryptPassword, email: email ?? '', referredBy: refSlug }),
+      body: JSON.stringify({ login, passwordHash: hashedPassword, email: email ?? '', referredBy: refSlug }),
     })
     const data = await vpsRes.json().catch(() => ({}))
     return res.status(vpsRes.status).json(data)

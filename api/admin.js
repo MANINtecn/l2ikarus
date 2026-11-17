@@ -213,11 +213,11 @@ export default async function handler(req, res) {
       const todayStart = now - (now % 86400)
       const weekStart = now - 7 * 86400
 
-      const [[{ online }]] = await db.query('SELECT COUNT(*) as online FROM characters WHERE online = 1')
+      const online = 0   // L2 antigo (characters) nao existe mais no banco novo
       const [[{ total_accounts }]] = await db.query('SELECT COUNT(*) as total_accounts FROM accounts')
       const [[{ today }]] = await db.query('SELECT COUNT(*) as today FROM accounts WHERE created_time >= ?', [todayStart])
       const [[{ week }]] = await db.query('SELECT COUNT(*) as week FROM accounts WHERE created_time >= ?', [weekStart])
-      const [[{ total_chars }]] = await db.query('SELECT COUNT(*) as total_chars FROM characters')
+      const total_chars = 0
       const [[{ banned }]] = await db.query('SELECT COUNT(*) as banned FROM accounts WHERE access_level < 0')
 
       // Registros por dia nos últimos 7 dias
@@ -232,6 +232,7 @@ export default async function handler(req, res) {
 
     // GET /api/admin/players — jogadores online
     if (action === 'players') {
+      return res.status(200).json({ players: [] })   // L2 antigo: sem personagens no banco novo
       const [rows] = await db.query(
         `SELECT * FROM characters WHERE online > 0 ORDER BY char_name ASC LIMIT 100`
       )

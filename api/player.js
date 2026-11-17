@@ -39,6 +39,17 @@ function verifyJWT(token, secret) {
   } catch { return null }
 }
 
+function senhaConfere(senha, guardada) {
+  try {
+    if (guardada.startsWith('scrypt$')) {
+      const [, sal, hash] = guardada.split('$')
+      const calc = crypto.scryptSync(senha, sal, 32, { N: 16384 }).toString('hex')
+      return calc.length === hash.length && crypto.timingSafeEqual(Buffer.from(calc), Buffer.from(hash))
+    }
+    return crypto.createHash('sha1').update(senha).digest('base64') === guardada
+  } catch { return false }
+}
+
 function getAction(req) {
   const url = req.url || ''
   if (url.includes('/login')) return 'login'
@@ -60,15 +71,14 @@ export default async function handler(req, res) {
     if (!login || !password) return res.status(400).json({ error: 'Login e senha obrigatórios' })
 
     try {
+      // banco novo (VPS do L2 Ikarus, 11/2026): senha em "scrypt$sal$hash"; aceita tambem o SHA1 antigo do L2
       const db = await getConnection()
-      const hashedPass = crypto.createHash('sha1').update(password).digest('base64')
-      const [rows] = await db.query(
-        'SELECT login, email FROM accounts WHERE login = ? AND password = ?',
-        [login, hashedPass]
-      )
-      if (rows.length === 0) return res.status(401).json({ error: 'Login ou senha incorretos' })
-
+      const [rows] = await db.query('SELECT login, email, password, access_level FROM accounts WHERE login = ?', [String(login)])
       const account = rows[0]
+      if (!account || !senhaConfere(String(password), String(account.password || ''))) {
+        return res.status(401).json({ error: 'Login ou senha incorretos' })
+      }
+      if (account.access_level < 0) return res.status(403).json({ error: 'Conta bloqueada.' })
       // login salvo por 30 dias (antes: 1 dia). O jogo entra com o passe gerado a partir desta sessao.
       const SESSAO = 30 * 86400
       const jwt = createJWT({ login: account.login, email: account.email, exp: Math.floor(Date.now() / 1000) + SESSAO }, jwtSecret)
@@ -140,10 +150,7 @@ export default async function handler(req, res) {
 
     try {
       const db = await getConnection()
-      const [chars] = await db.query(
-        'SELECT char_name, level, classid, online, pvpkills, onlinetime FROM characters WHERE account_name = ? ORDER BY level DESC',
-        [payload.login]
-      )
+      const chars = []   // personagens do L2 antigo nao existem mais; os do L2 Ikarus vem de /api/player/personagens
       // Saldo Ikoin (cria registro se não existir)
       let ikoin = 0
       try {
