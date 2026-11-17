@@ -160,6 +160,51 @@ function CartaoJogo() {
   )
 }
 
+const NOME_CLASSE = { guardiao: 'Guardião', guerreiro: 'Guerreiro', mago: 'Mago', clerico: 'Clérigo' }
+const NOME_RACA = { human: 'Humano', elf: 'Elfo', darkelf: 'Elfo Negro', orc: 'Orc', dwarf: 'Anão' }
+const raca = (r) => {
+  const k = String(r || '').toLowerCase()
+  const base = k.startsWith('darkelf') ? 'darkelf' : k.split('_')[0]
+  return NOME_RACA[base] || ''
+}
+
+// Aba Personagens: lista vinda do servidor do jogo (/api/player/personagens)
+function Personagens({ irParaJogos }) {
+  const [lista, setLista] = useState(null)
+  const [aviso, setAviso] = useState('')
+  useEffect(() => {
+    fetch('/api/player/personagens').then((r) => r.json())
+      .then((d) => { setLista(Array.isArray(d.pers) ? d.pers : []); setAviso(d.aviso || d.error || '') })
+      .catch(() => { setLista([]); setAviso('Não consegui buscar seus personagens agora.') })
+  }, [])
+  return (
+    <section className="ikp-bloco">
+      <h2>Seus personagens</h2>
+      {lista === null && <p className="ikp-mudo">Carregando...</p>}
+      {lista && !lista.length && (
+        <div className="ikp-vazio">
+          <p className="ikp-mudo">{aviso || 'Você ainda não criou nenhum personagem no L2 Ikarus.'}</p>
+          <button className="ikw-btn alto" onClick={irParaJogos}>Criar no jogo</button>
+        </div>
+      )}
+      {lista && lista.length > 0 && (
+        <div className="ikp-pers">
+          {lista.map((p) => (
+            <article key={p.name} className="ikp-per">
+              <span className="ikp-per-nv"><small>Nv</small>{p.level}</span>
+              <div>
+                <h3>{p.name}</h3>
+                <p>{[NOME_CLASSE[p.classe] || p.classe, raca(p.race)].filter(Boolean).join(' · ')}</p>
+                {p.location && <small>{p.location}</small>}
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
+    </section>
+  )
+}
+
 export default function PainelIkarusWeb({ data, onLogout, onFechar }) {
   const [aba, setAba] = useState('jogos')
   const [comprando, setComprando] = useState(false)
@@ -292,13 +337,7 @@ export default function PainelIkarusWeb({ data, onLogout, onFechar }) {
           </div>
         )}
 
-        {aba === 'personagens' && (
-          <section className="ikp-bloco ikp-vazio">
-            <h2>Seus personagens</h2>
-            <p className="ikp-mudo">Em breve os seus personagens do L2 Ikarus aparecem aqui, com nível e classe. Por enquanto, veja e escolha dentro do jogo.</p>
-            <button className="ikw-btn alto" onClick={() => setAba('jogos')}>Ir para Jogos</button>
-          </section>
-        )}
+        {aba === 'personagens' && <Personagens irParaJogos={() => setAba('jogos')} />}
 
         {aba === 'indicacao' && (
           <section className="ikp-bloco ikp-indic">

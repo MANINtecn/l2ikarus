@@ -99,6 +99,37 @@ export default async function handler(req, res) {
     return res.status(200).json({ ticket: `${corpo}.${sig}` })
   }
 
+  // GET /api/player/personagens — personagens do L2 Ikarus desta conta (painel, aba Personagens).
+  // O site pergunta ao servidor do jogo (servidor a servidor) com um passe de escopo 'pers',
+  // que nao serve para entrar no jogo. Jogo fora do ar = lista vazia com aviso.
+  if (action === 'personagens') {
+    const m = (req.headers.cookie || '').match(/player_session=([^;]+)/)
+    const payload = m ? verifyJWT(m[1], jwtSecret) : null
+    if (!payload) return res.status(401).json({ error: 'Entre na sua conta.' })
+    const segredo = process.env.GAME_SSO_SECRET
+    if (!segredo) return res.status(200).json({ pers: [], aviso: 'Lista indisponível no momento.' })
+    const corpo = Buffer.from(JSON.stringify({
+      sub: String(payload.login), esc: 'pers',
+      exp: Math.floor(Date.now() / 1000) + 60,
+      n: crypto.randomBytes(16).toString('hex'),
+    })).toString('base64url')
+    const ticket = `${corpo}.${crypto.createHmac('sha256', segredo).update(corpo).digest('base64url')}`
+    res.setHeader('Cache-Control', 'no-store')
+    try {
+      const ctl = new AbortController()
+      const t = setTimeout(() => ctl.abort(), 6000)
+      const r = await fetch((process.env.GAME_API_URL || 'https://play.isblade.tecx.pro') + '/api/conta/sso-pers', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ticket }), signal: ctl.signal,
+      })
+      clearTimeout(t)
+      const d = await r.json().catch(() => ({}))
+      if (!r.ok) return res.status(200).json({ pers: [], aviso: 'Lista indisponível no momento.' })
+      return res.status(200).json({ pers: Array.isArray(d.pers) ? d.pers : [] })
+    } catch {
+      return res.status(200).json({ pers: [], aviso: 'Servidor do jogo fora do ar no momento.' })
+    }
+  }
+
   // GET /api/player/me — retorna dados do jogador logado
   if (action === 'me') {
     const cookies = req.headers.cookie || ''

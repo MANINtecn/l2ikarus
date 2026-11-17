@@ -181,10 +181,23 @@
 .ikp-jogo-info h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); margin: .3rem 0 .5rem; }
 .ikp-jogo-info .ikw-jogar { margin-top: 1.2rem; border: 0; cursor: pointer; }
 .ikp-jogo-info .ikw-jogar:disabled { opacity: .7; cursor: wait; }
-.ikp-jogo-on { display: inline-flex; align-items: center; gap: .5rem; font-size: .82rem; color: var(--ik-mudo); margin-top: .6rem; }
+.ikp-jogo-on { display: flex; align-items: center; gap: .5rem; font-size: .82rem; color: var(--ik-mudo); margin-top: .6rem; }
 .ikp-jogo-on i { width: 8px; height: 8px; background: #34d399; transform: rotate(45deg); box-shadow: 0 0 10px #34d399; }
 .ikp-embreve { opacity: .7; }
 @media (max-width: 760px) {
   .ikp-jogo { grid-template-columns: 1fr; text-align: center; }
   .ikp-jogo-info .ikw-jogar { width: 100%; justify-content: center; }
 }
+
+/* aba Personagens */
+.ikp-pers { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: .8rem; }
+.ikp-per { display: flex; gap: 1rem; align-items: center; padding: 1rem 1.1rem; background: rgba(255,255,255,.03); clip-path: var(--ik-chanfro-p); box-shadow: inset 0 0 0 1px var(--ik-linha); }
+.ikp-per-nv {
+  flex: none; width: 58px; height: 58px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  font: 900 1.3rem/1 'Cinzel', serif; color: #fff; background: rgba(59,130,246,.18);
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+}
+.ikp-per-nv small { font: 600 .55rem 'Outfit', sans-serif; letter-spacing: 1px; color: var(--ik-azul2); text-transform: uppercase; }
+.ikp-per h3 { font-size: 1.05rem; margin: 0 0 .2rem; }
+.ikp-per p { font-size: .85rem; color: var(--ik-texto); margin: 0; }
+.ikp-per small { font-size: .72rem; color: var(--ik-mudo); }

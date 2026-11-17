@@ -260,6 +260,10 @@
     {
       "source": "/api/player/ticket",
       "destination": "/api/player?action=ticket"
+    },
+    {
+      "source": "/api/player/personagens",
+      "destination": "/api/player?action=personagens"
     }
   ],
   "headers": [
