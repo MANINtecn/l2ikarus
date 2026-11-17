@@ -13,6 +13,7 @@ import PaginaSandbox from './assets/components/PaginaSandbox'
 import PaginaIkarusWeb from './assets/components/PaginaIkarusWeb'
 import PainelIkarusWeb from './assets/components/PainelIkarusWeb'
 import CadastroIkarusWeb from './assets/components/CadastroIkarusWeb'
+import { entrarNoJogo } from './config/jogar'
 import InterludeInfo from './assets/components/InterludeInfo'
 import DonateTerminal from './assets/components/DonateTerminal'
 import AdminPanel from './assets/components/AdminPanel'
@@ -68,9 +69,21 @@ function App() {
     }).catch(() => {})
 
     // Verifica sessão jogador
-    fetch('/api/player/me').then(r => r.json()).then(d => {
-      if (d.authenticated) setPlayerData(d)
-    }).catch(() => {})
+    // ?jogar=1: veio do jogo sem estar logado nele. Logado no site -> entra direto no jogo; senao -> login.
+    // ikw.painel (sessionStorage): acabou de criar conta -> abre a central (aba Jogos).
+    const querJogar = new URLSearchParams(window.location.search).get('jogar') === '1'
+    if (querJogar) window.history.replaceState({}, '', '/')
+    fetch('/api/player/me').then(r => r.json()).then(async d => {
+      if (d.authenticated) {
+        setPlayerData(d)
+        let abrir = false
+        try { abrir = sessionStorage.getItem('ikw.painel') === '1'; sessionStorage.removeItem('ikw.painel') } catch {}
+        if (querJogar) {
+          const r = await entrarNoJogo()
+          if (r) setPainelSandbox('jogador')
+        } else if (abrir) setPainelSandbox('jogador')
+      } else if (querJogar) setIsLoginOpen(true)
+    }).catch(() => { if (querJogar) setIsLoginOpen(true) })
 
     // Link de afiliado/streamer: /r/<slug> -> guarda no localStorage por 30 dias (first-touch)
     const refMatch = window.location.pathname.match(/^\/r\/([a-zA-Z0-9_-]{2,32})\/?$/)
@@ -127,6 +140,14 @@ function App() {
     return () => ScrollTrigger.getAll().forEach(t => t.kill())
   }, [loading])
 
+  // "Jogar agora" da home: logado -> passe -> jogo (atalho); sem login -> entrar e depois a central (aba Jogos)
+  const jogar = async () => {
+    if (!playerData) { setIsLoginOpen(true); return }
+    const r = await entrarNoJogo()
+    if (r === 'login') { setPlayerData(null); setIsLoginOpen(true) }
+    else if (r) setPainelSandbox('jogador')
+  }
+
   const handlePlayerLogin = async (e) => {
     e.preventDefault()
     setLoginError('')
@@ -172,6 +193,7 @@ function App() {
           onCriarConta={() => setIsRegisterOpen(true)}
           onAbrirConta={() => setPainelSandbox('jogador')}
           onAbrirAdmin={() => setPainelSandbox('admin')}
+          onJogar={jogar}
         />
       )}
 

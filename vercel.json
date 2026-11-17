@@ -256,6 +256,10 @@
     {
       "source": "/api/admin/galeria",
       "destination": "/api/admin?action=galeria"
+    },
+    {
+      "source": "/api/player/ticket",
+      "destination": "/api/player?action=ticket"
     }
   ],
   "headers": [

@@ -72,8 +72,8 @@ export default function CadastroIkarusWeb({ isOpen, onClose, googleData, onEntra
         {criada ? (<>
           <div className="ikc-ok" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12 L10 17 L19 7" /></svg></div>
           <h3>Conta criada</h3>
-          <p className="ikp-mudo">Bem-vindo ao L2 Ikarus, <b>{f.login}</b>. Você já está conectado.</p>
-          <button className="ikw-btn alto ikp-cheio" onClick={() => { onClose(); window.location.reload() }}>Continuar</button>
+          <p className="ikp-mudo">Bem-vindo ao L2 Ikarus, <b>{f.login}</b>. Você já está conectado: na central, é só clicar em <b>Jogar</b>.</p>
+          <button className="ikw-btn alto ikp-cheio" onClick={() => { try { sessionStorage.setItem('ikw.painel', '1') } catch {} onClose(); window.location.reload() }}>Ir para a central e jogar</button>
         </>) : (<>
           <h3>Criar conta</h3>
           <p className="ikp-mudo">Grátis. Uma conta para jogar, guardar seus Ikoin e comprar skins.</p>

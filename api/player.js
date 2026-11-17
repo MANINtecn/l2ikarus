@@ -69,12 +69,34 @@ export default async function handler(req, res) {
       if (rows.length === 0) return res.status(401).json({ error: 'Login ou senha incorretos' })
 
       const account = rows[0]
-      const jwt = createJWT({ login: account.login, email: account.email, exp: Math.floor(Date.now() / 1000) + 86400 }, jwtSecret)
-      res.setHeader('Set-Cookie', `player_session=${jwt}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=86400`)
+      // login salvo por 30 dias (antes: 1 dia). O jogo entra com o passe gerado a partir desta sessao.
+      const SESSAO = 30 * 86400
+      const jwt = createJWT({ login: account.login, email: account.email, exp: Math.floor(Date.now() / 1000) + SESSAO }, jwtSecret)
+      res.setHeader('Set-Cookie', `player_session=${jwt}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=${SESSAO}`)
       return res.status(200).json({ success: true, login: account.login })
     } catch (err) {
       return res.status(500).json({ error: 'Erro interno: ' + err.message })
     }
+  }
+
+  // POST /api/player/ticket — passe para entrar no jogo (L2 Ikarus Web) com a conta do site.
+  // Assinado com GAME_SSO_SECRET (o mesmo SSO_SECRET do servidor do jogo), vale 2 minutos e
+  // e' de uso unico (o servidor do jogo guarda o "n"). Sem sessao no site = 401 (o site pede login).
+  if (action === 'ticket') {
+    if (req.method !== 'POST') return res.status(405).json({ error: 'Método inválido' })
+    const m = (req.headers.cookie || '').match(/player_session=([^;]+)/)
+    const payload = m ? verifyJWT(m[1], jwtSecret) : null
+    if (!payload) return res.status(401).json({ error: 'Entre na sua conta para jogar.' })
+    const segredo = process.env.GAME_SSO_SECRET
+    if (!segredo) return res.status(503).json({ error: 'Entrada no jogo ainda não configurada.' })
+    const corpo = Buffer.from(JSON.stringify({
+      sub: String(payload.login),
+      exp: Math.floor(Date.now() / 1000) + 120,
+      n: crypto.randomBytes(16).toString('hex'),
+    })).toString('base64url')
+    const sig = crypto.createHmac('sha256', segredo).update(corpo).digest('base64url')
+    res.setHeader('Cache-Control', 'no-store')
+    return res.status(200).json({ ticket: `${corpo}.${sig}` })
   }
 
   // GET /api/player/me — retorna dados do jogador logado

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
 import './HeroRede.css'
 import './PaginaSandbox.css'
 import './PaginaIkarusWeb.css'
@@ -54,9 +54,14 @@ function Icone({ d }) {
   )
 }
 
+// todos os "Jogar agora" da home chamam o mesmo fluxo (App: logado -> passe -> jogo; sem login -> entrar)
+const JogarCtx = createContext(() => {})
+const clicarJogar = (jogar) => (e) => { if (e.ctrlKey || e.metaKey || e.shiftKey || e.button === 1) return; e.preventDefault(); jogar() }
+
 function BotaoJogar({ grande = false }) {
+  const jogar = useContext(JogarCtx)
   return (
-    <a className={`ikw-jogar ${grande ? 'grande' : ''}`} href={URL_JOGO}>
+    <a className={`ikw-jogar ${grande ? 'grande' : ''}`} href={URL_JOGO} onClick={clicarJogar(jogar)}>
       <span>Jogar agora</span>
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4 L19 12 L7 20 Z" /></svg>
     </a>
@@ -117,7 +122,7 @@ function useStatusJogo() {
   return st
 }
 
-export default function PaginaIkarusWeb({ jogador, admin, onEntrar, onCriarConta, onAbrirConta, onAbrirAdmin }) {
+export default function PaginaIkarusWeb({ jogador, admin, onEntrar, onCriarConta, onAbrirConta, onAbrirAdmin, onJogar = () => {} }) {
   const links = useLinksComunidade()
   const status = useStatusJogo()
 
@@ -131,6 +136,7 @@ export default function PaginaIkarusWeb({ jogador, admin, onEntrar, onCriarConta
   useEffect(() => { document.title = 'L2 Ikarus — o primeiro L2 sem target · IS Labs' }, [])
 
   return (
+    <JogarCtx.Provider value={onJogar}>
     <div className="ikw">
       {/* TOPO DA IS LABS: a mesma barra e a mesma logo do site no ar (estilos de PaginaSandbox.css) */}
       <div className="sbx ikw-islabs">
@@ -163,7 +169,7 @@ export default function PaginaIkarusWeb({ jogador, admin, onEntrar, onCriarConta
                 ? <button className="sbx-conta" onClick={onAbrirConta} title="Painel do jogador">{jogador.login || 'Minha conta'}</button>
                 : <button className="sbx-conta" onClick={onEntrar}>Entrar</button>}
               <span className="sbx-brilho nav">
-                <a className="sbx-baixar nav" href={URL_JOGO}>
+                <a className="sbx-baixar nav" href={URL_JOGO} onClick={clicarJogar(onJogar)}>
                   <svg className="ikw-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4 L19 12 L7 20 Z" /></svg>
                   Jogar agora
                 </a>
@@ -395,5 +401,6 @@ export default function PaginaIkarusWeb({ jogador, admin, onEntrar, onCriarConta
         </div>
       </footer>
     </div>
+    </JogarCtx.Provider>
   )
 }

@@ -3,7 +3,8 @@ import './PaginaIkarusWeb.css'
 import './PainelIkarusWeb.css'
 import IkoinEmblema from './IkoinEmblema'
 import ReferralProgram from './ReferralProgram'
-import { URL_JOGO } from '../../config/ikarusWeb'
+import { URL_STATUS_JOGO } from '../../config/ikarusWeb'
+import { entrarNoJogo } from '../../config/jogar'
 
 /**
  * Painel do jogador da home nova (l2ikarus.com). Mesmas APIs do PlayerPanel antigo
@@ -16,6 +17,7 @@ const PACOTES = [50, 100, 250, 500, 1000]
 const reais = (v) => Number(v || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 
 const ABAS = [
+  ['jogos', 'Jogos'],
   ['carteira', 'Carteira'],
   ['loja', 'Loja de skins'],
   ['personagens', 'Personagens'],
@@ -122,8 +124,44 @@ function ModalCompra({ onFechar }) {
   )
 }
 
+// Cartao de um jogo na central: arte, status e o botao Jogar (entra com a conta do site, sem outro login)
+function CartaoJogo() {
+  const [indo, setIndo] = useState(false)
+  const [erro, setErro] = useState('')
+  const [online, setOnline] = useState(null)
+  useEffect(() => {
+    const ctl = new AbortController()
+    fetch(URL_STATUS_JOGO, { signal: ctl.signal, cache: 'no-store' }).then((r) => r.json())
+      .then((d) => setOnline((d.canais || []).reduce((a, c) => a + (c.jogadores || 0), 0)))
+      .catch(() => setOnline(null))
+    return () => ctl.abort()
+  }, [])
+  const jogar = async () => {
+    setIndo(true); setErro('')
+    const r = await entrarNoJogo()
+    if (r === 'login') { setErro('Sua sessão expirou. Saia e entre de novo.'); setIndo(false) }
+    else if (r) { setErro(r); setIndo(false) }
+  }
+  return (
+    <article className="ikp-jogo">
+      <img src="/media/web/capa_logo.webp" alt="L2 Ikarus" />
+      <div className="ikp-jogo-info">
+        <small>MMORPG de ação · sem target</small>
+        <h2>L2 Ikarus</h2>
+        <p className="ikp-mudo">O primeiro L2 sem target. No navegador, no PC e no celular.</p>
+        {online !== null && <p className="ikp-jogo-on"><i aria-hidden="true" />Servidor online{online > 0 ? ` · ${online} ${online === 1 ? 'jogador' : 'jogadores'}` : ''}</p>}
+        <button className="ikw-jogar grande" onClick={jogar} disabled={indo}>
+          <span>{indo ? 'Abrindo...' : 'Jogar'}</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4 L19 12 L7 20 Z" /></svg>
+        </button>
+        {erro && <p className="ikp-erro-txt">{erro}</p>}
+      </div>
+    </article>
+  )
+}
+
 export default function PainelIkarusWeb({ data, onLogout, onFechar }) {
-  const [aba, setAba] = useState('carteira')
+  const [aba, setAba] = useState('jogos')
   const [comprando, setComprando] = useState(false)
   const [codigo, setCodigo] = useState('')
   const [resgate, setResgate] = useState(null)
@@ -244,14 +282,21 @@ export default function PainelIkarusWeb({ data, onLogout, onFechar }) {
           </section>
         )}
 
+        {aba === 'jogos' && (
+          <div className="ikp-jogos">
+            <CartaoJogo />
+            <section className="ikp-bloco ikp-embreve">
+              <h2>Mais jogos da IS Labs</h2>
+              <p className="ikp-mudo">Novos jogos web vão aparecer aqui, todos com esta mesma conta.</p>
+            </section>
+          </div>
+        )}
+
         {aba === 'personagens' && (
           <section className="ikp-bloco ikp-vazio">
             <h2>Seus personagens</h2>
-            <p className="ikp-mudo">Em breve os seus personagens do L2 Ikarus Web aparecem aqui, com nível, classe e status.</p>
-            <a className="ikw-jogar" href={URL_JOGO}>
-              <span>Jogar agora</span>
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4 L19 12 L7 20 Z" /></svg>
-            </a>
+            <p className="ikp-mudo">Em breve os seus personagens do L2 Ikarus aparecem aqui, com nível e classe. Por enquanto, veja e escolha dentro do jogo.</p>
+            <button className="ikw-btn alto" onClick={() => setAba('jogos')}>Ir para Jogos</button>
           </section>
         )}
 
