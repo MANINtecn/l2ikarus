@@ -393,3 +393,30 @@
   .ikw-versus-linha .classico { text-decoration: none; opacity: .75; }
   .ikw-galeria { grid-template-columns: 1fr; }
 }
+
+/* ══ doacao por PIX, ao lado do titulo "Voce nao clica no alvo" ══ */
+.ikw-cab-linha { display: flex; justify-content: space-between; align-items: flex-start; gap: 2rem; margin-bottom: 3rem; }
+.ikw-cab-linha .ikw-cab { margin-bottom: 0; }
+.ikw-doacao {
+  flex: 0 1 560px; display: flex; gap: 1.4rem; align-items: center; padding: 1.3rem 1.4rem;
+  background: linear-gradient(135deg, rgba(230, 195, 90, .1), var(--ik-card) 55%);
+  clip-path: var(--ik-chanfro); box-shadow: inset 0 0 0 1px rgba(230, 195, 90, .28);
+}
+.ikw-doacao-txt { flex: 1; min-width: 0; }
+.ikw-doacao small { font-size: .68rem; letter-spacing: 3px; text-transform: uppercase; color: #e6c35a; }
+.ikw-doacao h3 { font-size: 1.15rem; margin: .35rem 0 .5rem; }
+.ikw-doacao h3 em { font-style: normal; color: #f1d27a; }
+.ikw-doacao p { font-size: .85rem; line-height: 1.5; color: var(--ik-texto); }
+.ikw-doacao-botoes { display: flex; flex-wrap: wrap; gap: .5rem; margin: .9rem 0 .7rem; }
+.ikw-doacao-botoes .ikw-btn { font-size: .7rem; padding: .7rem 1rem; }
+.ikw-doacao-nota { font-size: .74rem !important; color: var(--ik-mudo) !important; }
+.ikw-doacao-qr { flex: none; width: 150px; height: 150px; background: #fff; padding: 6px; clip-path: var(--ik-chanfro-p); }
+@media (max-width: 960px) {
+  .ikw-cab-linha { flex-direction: column; }
+  .ikw-doacao { flex-basis: auto; width: 100%; }
+}
+@media (max-width: 480px) {
+  .ikw-doacao { flex-direction: column-reverse; align-items: stretch; text-align: left; }
+  .ikw-doacao-qr { align-self: center; width: 170px; height: 170px; }
+  .ikw-doacao-botoes .ikw-btn { flex: 1; }
+}

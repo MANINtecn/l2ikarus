@@ -5,7 +5,9 @@ import './PaginaIkarusWeb.css'
 import { useLinksComunidade } from '../../config/linksComunidade'
 import { IconeWhatsapp, IconeDiscord } from './IconesComunidade'
 import IkoinEmblema from './IkoinEmblema'
-import { URL_JOGO, URL_STATUS_JOGO, pilares, classes, andares, progressao, versus, galeria, plataformas } from '../../config/ikarusWeb'
+import QRCode from 'qrcode'
+import { pixCopiaECola } from '../../config/pixEstatico'
+import { PIX_DOACAO, URL_JOGO, URL_STATUS_JOGO, pilares, classes, andares, progressao, versus, galeria, plataformas } from '../../config/ikarusWeb'
 
 /**
  * Home de l2ikarus.com: o L2 Ikarus Web (MMORPG de ação sem target, no navegador, PC e celular).
@@ -57,6 +59,41 @@ function BotaoJogar({ grande = false }) {
       <span>Jogar agora</span>
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4 L19 12 L7 20 Z" /></svg>
     </a>
+  )
+}
+
+// Doacao livre por PIX estatico (sem valor fixo). Some enquanto a chave nao estiver em config/ikarusWeb.js.
+function Doacao() {
+  const codigo = pixCopiaECola(PIX_DOACAO)
+  const [qr, setQr] = useState('')
+  const [copiado, setCopiado] = useState('')
+  useEffect(() => {
+    if (!codigo) return
+    QRCode.toDataURL(codigo, { margin: 1, width: 320, errorCorrectionLevel: 'M', color: { dark: '#0b1220', light: '#ffffff' } })
+      .then(setQr).catch(() => setQr(''))
+  }, [codigo])
+  if (!codigo) return null
+
+  const copiar = (oque, texto) => {
+    const ok = () => { setCopiado(oque); setTimeout(() => setCopiado(''), 1800) }
+    if (navigator.clipboard?.writeText) navigator.clipboard.writeText(texto).then(ok).catch(ok)
+    else ok()
+  }
+
+  return (
+    <aside className="ikw-doacao" aria-label="Apoie o servidor com PIX">
+      <div className="ikw-doacao-txt">
+        <small>Apoie o projeto</small>
+        <h3>Curtiu? <em>Fortaleça o servidor.</em></h3>
+        <p>O L2 Ikarus é independente. Qualquer valor ajuda a manter o servidor no ar e acelera as novidades.</p>
+        <div className="ikw-doacao-botoes">
+          <button className="ikw-btn" onClick={() => copiar('codigo', codigo)}>{copiado === 'codigo' ? 'Copiado!' : 'PIX copia e cola'}</button>
+          <button className="ikw-btn fantasma" onClick={() => copiar('chave', PIX_DOACAO.chave)}>{copiado === 'chave' ? 'Copiada!' : 'Copiar chave'}</button>
+        </div>
+        <p className="ikw-doacao-nota">Valor livre, você escolhe no app do banco. Quer aparecer como apoiador? Mande seu nome no Discord.</p>
+      </div>
+      {qr && <img className="ikw-doacao-qr" src={qr} alt="QR Code do PIX para doação" width="160" height="160" />}
+    </aside>
   )
 }
 
@@ -176,10 +213,13 @@ export default function PaginaIkarusWeb({ jogador, admin, onEntrar, onCriarConta
 
       {/* SEM TARGET: o diferencial, em contraste com o L2 classico */}
       <section className="ikw-sec" id="ikw-combate">
-        <div className="ikw-cab">
-          <small>Sem target</small>
-          <h2>Você não clica no alvo. <em>Você mira.</em></h2>
-          <p>O mundo do Lineage 2 que você conhece, com combate de jogo de ação. Quem decide a luta é a sua mão, não o auto-ataque.</p>
+        <div className="ikw-cab-linha">
+          <div className="ikw-cab">
+            <small>Sem target</small>
+            <h2>Você não clica no alvo. <em>Você mira.</em></h2>
+            <p>O mundo do Lineage 2 que você conhece, com combate de jogo de ação. Quem decide a luta é a sua mão, não o auto-ataque.</p>
+          </div>
+          <Doacao />
         </div>
         <div className="ikw-versus">
           <div className="ikw-versus-cab" aria-hidden="true">

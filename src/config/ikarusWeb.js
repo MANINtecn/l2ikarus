@@ -49,3 +49,11 @@ export const plataformas = [
   { id: 'celular', nome: 'No celular', itens: ['Joystick na tela para andar', 'Mira e skills no toque', 'Mesmo jogo, mesmo servidor do PC'] },
   { id: 'app', nome: 'Como app', itens: ['Instale na tela inicial do celular', 'Abre em tela cheia, como um app', 'Atualiza sozinho, sem loja'] },
 ]
+
+// Doacao livre por PIX (chave aleatoria). Preencher os tres campos para o cartao aparecer com QR.
+// nome: como esta no banco (ate 25 letras); cidade: ate 15 letras. Sem acento tudo bem.
+export const PIX_DOACAO = {
+  chave: '',
+  nome: '',
+  cidade: '',
+}
