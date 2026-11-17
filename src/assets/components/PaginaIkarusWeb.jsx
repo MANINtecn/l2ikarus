@@ -5,10 +5,10 @@ import './PaginaIkarusWeb.css'
 import { useLinksComunidade } from '../../config/linksComunidade'
 import { IconeWhatsapp, IconeDiscord } from './IconesComunidade'
 import IkoinEmblema from './IkoinEmblema'
-import { URL_JOGO, URL_STATUS_JOGO, pilares, classes, andares, progressao } from '../../config/ikarusWeb'
+import { URL_JOGO, URL_STATUS_JOGO, pilares, classes, andares, progressao, versus, galeria, plataformas } from '../../config/ikarusWeb'
 
 /**
- * Home de l2ikarus.com: o L2 Ikarus Web (hack and slash no navegador, PC e celular).
+ * Home de l2ikarus.com: o L2 Ikarus Web (MMORPG de ação sem target, no navegador, PC e celular).
  * Conta, painel do jogador (Ikoin via PIX) e painel admin sao os mesmos do site antigo;
  * aqui so' a apresentacao. Textos e enderecos em src/config/ikarusWeb.js.
  * Formas sempre angulares (chanfro/losango): nada redondo.
@@ -32,6 +32,11 @@ const ICONES = {
   combo: <path d="M3 12 H8 L11 5 L14 19 L17 12 H21" />,
   grupo: <path d="M12 3 L18 9 L12 15 L6 9 Z M4 21 L8 15 M20 21 L16 15" />,
   pvp: <path d="M5 5 L19 19 M19 5 L5 19 M3 9 L9 3 M15 21 L21 15" />,
+}
+const ICONES_PLAT = {
+  pc: <path d="M3 4 H21 V16 H3 Z M9 20 H15 M12 16 V20" />,
+  celular: <path d="M7 2 H17 V22 H7 Z M10 19 H14" />,
+  app: <path d="M12 3 V15 M7 10 L12 15 L17 10 M4 19 H20" />,
 }
 const ICONES_CLASSE = {
   guardiao: <path d="M12 2 L20 5 V12 L12 22 L4 12 V5 Z M12 7 V16" />,
@@ -85,7 +90,7 @@ export default function PaginaIkarusWeb({ jogador, admin, onEntrar, onCriarConta
     window.addEventListener('scroll', f, { passive: true })
     return () => window.removeEventListener('scroll', f)
   }, [])
-  useEffect(() => { document.title = 'L2 Ikarus — o único L2 hack and slash · IS Labs' }, [])
+  useEffect(() => { document.title = 'L2 Ikarus — o primeiro L2 sem target · IS Labs' }, [])
 
   return (
     <div className="ikw">
@@ -101,7 +106,7 @@ export default function PaginaIkarusWeb({ jogador, admin, onEntrar, onCriarConta
             <div className="sbx-jogos">
               <a className="sbx-jogo on" href="#ikw-combate" onClick={ir('ikw-combate')}>
                 <em aria-label="online" />
-                <span><b>L2 Ikarus<u className="sbx-tag-beta">Beta</u></b><small>Hack and slash web</small></span>
+                <span><b>L2 Ikarus<u className="sbx-tag-beta">Beta</u></b><small>MMORPG de ação web</small></span>
               </a>
             </div>
             <div className="sbx-acoes">
@@ -144,12 +149,13 @@ export default function PaginaIkarusWeb({ jogador, admin, onEntrar, onCriarConta
           <img src="/media/sandbox/islabs_fortaleza.webp" alt="IS Labs" width="1100" height="1100" />
         </div>
         <div className="ikw-collab-jogo">
-          <img className="ikw-collab-arte" src="/media/web/capa.webp" alt="L2 Ikarus — o único L2 hack and slash" width="1400" height="788" fetchpriority="high" />
+          <img className="ikw-collab-arte" src="/media/web/capa_logo.webp" alt="L2 Ikarus" width="1400" height="620" fetchpriority="high" />
           <div className="ikw-collab-txt">
             <p className="ikw-apresenta"><i aria-hidden="true" />IS Labs <span>×</span> L2 Ikarus</p>
+            <h1 className="ikw-chamada">O primeiro L2 <em>sem target</em></h1>
             <p className="ikw-hero-sub">
-              Ação em tempo real com a alma do Lineage 2. Esquive, bloqueie e encadeie skills contra hordas,
-              suba a <b>Torre do Baium</b> e enfrente o chefe.
+              Combate de ação de verdade: você <b>mira</b>, <b>esquiva</b> e <b>encadeia combos</b>.
+              Sem clicar e esperar. No navegador, no PC e no celular.
             </p>
             <div className="ikw-hero-acoes">
               <BotaoJogar grande />
@@ -168,12 +174,26 @@ export default function PaginaIkarusWeb({ jogador, admin, onEntrar, onCriarConta
         </div>
       </section>
 
-      {/* COMBATE */}
+      {/* SEM TARGET: o diferencial, em contraste com o L2 classico */}
       <section className="ikw-sec" id="ikw-combate">
         <div className="ikw-cab">
-          <small>Hack and slash</small>
-          <h2>Ação de verdade, <em>com a alma do L2</em></h2>
-          <p>O mundo que você conhece, agora com combate de jogo de ação. Rápido, na mira e decidido na habilidade.</p>
+          <small>Sem target</small>
+          <h2>Você não clica no alvo. <em>Você mira.</em></h2>
+          <p>O mundo do Lineage 2 que você conhece, com combate de jogo de ação. Quem decide a luta é a sua mão, não o auto-ataque.</p>
+        </div>
+        <div className="ikw-versus">
+          <div className="ikw-versus-cab" aria-hidden="true">
+            <span />
+            <b className="classico">L2 clássico</b>
+            <b className="ikarus">L2 Ikarus</b>
+          </div>
+          {versus.map(([tema, antes, agora]) => (
+            <div className="ikw-versus-linha" key={tema}>
+              <span className="tema">{tema}</span>
+              <p className="classico"><small>L2 clássico</small>{antes}</p>
+              <p className="ikarus"><small>L2 Ikarus</small>{agora}</p>
+            </div>
+          ))}
         </div>
         <div className="ikw-pilares">
           {pilares.map((p) => (
@@ -181,6 +201,41 @@ export default function PaginaIkarusWeb({ jogador, admin, onEntrar, onCriarConta
               <Icone d={ICONES[p.id]} />
               <h3>{p.titulo}</h3>
               <p>{p.texto}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      {/* VEJA O JOGO: imagens reais da versao beta */}
+      <section className="ikw-sec ikw-galeria-sec" id="ikw-galeria">
+        <div className="ikw-cab">
+          <small>Imagens reais · versão beta</small>
+          <h2>Veja o jogo</h2>
+          <p>Capturas do jogo rodando no navegador. Vídeos de gameplay no PC e no celular chegando.</p>
+        </div>
+        <div className="ikw-galeria">
+          {galeria.map((g) => (
+            <figure key={g.src}>
+              <img src={g.src} alt={g.legenda} loading="lazy" width="1200" height="700" />
+              <figcaption>{g.legenda}</figcaption>
+            </figure>
+          ))}
+        </div>
+      </section>
+
+      {/* PC E CELULAR */}
+      <section className="ikw-sec" id="ikw-plataformas">
+        <div className="ikw-cab">
+          <small>Jogue onde quiser</small>
+          <h2>PC e celular, <em>o mesmo jogo</em></h2>
+          <p>Por ser no navegador, não tem cliente para baixar. Abriu, jogou.</p>
+        </div>
+        <div className="ikw-plataformas">
+          {plataformas.map((x) => (
+            <article key={x.id} className="ikw-plat">
+              <div className="ikw-plat-ico"><Icone d={ICONES_PLAT[x.id]} /></div>
+              <h3>{x.nome}</h3>
+              <ul>{x.itens.map((i) => <li key={i}>{i}</li>)}</ul>
             </article>
           ))}
         </div>
@@ -288,7 +343,7 @@ export default function PaginaIkarusWeb({ jogador, admin, onEntrar, onCriarConta
 
       {/* celular: jogar sempre a um toque */}
       <div className="ikw-barra-jogar">
-        <span><b>L2 Ikarus</b><small>Hack and slash no navegador</small></span>
+        <span><b>L2 Ikarus</b><small>O L2 sem target, no navegador</small></span>
         <BotaoJogar />
       </div>
 

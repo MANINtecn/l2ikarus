@@ -8,7 +8,7 @@ export const pilares = [
   { id: 'esquiva', titulo: 'Esquive e bloqueie', texto: 'Nada de clicar e esperar. Você desvia, bloqueia e contra-ataca em tempo real.' },
   { id: 'combo', titulo: 'Encadeie combos', texto: 'Skills que se ligam umas nas outras. Quem sabe combar decide a luta.' },
   { id: 'grupo', titulo: 'Party e dungeons', texto: 'Monte o grupo, entre na dungeon e limpe as hordas juntos.' },
-  { id: 'pvp', titulo: 'PvP na mira', texto: 'Combate rápido e na mira. Stun curto: vence quem joga melhor.' },
+  { id: 'pvp', titulo: 'PvP na mira', texto: 'Sem target travado: no PvP, quem mira e esquiva melhor vence.' },
 ]
 
 export const classes = [
@@ -29,4 +29,23 @@ export const progressao = [
   { valor: '5', rotulo: 'pontos por nível' },
   { valor: '4', rotulo: 'atributos: FOR, INT, AGI, VIT' },
   { valor: 'Grátis', rotulo: 'reset de pontos, sempre' },
+]
+
+// L2 classico x L2 Ikarus: [tema, classico, ikarus]
+export const versus = [
+  ['Ataque', 'Clica no alvo e espera o personagem bater.', 'Você mira e acerta onde apontar. Errou a mira, errou o golpe.'],
+  ['Defesa', 'Fica parado tomando dano.', 'Esquiva e bloqueio no tempo certo. Saber sair do golpe faz parte.'],
+  ['Skills', 'Fila de comandos, uma de cada vez.', 'Combos que se encadeiam. Quem sabe combar vence.'],
+  ['Onde jogar', 'Só no PC, com cliente pesado.', 'No navegador, no PC e no celular. Sem download.'],
+]
+
+export const galeria = [
+  { src: '/media/web/jogo_baium.webp', legenda: 'Na mira do gigante: o retículo no centro da tela é a sua mira.' },
+  { src: '/media/web/jogo_combo.webp', legenda: 'Combo encadeado: dano, efeito da skill e contador de combo.' },
+]
+
+export const plataformas = [
+  { id: 'pc', nome: 'No PC', itens: ['Mouse para mirar', 'Teclado para andar, esquivar e soltar skills', 'Roda no navegador, sem instalar nada'] },
+  { id: 'celular', nome: 'No celular', itens: ['Joystick na tela para andar', 'Mira e skills no toque', 'Mesmo jogo, mesmo servidor do PC'] },
+  { id: 'app', nome: 'Como app', itens: ['Instale na tela inicial do celular', 'Abre em tela cheia, como um app', 'Atualiza sozinho, sem loja'] },
 ]

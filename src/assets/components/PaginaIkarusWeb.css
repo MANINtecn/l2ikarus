@@ -35,20 +35,19 @@
 
 .ikw-jogar {
   display: inline-flex; align-items: center; gap: 0.8rem;
-  font: 800 0.95rem/1 'Outfit', sans-serif; letter-spacing: 3px; text-transform: uppercase; text-decoration: none;
-  color: #fff; padding: 1rem 1.8rem;
-  background: linear-gradient(100deg, #1e56c8, #3b82f6 55%, #6fb6ff);
-  clip-path: polygon(16px 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%, 0 16px);
-  filter: drop-shadow(0 0 18px rgba(59, 130, 246, 0.55));
+  font: 800 0.92rem/1 'Outfit', sans-serif; letter-spacing: 3px; text-transform: uppercase; text-decoration: none;
+  color: #0b1220; padding: 1rem 1.8rem; position: relative; overflow: hidden;
+  background: linear-gradient(180deg, #ffffff 0%, #e3e9f3 30%, #a9b4c7 55%, #d6dde8 75%, #f4f7fb 100%);
+  clip-path: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px);
+  filter: drop-shadow(0 0 10px rgba(79, 141, 255, .55)) drop-shadow(0 6px 18px rgba(30, 80, 200, .35));
   transition: filter .25s, transform .25s;
-  position: relative;
 }
-.ikw-jogar svg { width: 1.1em; height: 1.1em; fill: currentColor; }
-.ikw-jogar:hover { filter: drop-shadow(0 0 30px rgba(110, 180, 255, 0.85)) brightness(1.1); transform: translateY(-2px); }
-.ikw-jogar.grande { font-size: 1.1rem; padding: 1.25rem 2.6rem; }
+.ikw-jogar svg { width: .95em; height: .95em; fill: currentColor; }
+.ikw-jogar:hover { filter: drop-shadow(0 0 18px rgba(110, 170, 255, .9)) drop-shadow(0 8px 22px rgba(30, 80, 200, .45)); transform: translateY(-2px); }
+.ikw-jogar.grande { font-size: 1.02rem; padding: 1.2rem 2.4rem; }
 .ikw-jogar::after { /* faixa de luz que corre pelo botao */
   content: ''; position: absolute; inset: 0;
-  background: linear-gradient(100deg, transparent 30%, rgba(255,255,255,.35) 50%, transparent 70%);
+  background: linear-gradient(100deg, transparent 30%, rgba(255,255,255,.75) 50%, transparent 70%);
   transform: translateX(-120%); animation: ikw-varre 3.6s ease-in-out infinite;
 }
 @keyframes ikw-varre { 0%, 55% { transform: translateX(-120%); } 85%, 100% { transform: translateX(120%); } }
@@ -332,4 +331,65 @@
   .ikw-collab-txt { margin-top: -.6rem; padding: 0 1rem; }
   .ikw-collab-txt .ikw-hero-acoes { flex-direction: column; align-items: stretch; }
   .ikw-collab-txt .ikw-hero-acoes > * { justify-content: center; }
+}
+
+/* ══ chamada principal ══ */
+.ikw-chamada {
+  font: 900 clamp(2rem, 4.4vw, 3.6rem)/1.05 'Cinzel', serif !important; letter-spacing: .02em; margin: 0 0 1rem;
+  background: linear-gradient(180deg, #ffffff 0%, #e3e9f3 35%, #99a5ba 58%, #e9eef6 82%, #ffffff 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent !important;
+  filter: drop-shadow(0 0 18px rgba(79, 141, 255, .35)) drop-shadow(0 2px 1px rgba(0, 0, 0, .8));
+  text-wrap: balance;
+}
+.ikw-chamada em {
+  font-style: normal; display: inline-block;
+  background: linear-gradient(180deg, #e2edff 0%, #8fb6ff 45%, #3b82f6 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.ikw-collab-txt .ikw-hero-sub b { color: #fff; }
+
+/* ══ L2 classico x L2 Ikarus ══ */
+.ikw-versus { margin-bottom: 2.5rem; box-shadow: inset 0 0 0 1px var(--ik-linha); }
+.ikw-versus-cab, .ikw-versus-linha { display: grid; grid-template-columns: 160px 1fr 1fr; }
+.ikw-versus-cab b { padding: 1rem 1.4rem; font: 700 .78rem 'Outfit', sans-serif; letter-spacing: 2.5px; text-transform: uppercase; }
+.ikw-versus-cab .classico { color: var(--ik-mudo); }
+.ikw-versus-cab .ikarus { color: #fff; background: linear-gradient(90deg, rgba(59,130,246,.22), rgba(59,130,246,.06)); box-shadow: inset 2px 0 0 var(--ik-azul2); }
+.ikw-versus-linha { border-top: 1px solid var(--ik-linha); }
+.ikw-versus-linha .tema { padding: 1.2rem 1.4rem; font: 700 .95rem 'Cinzel', serif; color: var(--ik-prata); }
+.ikw-versus-linha p { padding: 1.2rem 1.4rem; font-size: .92rem; line-height: 1.5; }
+.ikw-versus-linha p small { display: none; }
+.ikw-versus-linha .classico { color: var(--ik-mudo); text-decoration: line-through; text-decoration-color: rgba(125,136,158,.45); }
+.ikw-versus-linha .ikarus { color: #e8eef8; background: linear-gradient(90deg, rgba(59,130,246,.12), rgba(59,130,246,.03)); box-shadow: inset 2px 0 0 var(--ik-azul2); }
+
+/* ══ galeria ══ */
+.ikw-galeria { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.ikw-galeria figure { margin: 0; }
+.ikw-galeria img {
+  display: block; width: 100%; height: auto; aspect-ratio: 12 / 7; object-fit: cover;
+  clip-path: var(--ik-chanfro); box-shadow: inset 0 0 0 1px var(--ik-linha);
+}
+.ikw-galeria figcaption { font-size: .82rem; color: var(--ik-mudo); margin-top: .6rem; }
+
+/* ══ PC e celular ══ */
+.ikw-plataformas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+.ikw-plat { padding: 1.8rem 1.6rem; background: linear-gradient(180deg, var(--ik-card), var(--ik-bg)); clip-path: var(--ik-chanfro); box-shadow: inset 0 0 0 1px var(--ik-linha); }
+.ikw-plat-ico { width: 50px; height: 50px; display: grid; place-items: center; margin-bottom: 1.1rem; background: rgba(59,130,246,.1); clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
+.ikw-plat-ico svg { width: 24px; height: 24px; color: var(--ik-azul2); }
+.ikw-plat h3 { font-size: 1.25rem; margin-bottom: .8rem; }
+.ikw-plat ul { list-style: none; display: grid; gap: .5rem; }
+.ikw-plat li { display: flex; gap: .65rem; align-items: baseline; font-size: .9rem; color: var(--ik-texto); }
+.ikw-plat li::before { content: ''; flex: none; width: 6px; height: 6px; background: var(--ik-azul2); transform: rotate(45deg) translateY(-1px); }
+
+@media (max-width: 900px) {
+  .ikw-plataformas { grid-template-columns: 1fr; }
+}
+@media (max-width: 700px) {
+  .ikw-versus-cab { display: none; }
+  .ikw-versus-linha { grid-template-columns: 1fr 1fr; }
+  .ikw-versus-linha .tema { grid-column: 1 / -1; padding: 1rem 1rem .2rem; }
+  .ikw-versus-linha p { padding: .6rem 1rem 1rem; font-size: .85rem; }
+  .ikw-versus-linha p small { display: block; font-size: .62rem; letter-spacing: 2px; text-transform: uppercase; margin-bottom: .3rem; text-decoration: none; }
+  .ikw-versus-linha .ikarus small { color: var(--ik-azul2); }
+  .ikw-versus-linha .classico { text-decoration: none; opacity: .75; }
+  .ikw-galeria { grid-template-columns: 1fr; }
 }
